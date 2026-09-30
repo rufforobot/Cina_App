@@ -54,7 +54,10 @@ header {
 }
 .brand h1 { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: -0.4px; }
 .brand small { color: var(--muted); display: block; margin-top: 2px; font-size: 12px;}
-.header-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.header-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; align-items: center;}
+
+/* Clocks */
+.clocks { display: flex; gap: 10px; font-size: 12px; font-weight: 600; color: var(--text); background: var(--surface-2); padding: 6px 12px; border-radius: 12px; }
 
 /* Bottoni Stile iOS */
 .icon-btn, .btn {
@@ -184,6 +187,12 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
 .expense-form input, .expense-form select { border:none; background:var(--surface-2); color:var(--text); border-radius:12px; padding:12px; outline:none; }
 .expense-list { margin-top:16px; display:grid; gap:0; }
 .expense-row { display:flex; justify-content:space-between; align-items: center; padding:12px 0; border-bottom:0.5px solid var(--border); font-size:15px; }
+
+/* Quick Apps */
+.quick-apps { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+.quick-apps a { padding: 14px; border-radius: 16px; font-size: 16px; font-weight: 700; text-align: center; color: white; display: flex; align-items: center; justify-content: center; gap: 8px;}
+.app-alipay { background: #1677FF; }
+.app-wechat { background: #07C160; }
 </style>
 </head>
 <body>
@@ -198,7 +207,11 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
       </div>
     </div>
     <div class="header-actions">
-      <button class="btn small ghost hide-mobile" id="exportBtn">Backup JSON</button>
+      <!-- Doppio Orologio -->
+      <div class="clocks">
+        <span id="clockChina">🇨🇳 --:--</span>
+        <span id="clockItaly">🇮🇹 --:--</span>
+      </div>
     </div>
   </div>
 </header>
@@ -207,7 +220,7 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
   <section class="hero">
     <div class="hero-card">
       <h2>La Cina, <br>giorno per giorno.</h2>
-      <p>La tua dashboard personale e archivio di viaggio. Segui l'itinerario, non perdere le prenotazioni critiche, scatta foto nel diario e ascolta le audioguide generate per te.</p>
+      <p>La tua dashboard personale. Segui l'itinerario, spunta le tappe, scatta foto nel diario e ascolta le audioguide offline.</p>
       <div class="hero-route" id="heroRoute"></div>
     </div>
     <div class="hero-card countdown">
@@ -228,7 +241,7 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
     <button class="tab" data-view="itinerary">Itinerario & Diario</button>
     <button class="tab" data-view="companion">Audioguida</button>
     <button class="tab" data-view="wallet">Wallet</button>
-    <button class="tab" data-view="useful">Spese & Strumenti</button>
+    <button class="tab" data-view="useful">Spese & Utili</button>
   </div>
 
   <!-- DASHBOARD -->
@@ -242,7 +255,7 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
     </div>
     <div class="city-grid" id="bookingAlertsGrid" style="margin-bottom: 24px;"></div>
 
-    <div class="section-title"><div><h3>Le Tappe</h3><p>Accedi rapidamente ai giorni del viaggio.</p></div></div>
+    <div class="section-title"><div><h3>Le Tappe</h3><p>Accedi rapidamente ai giorni del viaggio e alle Taxi Card.</p></div></div>
     <div class="city-grid" id="cityGrid"></div>
   </section>
 
@@ -254,7 +267,7 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
 
   <!-- AUDIOGUIDA -->
   <section id="companion" class="view">
-    <div class="section-title"><div><h3>Il tuo Cicerone Digitale</h3><p>Storia, cultura e consigli. Leggili o ascoltali mentre cammini.</p></div></div>
+    <div class="section-title"><div><h3>Il tuo Cicerone Digitale</h3><p>Storia, cultura e consigli. Ascolta la voce di sistema offline.</p></div></div>
     <div class="companion-grid" id="companionGrid"></div>
   </section>
 
@@ -266,10 +279,38 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
 
   <!-- USEFUL & EXPENSES -->
   <section id="useful" class="view">
+
+    <!-- BOTTONI SALTA-FILA -->
+    <div class="section-title"><div><h3>📱 Pagamenti Rapidi</h3><p>Apri le app cinesi con un tocco.</p></div></div>
+    <div class="quick-apps" style="margin-bottom: 24px;">
+      <a href="alipay://" class="app-alipay">💳 Apri Alipay</a>
+      <a href="weixin://" class="app-wechat">💬 Apri WeChat</a>
+    </div>
+    
+    <div class="section-title"><div><h3>💱 Convertitore Rapido</h3><p>Calcolo istantaneo offline.</p></div></div>
+    <div class="utility-card" style="margin-bottom: 24px;">
+      <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: center;">
+        <div>
+          <label style="font-size: 13px; color: var(--muted); font-weight: 600; display: block; margin-bottom: 8px; text-align: center;">Yuan (¥)</label>
+          <input type="number" id="convYuan" inputmode="decimal" placeholder="0" style="width: 100%; border: none; background: var(--surface-2); color: var(--text); border-radius: 14px; padding: 16px 12px; font-size: 22px; font-weight: 700; text-align: center; outline: none;">
+        </div>
+        <div style="font-size: 28px; color: var(--muted); font-weight: bold; margin-top: 24px;">⇄</div>
+        <div>
+          <label style="font-size: 13px; color: var(--muted); font-weight: 600; display: block; margin-bottom: 8px; text-align: center;">Euro (€)</label>
+          <input type="number" id="convEuro" inputmode="decimal" placeholder="0" style="width: 100%; border: none; background: var(--surface-2); color: var(--text); border-radius: 14px; padding: 16px 12px; font-size: 22px; font-weight: 700; text-align: center; outline: none;">
+        </div>
+      </div>
+    </div>
+
+    <!-- SPESE SENZA LIMITE, CON CONTATORE "OGGI" -->
     <div class="section-title"><div><h3>💶 Gestione Budget</h3><p>Tasso di cambio stimato: 1€ = 7.70¥</p></div></div>
     <div class="expense-card" style="margin-bottom: 24px;">
       <div style="display:flex; justify-content:space-between; align-items:start;">
-        <div><div class="companion-meta">Totale Speso</div><div class="expense-total" id="expenseTotal">€0,00</div></div>
+        <div>
+          <div class="companion-meta">Totale Viaggio</div>
+          <div class="expense-total" id="expenseTotal">€0,00</div>
+          <div style="margin-top: 6px; font-size: 15px; font-weight: 600; color: var(--accent-2);" id="expenseToday">Oggi: €0,00</div>
+        </div>
       </div>
       <div class="expense-form">
         <input id="expenseDesc" placeholder="Cos'hai comprato?"/>
@@ -280,20 +321,16 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
       <div class="expense-list" id="expenseList"></div>
     </div>
 
-    <div class="section-title"><div><h3>📷 Traduttore Visivo & Strumenti</h3><p>Strumenti veloci per la sopravvivenza in Cina.</p></div></div>
+    <div class="section-title"><div><h3>🧰 Strumenti di Sopravvivenza</h3><p>Utility veloci e offline.</p></div></div>
     <div class="city-grid">
-      <!-- Mappe Apple -->
       <div class="utility-card" style="border: 1px solid var(--border);">
         <h4 style="margin:0; font-size:18px;">🧭 Navigazione Apple Maps</h4>
-        <p style="margin: 8px 0; font-size:14px; color:var(--muted);">In Cina Google Maps non funziona bene. Tutti i bottoni della dashboard usano Apple Maps (che si appoggia a dati locali perfetti).</p>
+        <p style="margin: 8px 0; font-size:14px; color:var(--muted);">Tutti i bottoni Mappa usano Apple Maps, che in Cina si appoggia ai precisi dati locali di Amap aggirando i blocchi.</p>
       </div>
-      <!-- Traduttore AR -->
       <div class="utility-card" style="border: 1px solid var(--border);">
         <h4 style="margin:0; font-size:18px;">🈯️ OCR Live Text (iOS)</h4>
-        <p style="margin: 8px 0; font-size:14px; color:var(--muted);">Apri la fotocamera, inquadra i caratteri cinesi su un menu e premi l'icona "Testo" gialla in basso a destra su iPhone per tradurre al volo.</p>
-        <a class="btn small primary" style="width:100%; margin-top: 8px;" href="https://fanyi.baidu.com/" target="_blank">🌐 Apri Baidu Translate</a>
+        <p style="margin: 8px 0; font-size:14px; color:var(--muted);">Usa l'app <strong>Fotocamera</strong> nativa, inquadra i caratteri cinesi e premi l'icona gialla in basso a destra per tradurre al volo offline.</p>
       </div>
-      <!-- Emergenze -->
       <div class="utility-card" style="border: 1px solid var(--border);">
         <h4 style="margin:0; font-size:18px;">🚨 Numeri Utili</h4>
         <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center; margin-top: 12px;">
@@ -309,21 +346,13 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
 
 <!-- Bottom Nav -->
 <nav class="bottom-nav" id="bottomNav">
-  <button class="active" data-view="dashboard">
-    <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Home
-  </button>
-  <button data-view="itinerary">
-    <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>Diario
-  </button>
-  <button data-view="companion">
-    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>Guida
-  </button>
-  <button data-view="useful">
-    <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>Spese
-  </button>
+  <button class="active" data-view="dashboard"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Home</button>
+  <button data-view="itinerary"><svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>Diario</button>
+  <button data-view="companion"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>Guida</button>
+  <button data-view="useful"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>Utili</button>
 </nav>
 
-<!-- Modale Base -->
+<!-- Modale Base (Usata anche per le Taxi Card) -->
 <div class="modal" id="modal">
   <div class="modal-card">
     <div class="modal-head"><strong id="modalTitle">Titolo</strong><button class="btn small" id="closeModal">Chiudi</button></div>
@@ -332,16 +361,18 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
 </div>
 
 <script>
-/* Dati del viaggio */
+const exchangeRateVal = 7.70;
+
+/* Dati del viaggio con traduzioni cinesi degli Hotel per la Taxi Card */
 const trip = {
   start: '2026-10-16', end: '2026-11-01',
   cities: [
-    {name:'Shanghai', dates:'17–21 ottobre', days:[2,3,4,5], hotel:'HanTing Hotel The Bund'},
-    {name:'Zhangjiajie', dates:'21–23 ottobre', days:[6,7,8], hotel:'Zhangjiajie Junlan Hotel'},
-    {name:'Chongqing', dates:'23–25 ottobre', days:[8,9,10], hotel:'S·island River View Hotel'},
-    {name:'Chengdu', dates:'25–27 ottobre', days:[10,11,12], hotel:'Crescent Moon Hotel'},
-    {name:"Xi'an", dates:'27–29 ottobre', days:[12,13,14], hotel:'Country Inn & Suites'},
-    {name:'Pechino', dates:'29 ott–1 nov', days:[14,15,16,17], hotel:'City Line WangFuJing'}
+    {name:'Shanghai', dates:'17–21 ottobre', days:[2,3,4,5], hotel:'HanTing Hotel The Bund', hotelZh:'汉庭酒店(上海外滩豫园店)'},
+    {name:'Zhangjiajie', dates:'21–23 ottobre', days:[6,7,8], hotel:'Zhangjiajie Junlan Hotel', hotelZh:'张家界君澜酒店'},
+    {name:'Chongqing', dates:'23–25 ottobre', days:[8,9,10], hotel:'S·island River View Hotel', hotelZh:'重庆S·island高空江景酒店'},
+    {name:'Chengdu', dates:'25–27 ottobre', days:[10,11,12], hotel:'Crescent Moon Hotel', hotelZh:'成都弦月酒店'},
+    {name:"Xi'an", dates:'27–29 ottobre', days:[12,13,14], hotel:'Country Inn & Suites', hotelZh:'丽柏酒店(西安钟鼓楼大差市站店)'},
+    {name:'Pechino', dates:'29 ott–1 nov', days:[14,15,16,17], hotel:'City Line WangFuJing', hotelZh:'城线酒店(北京王府井店)'}
   ],
   days: [
     {day:1,date:'16/10',dow:'venerdì',city:'In viaggio',title:'Milano → Abu Dhabi → Shanghai', stops:[['11:40','Partenza da MXP','Etihad EY82'],['21:15','Scalo ad AUH e ripartenza','EY866']]},
@@ -380,9 +411,19 @@ const reservations = [
   {id:'panda',type:'🎟️ Attrazione',title:'Chengdu Panda Base',date:'26/10',status:'🟡 Da prenotare',ref:'Apertura 19/10'},
   {id:'tianmen',type:'🎟️ Attrazione',title:'Tianmen Shan',date:'23/10',status:'🟡 Da prenotare',ref:'Apertura 18/10'},
   {id:'terracotta',type:'🎟️ Attrazione',title:'Esercito Terracotta',date:'28/10',status:'🟡 Da prenotare',ref:'Apertura 21/10'},
-  {id:'forbidden',type:'🎟️ Attrazione',title:'Città Proibita',date:'30/10',status:'🟡 Da prenotare',ref:'Finestra 23/10 (ore 14:00 IT)'},
+  {id:'forbidden',type:'🎟 Attrazione',title:'Città Proibita',date:'30/10',status:'🟡 Da prenotare',ref:'Finestra 23/10 (ore 14:00 IT)'},
   {id:'tiananmen',type:'🎟️ Prenotazione',title:'Piazza Tienanmen',date:'30/10',status:'🟡 Da prenotare',ref:'Tramite WeChat (Apertura 21/10)'}
 ];
+
+// Orologi Dual-Time
+function updateClocks() {
+  const now = new Date();
+  const opt = { hour: '2-digit', minute: '2-digit', hour12: false };
+  document.getElementById('clockChina').textContent = '🇨🇳 ' + now.toLocaleTimeString('it-IT', { ...opt, timeZone: 'Asia/Shanghai' });
+  document.getElementById('clockItaly').textContent = '🇮🇹 ' + now.toLocaleTimeString('it-IT', { ...opt, timeZone: 'Europe/Rome' });
+}
+setInterval(updateClocks, 1000);
+updateClocks();
 
 // Apple Maps Link Builder
 function appleMaps(query){ return `https://maps.apple.com/?q=${encodeURIComponent(query)}`; }
@@ -399,7 +440,7 @@ function saveState() {
   catch(e) { alert("Memoria del browser piena! Prova a svuotare le vecchie foto."); }
 }
 
-// 1. Alert Prenotazioni Dinamico
+// Alert Prenotazioni Dinamico
 function renderBookingAlerts() {
   const wrap = document.getElementById('bookingAlertsGrid');
   const title = document.getElementById('bookingAlertsTitle');
@@ -418,20 +459,20 @@ function renderBookingAlerts() {
   } else { title.style.display = 'none'; }
 }
 
-// 2. Diario Fotografico compresso al volo
+// Diario Fotografico compresso
 function processPhoto(file, dayId) {
   const reader = new FileReader();
   reader.onload = (e) => {
     const img = new Image();
     img.onload = () => {
       const canvas = document.createElement('canvas');
-      const MAX_WIDTH = 800; // Riduce risoluzione per salvare spazio
+      const MAX_WIDTH = 800;
       const scaleSize = MAX_WIDTH / img.width;
       canvas.width = MAX_WIDTH;
       canvas.height = img.height * scaleSize;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.6); // Qualità 60%
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
       
       state.photos = state.photos || {}; state.photos[dayId] = state.photos[dayId] || [];
       state.photos[dayId].push(dataUrl);
@@ -442,18 +483,41 @@ function processPhoto(file, dayId) {
   reader.readAsDataURL(file);
 }
 
-// 3. Spese Unificate
+// Taxi Card Function
+function showTaxiCard(chineseText) {
+  document.getElementById('modalTitle').textContent = `Mostra all'autista`;
+  document.getElementById('modalBody').innerHTML = `
+    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:40vh; text-align:center;">
+      <div style="font-size: 60px; margin-bottom: 20px;">🚕</div>
+      <div style="font-size: 32px; font-weight: 800; line-height: 1.4; color: var(--text);">${chineseText}</div>
+      <p style="margin-top: 20px; font-size: 16px; color: var(--muted);">Prego, mi porti a questo indirizzo.</p>
+    </div>
+  `;
+  document.getElementById('modal').classList.add('open');
+}
+
+// Spese e Convertitore
 function renderExpenses() {
   const wrap = document.getElementById('expenseList'); wrap.innerHTML = '';
+  
+  // Calcolo totale
   const euro = state.expenses.filter(x=>x.currency==='€').reduce((a,x)=>a+Number(x.amount),0); 
   const yuan = state.expenses.filter(x=>x.currency==='¥').reduce((a,x)=>a+Number(x.amount),0); 
-  const exchangeRate = 7.70; 
-  const totalInEuro = euro + (yuan / exchangeRate);
+  const totalInEuro = euro + (yuan / exchangeRateVal);
 
-  document.getElementById('expenseTotal').innerHTML = `€${totalInEuro.toFixed(2).replace('.',',')} <br><span style="font-size: 14px; font-weight: 500; color: var(--muted); letter-spacing: 0;">(Spesi €${euro.toFixed(0)} | ¥${yuan.toFixed(0)})</span>`;
+  // Calcolo di Oggi (filtra le spese registrate nel giorno corrente del viaggio)
+  const currentDay = trip.days[tripDayIndex()].day;
+  const todayExpenses = state.expenses.filter(x => x.day === currentDay);
+  const todayEuro = todayExpenses.filter(x=>x.currency==='€').reduce((a,x)=>a+Number(x.amount),0); 
+  const todayYuan = todayExpenses.filter(x=>x.currency==='¥').reduce((a,x)=>a+Number(x.amount),0);
+  const todayTotalInEuro = todayEuro + (todayYuan / exchangeRateVal);
+
+  document.getElementById('expenseTotal').innerHTML = `€${totalInEuro.toFixed(2).replace('.',',')} <span style="font-size: 14px; font-weight: 500; color: var(--muted);">(Totale)</span>`;
+  document.getElementById('expenseToday').innerHTML = `Spese di Oggi: €${todayTotalInEuro.toFixed(2).replace('.',',')}`;
+
   state.expenses.slice().reverse().forEach((x) => { 
     const row = document.createElement('div'); row.className = 'expense-row'; 
-    row.innerHTML = `<span>${x.desc}</span><strong>${Number(x.amount).toFixed(2)} ${x.currency}</strong>`; 
+    row.innerHTML = `<span>${x.desc} <span style="color:var(--muted); font-size:12px;">(Giorno ${x.day})</span></span><strong>${Number(x.amount).toFixed(2)} ${x.currency}</strong>`; 
     wrap.appendChild(row); 
   });
 }
@@ -463,13 +527,35 @@ document.getElementById('addExpense').addEventListener('click', () => {
   const amount = parseFloat(document.getElementById('expenseAmount').value.replace(',','.')); 
   const currency = document.getElementById('expenseCurrency').value;
   if(!desc || !Number.isFinite(amount)) return;
-  state.expenses.push({desc, amount, currency});
+  state.expenses.push({desc, amount, currency, day: trip.days[tripDayIndex()].day});
   document.getElementById('expenseDesc').value = ''; document.getElementById('expenseAmount').value = ''; 
   saveState(); renderExpenses();
 });
 
+// Logica Convertitore
+const inputYuan = document.getElementById('convYuan');
+const inputEuro = document.getElementById('convEuro');
+if(inputYuan && inputEuro) {
+  inputYuan.addEventListener('input', (e) => {
+    const val = parseFloat(e.target.value.replace(',', '.'));
+    if (isNaN(val)) { inputEuro.value = ''; return; }
+    inputEuro.value = (val / exchangeRateVal).toFixed(2);
+  });
+  inputEuro.addEventListener('input', (e) => {
+    const val = parseFloat(e.target.value.replace(',', '.'));
+    if (isNaN(val)) { inputYuan.value = ''; return; }
+    inputYuan.value = (val * exchangeRateVal).toFixed(2);
+  });
+}
 
-// Core UI Functions
+function tripDayIndex(){
+  const now = new Date(); now.setHours(0,0,0,0);
+  const dates = trip.days.map(d=>new Date(`2026-${d.date.slice(3,5)}-${d.date.slice(0,2)}`));
+  let idx = dates.findIndex(x=>x.toDateString()===now.toDateString());
+  if(idx<0) idx = dates.findIndex(x=>x>now);
+  return idx<0 ? dates.length-1 : idx;
+}
+
 function updateCountdown(){
   const start=new Date('2026-10-16T00:00:00'); const end=new Date('2026-11-02T06:30:00'); const now=new Date();
   const el=document.getElementById('countdownValue'); const label=document.getElementById('countdownLabel');
@@ -491,8 +577,10 @@ function renderCities(){
     const card = document.createElement('div'); card.className = 'city-card';
     card.innerHTML = `<div class="city-card-top"><div><div class="city-name">${city.name}</div><div class="city-dates">${city.dates}</div></div></div>
       <div class="city-dates" style="margin-top:10px">Hotel: <strong>${city.hotel}</strong></div>
-      <div class="city-actions"><button class="btn small primary" onclick="setView('itinerary'); setTimeout(()=>document.getElementById('day-${city.days[0]}').scrollIntoView({behavior:'smooth',block:'start'}), 50);">Vedi Itinerario</button>
-      <a class="btn small" href="${appleMaps(city.name + ', China')}">Mappa</a></div>`;
+      <div class="city-actions">
+        <button class="btn small primary" onclick="setView('itinerary'); setTimeout(()=>document.getElementById('day-${city.days[0]}').scrollIntoView({behavior:'smooth',block:'start'}), 50);">Itinerario</button>
+        <button class="btn small" onclick="showTaxiCard('${city.hotelZh}')">🚕 Taxi Card</button>
+      </div>`;
     wrap.appendChild(card);
   });
 }
@@ -524,33 +612,41 @@ function renderDay(day, target){
     timeline.appendChild(row);
   });
 
-  // Gestione foto
   section.querySelector(`input[data-day="${day.day}"]`).addEventListener('change', e => {
     if(e.target.files && e.target.files[0]) processPhoto(e.target.files[0], day.day);
   });
   
-  // Render foto salvate
   const gallery = section.querySelector(`#gallery-${day.day}`);
   if(state.photos && state.photos[day.day]) {
     state.photos[day.day].forEach(src => {
       const img = document.createElement('img'); img.src = src; gallery.appendChild(img);
     });
   }
-  
   target.appendChild(section);
 }
 
 function renderItinerary(){ const wrap = document.getElementById('fullItinerary'); wrap.innerHTML=''; trip.days.forEach(d=>renderDay(d,wrap)); }
 
+// Audioguida (Offline)
 function renderCompanion(){
-  const wrap = document.getElementById('companionGrid'); wrap.innerHTML = '';
+  const wrap = document.getElementById('companionGrid'); 
+  wrap.innerHTML = '';
+  
+  let availableVoices = [];
+  window.speechSynthesis.onvoiceschanged = () => {
+    availableVoices = window.speechSynthesis.getVoices();
+  };
+  
   trip.companion.forEach((c) => {
-    const card = document.createElement('div'); card.className = 'companion-card';
-    card.innerHTML = `<div class="city-name">${c.title}</div><div class="companion-meta" style="margin-top:6px;">${c.city}</div>
-      <div class="chip-row">${c.tags.map(t=>`<span class="chip">${t}</span>`).join('')}</div><p>${c.intro}</p>
+    const card = document.createElement('div'); 
+    card.className = 'companion-card';
+    card.innerHTML = `<div class="city-name">${c.title}</div>
+      <div class="companion-meta" style="margin-top:6px;">${c.city}</div>
+      <div class="chip-row">${c.tags.map(t=>`<span class="chip">${t}</span>`).join('')}</div>
+      <p>${c.intro}</p>
       <div style="display:flex; gap:10px; margin-top:16px;">
         <button class="btn small primary read-btn">📖 Leggi</button>
-        <button class="btn small ghost listen-btn">🔊 Ascolta TTS</button>
+        <button class="btn small ghost listen-btn">🔊 Ascolta la Guida</button>
       </div>`;
     
     card.querySelector('.read-btn').addEventListener('click', () => {
@@ -561,15 +657,25 @@ function renderCompanion(){
     
     card.querySelector('.listen-btn').addEventListener('click', (e) => {
       const btn = e.target;
-      if('speechSynthesis' in window){
-        if (speechSynthesis.speaking) { speechSynthesis.cancel(); btn.textContent = '🔊 Ascolta TTS'; } 
-        else {
+      if('speechSynthesis' in window) {
+        if (speechSynthesis.speaking) { 
+          speechSynthesis.cancel(); 
+          btn.textContent = '🔊 Ascolta la Guida'; 
+        } else {
           const fullText = c.intro + ". " + c.body.map(b => b[0] + ". " + b[1]).join(". ");
-          const u = new SpeechSynthesisUtterance(fullText); u.lang = 'it-IT'; u.rate = 1.0;
-          btn.textContent = '⏹️ Ferma'; u.onend = () => btn.textContent = '🔊 Ascolta TTS';
+          const u = new SpeechSynthesisUtterance(fullText); 
+          u.lang = 'it-IT'; u.rate = 0.95; 
+          
+          availableVoices = window.speechSynthesis.getVoices();
+          const itVoices = availableVoices.filter(v => v.lang.startsWith('it'));
+          const premiumVoice = itVoices.find(v => v.name.includes('Siri') || v.name.includes('Premium') || v.name.includes('Migliorata'));
+          if (premiumVoice) u.voice = premiumVoice; else if (itVoices.length > 0) u.voice = itVoices[0]; 
+
+          btn.textContent = '⏹️ Ferma Riproduzione'; 
+          u.onend = () => btn.textContent = '🔊 Ascolta la Guida';
           speechSynthesis.speak(u);
         }
-      } else { alert("Sintesi vocale non supportata."); }
+      } else { alert("Sintesi vocale non supportata sul tuo dispositivo."); }
     });
     wrap.appendChild(card);
   });
