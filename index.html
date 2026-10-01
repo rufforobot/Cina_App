@@ -119,6 +119,13 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
 .metric strong { display: block; font-size: 20px; font-weight: 600; }
 .metric span { color: var(--muted); font-size: 12px; font-weight: 500; }
 
+.wsec { margin-bottom: 12px; }
+.wsec > summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 16px 20px; font-size: 18px; font-weight: 700; letter-spacing: -.3px; background: var(--glass); border: 0.5px solid var(--glass-border); box-shadow: var(--shadow); border-radius: var(--radius); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); }
+.wsec > summary::-webkit-details-marker { display: none; }
+.wsec > summary small { margin-left: auto; color: var(--muted); font-size: 14px; font-weight: 600; }
+.wsec > summary::after { content: '▾'; color: var(--muted); font-size: 16px; transition: transform .2s; }
+.wsec[open] > summary::after { transform: rotate(180deg); }
+.wsec > .wallet-grid, .wsec > .utility-card { margin-top: 12px; }
 .view { display: none; animation: fadeIn 0.3s ease; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 .view.active { display: block; }
@@ -390,7 +397,6 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
 
   <!-- ITINERARIO E DIARIO -->
   <section id="itinerary" class="view">
-    <div class="section-title"><div><h3>Itinerario Completo & Diario</h3><p>Spunta le tappe e scrivi le note della giornata.</p></div></div>
     <div class="day-list" id="fullItinerary"></div>
   </section>
 
@@ -411,22 +417,23 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
 
   <!-- WALLET -->
   <section id="wallet" class="view">
-    <div class="section-title"><div><h3>✈️ Trasferimenti</h3><p>Voli e treni, con posto, binario o gate.</p></div></div>
-    <div class="wallet-grid" id="transferGrid"></div>
+    <details class="wsec" id="secTr"><summary><span>✈️ Trasferimenti</span><small id="cntTr"></small></summary>
+      <div class="wallet-grid" id="transferGrid"></div></details>
 
-    <div class="section-title" id="secHotel"><div><h3>🏨 Hotel</h3></div></div>
-    <div class="wallet-grid" id="hotelGrid"></div>
+    <details class="wsec" id="secHotel"><summary><span>🏨 Hotel</span><small id="cntHotel"></small></summary>
+      <div class="wallet-grid" id="hotelGrid"></div></details>
 
-    <div class="section-title" id="secAttr"><div><h3>🎟️ Attrazioni</h3><p>Prenotazioni e finestre di apertura.</p></div></div>
-    <div class="wallet-grid" id="walletGrid"></div>
+    <details class="wsec" id="secAttr"><summary><span>🎟️ Attrazioni</span><small id="cntAttr"></small></summary>
+      <div class="wallet-grid" id="walletGrid"></div></details>
 
-    <div class="section-title"><div><h3>📅 Promemoria sul calendario</h3><p>Scarica un file .ics e aprilo per aggiungere gli eventi.</p></div></div>
-    <div class="utility-card">
-      <div class="grid-2">
-        <button class="btn primary" id="icsRes">Aperture prenotazioni</button>
-        <button class="btn primary" id="icsTr">Voli e treni</button>
-      </div>
-    </div>
+    <details class="wsec"><summary><span>📅 Promemoria sul calendario</span></summary>
+      <div class="utility-card">
+        <p class="note-line" style="margin:0 0 10px;">Scarica un file .ics e aprilo per aggiungere gli eventi.</p>
+        <div class="grid-2">
+          <button class="btn primary" id="icsRes">Aperture prenotazioni</button>
+          <button class="btn primary" id="icsTr">Voli e treni</button>
+        </div>
+      </div></details>
 
     <div id="oldCodes" hidden>
       <div class="section-title"><div><h3>🔑 Altri codici</h3><p>Salvati in precedenza. Ora i codici e le note si inseriscono dentro ogni prenotazione.</p></div></div>
@@ -538,9 +545,9 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
 
 <nav class="bottom-nav" id="bottomNav">
   <button class="active" data-view="dashboard"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Home</button>
-  <button data-view="itinerary"><svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>Diario</button>
+  <button data-view="itinerary"><svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>Itinerario</button>
   <button data-view="companion"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>Guida</button>
-  <button data-view="wallet"><svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>Wallet</button>
+  <button data-view="wallet"><svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>Prenotazioni</button>
   <button data-view="useful"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>Utili</button>
 </nav>
 
@@ -868,7 +875,7 @@ function renderToday() {
     return;
   }
   if (ended) {
-    modeEl.innerHTML = `<div class="companion-meta">Viaggio</div><h3>Concluso ✓</h3><p>Rivedi le note nel Diario.</p>`;
+    modeEl.innerHTML = `<div class="companion-meta">Viaggio</div><h3>Concluso ✓</h3><p>Rivedi le note nell'Itinerario.</p>`;
     nextEl.innerHTML = `<div class="companion-meta">Prossima tappa</div><h3>A presto!</h3>`;
     return;
   }
@@ -1010,8 +1017,8 @@ function renderWallet() {
   /* gli hotel vengono da tutta la sezione "# Hotel" del viaggio, non solo dalle righe di "# Prenotazioni" */
   const hotels = Object.keys(HOTELS).map(k => { const h = hotelInfo(k); return { id: 'hotel-' + k.toLowerCase(), type: '🏨 Hotel · ' + h.city, title: L(h.name.replace(/ \(.*$/, '').replace(/ = .*$/, '')), date: h.nights, ref: h.booking || '—', status: h.booking ? '✅ Prenotato' : '🟡 Da prenotare' }; });
   const attrs = list.filter(r => !/hotel/i.test(r.type));
-  $('secHotel').hidden = hotelWrap.hidden = !hotels.length;
-  $('secAttr').hidden = attrWrap.hidden = !attrs.length;
+  $('secHotel').hidden = !hotels.length; $('secAttr').hidden = !attrs.length;
+  $('cntHotel').textContent = hotels.length; $('cntAttr').textContent = attrs.length; $('cntTr').textContent = transfers.length;
   hotels.forEach(r => hotelWrap.appendChild(resCard(r)));
   attrs.forEach(r => attrWrap.appendChild(resCard(r)));
   renderCodes();
