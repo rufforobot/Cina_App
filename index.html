@@ -259,9 +259,12 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
 /* Frasi */
 .phrase-cat { margin: 18px 0 2px; font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
 .phrase { padding: 12px 0; border-bottom: 0.5px solid var(--border); display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; }
-.phrase .it { font-size: 15px; font-weight: 600; }
-.phrase .zh { font-size: 24px; font-weight: 700; margin-top: 2px; }
-.phrase .py { color: var(--muted); font-size: 14px; }
+.phrase .it { font-size: 17px; font-weight: 600; }
+.phrase .zh { font-size: 32px; line-height: 1.25; font-weight: 700; margin-top: 4px; }
+.phrase .py { color: var(--muted); font-size: 18px; margin-top: 2px; }
+.phrase { grid-template-columns: 1fr; }
+.phrase .acts { justify-content: flex-start; }
+.uinline { margin-bottom: 8px; }
 .phrase .acts { display: flex; gap: 6px; }
 
 /* Meteo */
@@ -564,8 +567,6 @@ main { padding: 16px 16px 140px; }
       </div>
     </section>
 
-    <section class="card" id="todayWeather" hidden></section>
-
     <section class="card" id="nowCard"></section>
 
     <div id="todayGuides" style="margin-bottom:24px;"></div>
@@ -578,16 +579,6 @@ main { padding: 16px 16px 140px; }
       <div class="todo-list" id="bookingAlertsGrid"></div>
     </section>
 
-
-    <section class="card">
-      <h3>Strumenti</h3>
-      <div class="tools-grid">
-        <button type="button" class="tool-btn" data-go="cambio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 7.5 12 12l3.5-4.5M8.5 12h7M8.5 15h7M12 12v5"/></svg>Cambio valuta</button>
-        <button type="button" class="tool-btn" data-go="weather"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3"/><path d="M9 3v1.5M3 9h1.5M4.8 4.8l1 1M13.2 4.8l-1 1"/><path d="M8 19h9a3.5 3.5 0 0 0 .4-7A5 5 0 0 0 8 13a3 3 0 0 0 0 6z"/></svg>Meteo</button>
-        <button type="button" class="tool-btn" data-go="trans"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h9v7H8l-3 3v-3H4zM11 12v3h5l3 3v-3h1v-7h-5"/></svg>Traduttore</button>
-        <button type="button" class="tool-btn" data-go="budget"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>Budget</button>
-      </div>
-    </section>
 
     <div class="section-title"><div><h3>Guide nella tua città</h3></div></div>
     <div id="todayGuides" style="margin-bottom:24px;"></div>
@@ -666,10 +657,11 @@ main { padding: 16px 16px 140px; }
       </div>
     </div>
     <div class="quick-apps" id="quickApps" style="margin-bottom: 24px; scroll-margin-top: 90px;" hidden></div>
-      <div class="util-grid" id="utilGrid"></div>
+    <div class="uinline" id="up-weather">
+    <div class="section-title" id="sec-weather"><div><h3>Meteo</h3><p id="wxStamp"></p></div><button class="btn small" id="wxRefresh" style="flex:0 0 auto;">Aggiorna</button></div>
+    <div class="wx-cities" id="weatherBox" style="margin-bottom: 24px;"></div>
     </div>
-    <div class="upanel" id="up-budget" hidden>
-      <button class="ubar" type="button" data-uback>&lsaquo; Utili</button>
+    <div class="uinline" id="up-budget">
     <div class="section-title" id="sec-budget"><div><h3>Gestione Budget</h3></div></div>
     <div class="expense-card" style="margin-bottom: 24px;">
       <div style="width: 100%;">
@@ -691,6 +683,16 @@ main { padding: 16px 16px 140px; }
       <div class="expense-list" id="expenseList"></div>
     </div>
     </div>
+    <div class="uinline" id="up-phrases">
+    <div class="section-title" id="sec-phrases"><div><h3>Frasi utili</h3></div></div>
+    <div class="utility-card" id="phrasesCard" style="margin-bottom: 24px;">
+      <input class="field" id="phraseSearch" placeholder="Cerca (es. bagno, conto, allergico)">
+      <div id="phrasesBox"></div>
+    </div>
+    </div>
+    <div class="section-title"><div><h3>Altro</h3></div></div>
+      <div class="util-grid" id="utilGrid"></div>
+    </div>
     <div class="upanel" id="up-check" hidden>
       <button class="ubar" type="button" data-uback>&lsaquo; Utili</button>
     <div class="section-title" id="sec-check"><div><h3>Checklist pre-partenza</h3><p>Completate: <strong id="checkProgress">0/0</strong></p></div></div>
@@ -706,19 +708,6 @@ main { padding: 16px 16px 140px; }
       <button class="ubar" type="button" data-uback>&lsaquo; Utili</button>
     <div class="section-title" id="sec-info" hidden><div><h3>Info paese</h3></div></div>
     <div class="utility-card" id="infoBox" style="margin-bottom: 24px;" hidden></div>
-    </div>
-    <div class="upanel" id="up-phrases" hidden>
-      <button class="ubar" type="button" data-uback>&lsaquo; Utili</button>
-    <div class="section-title" id="sec-phrases"><div><h3>Frasi utili</h3></div></div>
-    <div class="utility-card" id="phrasesCard" style="margin-bottom: 24px;">
-      <input class="field" id="phraseSearch" placeholder="Cerca (es. bagno, conto, allergico)">
-      <div id="phrasesBox"></div>
-    </div>
-    </div>
-    <div class="upanel" id="up-weather" hidden>
-      <button class="ubar" type="button" data-uback>&lsaquo; Utili</button>
-    <div class="section-title" id="sec-weather"><div><h3>Meteo</h3><p id="wxStamp"></p></div><button class="btn small" id="wxRefresh" style="flex:0 0 auto;">Aggiorna</button></div>
-    <div class="wx-cities" id="weatherBox" style="margin-bottom: 24px;"></div>
     </div>
     <div class="upanel" id="up-sos" hidden>
       <button class="ubar" type="button" data-uback>&lsaquo; Utili</button>
@@ -1984,6 +1973,7 @@ function renderChecklist() {
 function speakZh(text) { speak(text.replace(/…/g, ''), meta.tts, null, 0.85); }
 function renderPhrases(filter) {
   const box = $('phrasesBox'); box.innerHTML = '';
+  { const up = $('up-phrases'); if (up) up.hidden = !hasPhr; }
   const q = (filter || '').trim().toLowerCase();
   const list = phrases.filter(p => !q || p[1].toLowerCase().includes(q) || p[3].toLowerCase().includes(q) || p[2].includes(q) || p[0].toLowerCase().includes(q));
   if (!list.length) { box.innerHTML = '<p class="note-line" style="margin-top:12px;">Nessuna frase trovata.</p>'; return; }
@@ -2067,14 +2057,16 @@ function renderWeather() {
   box.innerHTML = '';
   trip.cities.forEach(city => {
     const w = cache.data[city.name]; if (!w || !w.daily) return;
-    const dates = city.days.map(n => dayISO(trip.days.find(d => d.day === n)));
-    let idxs = dates.map(dt => w.daily.time.indexOf(dt)).filter(i => i >= 0);
-    let note = 'Giorni del soggiorno';
-    if (!idxs.length) { idxs = [0, 1, 2]; note = 'Prossimi giorni: il soggiorno non è ancora coperto dalle previsioni'; }
+    const today = destToday();
+    const dates = city.days.map(n => dayISO(trip.days.find(d => d.day === n))).filter(dt => dt >= today);
+    if (!dates.length) return;
+    const note = 'Giorni del soggiorno';
     const wd = t => new Date(t + 'T12:00:00').toLocaleDateString('it-IT', { weekday: 'short' }).replace('.', '');
-    const tiles = idxs.map((i, k) => {
-      const t = w.daily.time[i], p = w.daily.precipitation_probability_max?.[i];
-      return `<div class="wx-tile"><div class="wd">${esc(wd(t))}</div><div class="wdt">${esc(t.slice(8, 10))}/${esc(t.slice(5, 7))}</div><div class="wi">${wxIcon(w.daily.weather_code[i])}</div><div class="hi">${Math.round(w.daily.temperature_2m_max[i])}°</div><div class="lo">${Math.round(w.daily.temperature_2m_min[i])}°</div><div class="rn">${p != null ? p + '%' : ''}</div></div>`;
+    const tiles = dates.map(t => {
+      const f = wxFor(city.name, t);
+      if (!f) return `<div class="wx-tile"><div class="wd">${esc(wd(t))}</div><div class="wdt">${esc(t.slice(8, 10))}/${esc(t.slice(5, 7))}</div><div class="wi">–</div><div class="hi">&nbsp;</div><div class="lo">&nbsp;</div><div class="rn"></div></div>`;
+      const r = f.kind === 'fc' ? (f.pop != null ? f.pop + '%' : '') : 'tipico';
+      return `<div class="wx-tile"><div class="wd">${esc(wd(t))}</div><div class="wdt">${esc(t.slice(8, 10))}/${esc(t.slice(5, 7))}</div><div class="wi">${wxIcon(f.code)}</div><div class="hi">${Math.round(f.max)}°</div><div class="lo">${Math.round(f.min)}°</div><div class="rn">${r}</div></div>`;
     }).join('');
     const el = document.createElement('div'); el.className = 'wx-city';
     el.innerHTML = `<div class="wx-top"><div><div class="wx-name">${esc(city.name)}</div><div class="wx-sub">${esc(note)}</div></div>
@@ -2427,15 +2419,11 @@ function showUtil(id) {
   window.scrollTo({ top: 0, behavior: 'auto' });
 }
 function renderUtilHome() {
-  const cache = readWxCache();
   const tiles = [
-    ['budget', 'Budget', true, () => $('expenseTotal').textContent.replace(/ *\(.*\)/, '')],
     ['check', 'Checklist', true, () => $('checkProgress').textContent + ' completate'],
     ['remind', 'Promemoria', true, () => { const n = buildReminders().filter(r => !(state.remDone || {})[r.id]).length; return n + ' da fare'; }],
     ['info', 'Info paese', hasInfo, () => INFO.length + ' argomenti'],
-    ['phrases', 'Frasi utili', hasPhr, () => phrases.length + ' frasi con audio'],
     ['trans', 'Traduttore', true, () => 'Italiano e lingua locale'],
-    ['weather', 'Meteo', true, () => cache ? 'Aggiornato ' + new Date(cache.ts).toLocaleDateString('it-IT', { day: 'numeric', month: 'short' }) : 'Da scaricare'],
     ['sos', 'Emergenze', true, () => (meta.emergency[0] ? meta.emergency[0][0] + ' · ' + meta.emergency[0][1] : 'Numeri utili')],
     ['backup', 'Backup', true, () => state.lastBackup ? 'Ultimo: ' + new Date(state.lastBackup).toLocaleDateString('it-IT', { day: 'numeric', month: 'short' }) : 'Mai eseguito']
   ];
