@@ -1816,23 +1816,31 @@ function openStop(list, i) {
   const card = document.querySelector('.modal-card'); if (card) card.scrollTop = 0;
 }
 
+const normG = t => String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
+function guidesForDay(d) {
+  const hay = ' ' + d.stops.map((st, i) => normG(L(st[1]) + ' ' + (d.det && d.det[i] ? L(d.det[i].title) : '') + ' ' + L(st[2]))).join(' | ') + ' ';
+  const out = [];
+  allStops().forEach(x => {
+    const t = normG(x.stop.title); if (!t) return;
+    const words = t.split(' ').filter(w => w.length > 3 && !['the', 'della', 'delle', 'dello', 'dei', 'del', 'road', 'street', 'park'].includes(w));
+    const inHay = w => hay.includes(' ' + w + ' ') || hay.includes(' ' + w + 's ');
+    const hit = hay.includes(' ' + t + ' ') || (words.length > 0 && words.every(inHay));
+    if (hit) out.push(x);
+  });
+  return out;
+}
 function renderTodayGuides() {
   const box = $('todayGuides'); box.innerHTML = '';
-  const city = todayGuideCity(); if (!city) return;
-  const list = allStops().filter(x => x.city === city);
+  const d = trip.days[tripDayIndex()]; if (!d) return;
+  const list = guidesForDay(d);
+  if (!list.length) return;
   const card = document.createElement('div'); card.className = 'utility-card glist';
-  card.innerHTML = `<div class="companion-meta">${tripStarted() ? 'Oggi' : 'Prima tappa'} · ${esc(city)}</div>`;
-  const MAX = 4;
-  list.slice(0, MAX).forEach((x, i) => {
+  card.innerHTML = `<div class="companion-meta">${tripStarted() ? 'Guide di oggi' : 'Guide del primo giorno'}</div>`;
+  list.forEach((x, i) => {
     const b = document.createElement('button'); b.type = 'button'; b.className = 'grow';
-    b.innerHTML = `<span><b>${esc(x.stop.title)}</b><small>${esc(tagLabel(x.stop.tag))}</small></span>`;
+    b.innerHTML = `<span><b>${esc(x.stop.title)}</b><small>${esc(x.city)} · ${esc(tagLabel(x.stop.tag))}</small></span>`;
     b.addEventListener('click', () => openStop(list, i)); card.appendChild(b);
   });
-  if (list.length > MAX) {
-    const m = document.createElement('button'); m.type = 'button'; m.className = 'grow more';
-    m.innerHTML = `<span><b>Tutte le guide (${list.length})</b></span>`;
-    m.addEventListener('click', () => { guide.city = city; guide.tag = 'all'; guide.favOnly = false; refreshGuide(); setView('companion'); }); card.appendChild(m);
-  }
   box.appendChild(card);
 }
 
