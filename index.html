@@ -294,10 +294,22 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
 .modal-body .act-row .btn.primary { background: var(--accent-2); color: #fff; }
 .act-row a.btn, .act-row button.btn { display: inline-flex; align-items: center; }
 .stop-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-.stop-det { grid-column: 1 / -1; background: var(--surface-2); border-radius: 14px; padding: 14px; margin-top: 4px; }
+.stop-det { grid-column: 1 / -1; background: var(--glass); border: 0.5px solid var(--glass-border); border-radius: 14px; padding: 12px 14px; margin-top: 4px; }
 .stop-det[hidden] { display: none; }
 .pl { padding: 12px 14px; border-radius: 12px; background: var(--surface); margin-bottom: 10px; }
 .pl-empty { color: var(--muted); font-size: 14px; }
+.dsec { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; padding: 12px 0; border-top: 0.5px solid var(--glass-border); }
+.dsec:first-child { border-top: none; padding-top: 4px; }
+.dsec .di { font-size: 18px; line-height: 1.3; text-align: center; }
+.dsec b { display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; color: var(--muted); margin-bottom: 3px; }
+.dsec div, .dsec li { font-size: 15px; line-height: 1.55; }
+.dsec .dn { font-weight: 700; }
+.dsec ul { margin: 0; padding-left: 18px; }
+.dsec li { margin-bottom: 4px; }
+.dsec .py { font-size: 13px; color: var(--muted); }
+.dsec .field { margin-top: 2px; }
+.code-line { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 4px 0; word-break: break-all; }
+.msec { margin: 22px 0 4px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; color: var(--muted); }
 .sec { margin-top: 12px; }
 .sec b { display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; color: var(--muted); margin-bottom: 3px; }
 .sec div, .sec li { font-size: 14.5px; line-height: 1.55; }
@@ -802,9 +814,9 @@ function showPlaceCard(p) {
     </div>
     <div class="btn-grid" style="--n:${btnCount}">${btns}</div>
     ${p.en ? `<p class="py" style="text-align:center">${esc(p.en)}</p>` : ''}
-    ${p.more ? `<details class="more"><summary>Info hotel</summary>${p.more}</details>` : ''}
-    <details class="more"><summary>Altre frasi per il tassista</summary><div class="taxi-ph">
-      ${DRIVER_PHRASES.slice(1).map(f => `<div><strong style="font-size:20px">${esc(f[0])}</strong><br><span class="py">${esc(f[1])} · ${esc(f[2])}</span></div>`).join('')}</div></details>`);
+    ${p.more ? `<h4 class="msec">Info</h4>${p.more}` : ''}
+    <h4 class="msec">Altre frasi per il tassista</h4>
+    <div class="taxi-ph">${DRIVER_PHRASES.slice(1).map(f => `<div><strong style="font-size:20px">${esc(f[0])}</strong><br><span class="py">${esc(f[1])} · ${esc(f[2])}</span></div>`).join('')}</div>`);
   const body = $('modalBody');
   body.querySelector('[data-act="copy"]').onclick = () => copyText([zh, addr].filter(Boolean).join('\n'));
   const ed = body.querySelector('[data-act="edit"]');
@@ -847,13 +859,10 @@ function hotelBoxHTML(k, withNight) {
 }
 function hotelMoreHTML(k) {
   const h = hotelInfo(k);
-  return `<div class="sec"><b>Nome completo</b><div>${esc(L(h.name))}</div></div>
-    <div class="sec"><b>Posizione</b><div>${esc(L(h.metro))}</div></div>
-    <div class="sec"><b>Check-in / check-out</b><div>${esc(h.cin)} · ${esc(h.cout)}</div></div>
-    ${h.telShow ? `<div class="sec"><b>Telefono</b><div>${esc(h.telShow)}</div></div>` : ''}
-    ${h.booking ? `<div class="sec"><b>Prenotazione</b><div>${esc(h.booking)}</div></div>` : ''}
-    ${h.warn ? `<div class="warnbox">⚠️ ${esc(L(h.warn))}</div>` : ''}
-    <div class="vb">${h.custom ? '✏️ Dati modificati da te' : (h.v === 'ok' ? '✅ Letto su fonti online' : '🟡 Da verificare con la tua conferma')}</div>`;
+  return dsec('📍', 'Posizione', `<div>${esc(L(h.metro))}</div>`) + dsec('🕒', 'Check-in / check-out', `<div>${esc(h.cin)} · ${esc(h.cout)}</div>`) +
+    (h.telShow ? dsec('📞', 'Telefono', `<div>${esc(h.telShow)}</div>`) : '') + (h.booking ? dsec('🎟️', 'Prenotazione', `<div>${esc(h.booking)}</div>`) : '') +
+    (h.warn ? `<div class="warnbox">⚠️ ${esc(L(h.warn))}</div>` : '') +
+    `<div class="vb">${h.custom ? '✏️ Dati modificati da te' : (h.v === 'ok' ? '✅ Letto su fonti online' : '🟡 Da verificare con la tua conferma')}</div>`;
 }
 function hotelActs(k, host) {
   const h = hotelInfo(k);
@@ -1067,27 +1076,33 @@ function resCard(r) {
     d.querySelector('button').onclick = () => copyText(c.value);
   });
   if (ex.note) add(mk(`<div class="companion-meta" style="margin:0;">Note</div><div style="white-space:pre-wrap; font-size:14px;">${esc(ex.note)}</div>`));
-  /* parte espandibile per inserire / modificare */
-  const det = document.createElement('details'); det.className = 'more'; det.style.marginTop = '12px';
+  /* inserimento / modifica in una finestra dedicata (niente menù dentro menù) */
   const filled = !!(num || ex.note || ex.codes.length);
-  det.innerHTML = `<summary>🔑 Codici e note${filled ? ' · modifica' : ''}</summary>
-    <div class="row-form" style="margin-top:10px;">
-      ${isBooked ? `<div class="grid-2" style="grid-template-columns:1fr auto;"><input class="field" data-f="num" placeholder="N° prenotazione (se c'è il QR)" value="${esc(num || '')}"><button class="btn" data-b="num">Salva</button></div>` : ''}
-      <div class="grid-2"><input class="field" data-f="ct" placeholder="Titolo (es. PIN)"><input class="field" data-f="cv" placeholder="Codice o testo"></div>
-      <button class="btn" data-b="code">Aggiungi codice</button>
-      <textarea class="field" data-f="note" rows="3" placeholder="Note">${esc(ex.note)}</textarea>
-      <button class="btn" data-b="note">Salva note</button>
-      ${ex.codes.length ? `<div class="chip-row">${ex.codes.map(c => `<button class="btn small" data-del="${c.id}">✕ ${esc(c.title)}</button>`).join('')}</div>` : ''}
-    </div>`;
-  const q = sel => det.querySelector(sel);
-  const nb = q('[data-b="num"]'); if (nb) nb.onclick = () => { const v = q('[data-f="num"]').value.trim(); if (v) state.resCodes[r.id] = v; else delete state.resCodes[r.id]; save(); };
-  q('[data-b="code"]').onclick = () => { const t = q('[data-f="ct"]').value.trim(), v = q('[data-f="cv"]').value.trim(); if (!v) return; ex.codes.push({ id: Date.now(), title: t || 'Codice', value: v }); save(); };
-  q('[data-b="note"]').onclick = () => { ex.note = q('[data-f="note"]').value.trim(); save(); };
-  det.querySelectorAll('[data-del]').forEach(b => b.onclick = () => { ex.codes = ex.codes.filter(c => String(c.id) !== b.dataset.del); state.resNotes[r.id].codes = ex.codes; save(); });
-  add(det);
-  if (state.booked[r.id]) { const b = add(document.createElement('button')); b.className = 'btn small'; b.style.marginTop = '12px'; b.textContent = '↩️ Non ancora prenotato'; b.onclick = () => toggle(false); }
-  else if (r.status.includes('Da prenotare')) { const b = add(document.createElement('button')); b.className = 'btn small'; b.style.marginTop = '12px'; b.textContent = '✅ Segna come prenotato'; b.onclick = () => toggle(true); }
+  const row2 = [bAct('🔑 Codici e note' + (filled ? ' · modifica' : ''), () => openResEditor(r, isBooked))];
+  if (state.booked[r.id]) row2.push(bAct('↩️ Non prenotato', () => toggle(false)));
+  else if (r.status.includes('Da prenotare')) row2.push(bAct('✅ Prenotato', () => toggle(true)));
+  card.appendChild(btnGrid(row2));
   return card;
+}
+function openResEditor(r, isBooked) {
+  const ex = resExtra(r.id); state.resCodes = state.resCodes || {};
+  const num = state.resCodes[r.id] || '';
+  const done = () => { saveState(); closeModal(); renderWallet(); };
+  const box = document.createElement('div');
+  box.innerHTML = `<div class="dsec"><div class="di">🔢</div><div><b>N° prenotazione</b>${isBooked ? `<input class="field" data-f="num" placeholder="Se c'è il QR, scrivilo qui" value="${esc(num)}">` : '<div>Disponibile dopo la prenotazione.</div>'}</div></div>
+    <div class="dsec"><div class="di">🔑</div><div><b>Codici</b>
+      ${ex.codes.map(c => `<div class="code-line"><span>${esc(c.title)}: <strong>${esc(c.value)}</strong></span><button class="btn small" data-del="${c.id}">✕</button></div>`).join('')}
+      <div class="grid-2" style="margin-top:8px;"><input class="field" data-f="ct" placeholder="Titolo (es. PIN)"><input class="field" data-f="cv" placeholder="Codice o testo"></div></div></div>
+    <div class="dsec"><div class="di">📝</div><div><b>Note</b><textarea class="field" data-f="note" rows="3" placeholder="Note">${esc(ex.note)}</textarea></div></div>
+    <button class="btn primary block" data-b="save" style="margin-top:14px;">Salva</button>`;
+  const q = sel => box.querySelector(sel);
+  box.querySelectorAll('[data-del]').forEach(b => b.onclick = () => { ex.codes = ex.codes.filter(c => String(c.id) !== b.dataset.del); done(); });
+  q('[data-b="save"]').onclick = () => {
+    const n = q('[data-f="num"]'); if (n) { const v = n.value.trim(); if (v) state.resCodes[r.id] = v; else delete state.resCodes[r.id]; }
+    const cv = q('[data-f="cv"]').value.trim(); if (cv) ex.codes.push({ id: Date.now(), title: q('[data-f="ct"]').value.trim() || 'Codice', value: cv });
+    ex.note = q('[data-f="note"]').value.trim(); done();
+  };
+  $('modalTitle').textContent = r.title; $('modalBody').replaceChildren(box); $('modal').classList.add('open');
 }
 function renderCodes() {
   const sec = $('oldCodes'), box = $('codeList'); box.innerHTML = '';
@@ -1213,16 +1228,15 @@ function stopCardData(day, i) {
 function stopMapQ(day, st, p) {
   return p.zh || st.map || (/^(volo|treno|aereo|bus|traghetto)\b/i.test(st.title) ? '' : String(day.city).includes('→') ? `${st.title}, ${meta.country}` : `${st.title}, ${day.city}, ${meta.country}`);
 }
+const dsec = (ic, label, html) => html ? `<div class="dsec"><div class="di">${ic}</div><div><b>${label}</b>${html}</div></div>` : '';
 function detHTML(day, i) {
   const st = day.det[i], p = placeInfo(day, i);
-  const sec = (label, txt) => txt ? `<div class="sec"><b>${label}</b><div>${esc(L(txt))}</div></div>` : '';
+  const txt = t => t ? `<div>${esc(L(t))}</div>` : '';
   let h = '';
-  if (p.zh || p.addr || st.editable) {
-    h += `<div class="pl">${(p.zh || p.addr) ? `<div class="pl-lat">${esc(L(p.py || st.title))}</div>${p.pya ? `<div class="pl-ad">${esc(p.pya)}</div>` : ''}<div class="py">I caratteri locali sono nel pulsante 🚕</div>` : '<div class="pl-empty">Indirizzo non ancora inserito</div>'}</div>`;
-  }
-  h += sec('Come arrivare', st.how) + sec('Orari', st.hours) + sec('Costi', st.cost) + sec('Prenotazione', st.book);
+  if (p.zh || p.addr) h += dsec('📍', 'Dove', `<div class="dn">${esc(L(p.py || st.title))}</div>${p.pya ? `<div>${esc(p.pya)}</div>` : ''}<div class="py">I caratteri locali sono nel pulsante 🚕 Taxi</div>`);
+  h += dsec('🧭', 'Come arrivare', txt(st.how)) + dsec('🕒', 'Orari', txt(st.hours)) + dsec('💶', 'Costi', txt(st.cost)) + dsec('🎟️', 'Prenotazione', txt(st.book));
   if (st.warn) h += `<div class="warnbox">⚠️ ${esc(L(st.warn))}</div>`;
-  if (st.tips && st.tips.length) h += `<details class="more"><summary>Consigli (${st.tips.length})</summary><ul class="sec">${st.tips.map(t => `<li>${esc(L(t))}</li>`).join('')}</ul></details>`;
+  if (st.tips && st.tips.length) h += dsec('💡', 'Consigli', `<ul>${st.tips.map(t => `<li>${esc(L(t))}</li>`).join('')}</ul>`);
   h += `<div class="vb">${st.v === 'ok' ? '✅ Dati letti su fonti online' : '🟡 Da verificare prima di partire'}${p.custom ? ' · ✏️ modificato da te' : ''}</div>`;
   return h;
 }
