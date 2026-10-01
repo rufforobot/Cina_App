@@ -493,12 +493,7 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
   <!-- UTILI -->
   <section id="useful" class="view">
     <div id="utilHome">
-    <div class="quick-apps" id="quickApps" style="margin-bottom: 24px; scroll-margin-top: 90px;" hidden></div>
-      <div class="util-grid" id="utilGrid"></div>
-    </div>
-    <div class="upanel" id="up-conv" hidden>
-      <button class="ubar" type="button" data-uback>&lsaquo; Utili</button>
-    <div class="section-title" id="sec-conv"><div><h3>Convertitore Rapido</h3><p id="rateLabel">Calcolo istantaneo offline.</p></div></div>
+    <div class="section-title" id="sec-conv" style="margin-top:4px;"><div><h3>Cambio</h3><p id="rateLabel">Calcolo istantaneo offline.</p></div></div>
     <div class="utility-card" id="convCard" style="margin-bottom: 24px;">
       <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: center;">
         <div>
@@ -512,6 +507,8 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
         </div>
       </div>
     </div>
+    <div class="quick-apps" id="quickApps" style="margin-bottom: 24px; scroll-margin-top: 90px;" hidden></div>
+      <div class="util-grid" id="utilGrid"></div>
     </div>
     <div class="upanel" id="up-budget" hidden>
       <button class="ubar" type="button" data-uback>&lsaquo; Utili</button>
@@ -1231,7 +1228,7 @@ function setupExpenseForm() {
 /* ====================== CONVERTITORE E TASSO ====================== */
 function updateRateUI() {
   const d = fx && fx.src ? fx.src.split('-').reverse().join('/') : '';
-  $('rateLabel').textContent = `1 € = ${rate().toFixed(2)} ${meta.currency.symbol} · ${d ? 'cambio del ' + d : 'cambio indicativo, si aggiorna da solo online'}`;
+  $('rateLabel').textContent = `1 € = ${rate().toFixed(2)} ${meta.currency.symbol} · ${d ? 'cambio del ' + d : 'indicativo, si aggiorna online'}`;
 }
 function setupConverter() {
   const y = $('convYuan'), e = $('convEuro');
@@ -1761,7 +1758,6 @@ function showUtil(id) {
 function renderUtilHome() {
   const cache = readWxCache();
   const tiles = [
-    ['conv', 'Cambio', foreignCur, () => `1 € = ${rate().toFixed(2)} ${meta.currency.symbol}`],
     ['budget', 'Budget', true, () => $('expenseTotal').textContent.replace(/ *\(.*\)/, '')],
     ['check', 'Checklist', true, () => $('checkProgress').textContent + ' completate'],
     ['info', 'Info paese', hasInfo, () => INFO.length + ' argomenti'],
