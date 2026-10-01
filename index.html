@@ -422,7 +422,6 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
 
   <!-- AUDIOGUIDA -->
   <section id="companion" class="view">
-    <div class="section-title"><div><h3>Il tuo Cicerone Digitale</h3><p>Storia, curiosità e dritte per ogni tappa. La voce di sistema funziona anche offline.</p></div></div>
     <input class="field" id="guideSearch" placeholder="Cerca una tappa (es. panda, tè, muraglia)">
     <div class="chips-nav" id="guideCities" style="margin-top:10px;"></div>
     <div class="chips-nav" id="guideTags"></div>
@@ -1551,7 +1550,7 @@ function renderPhrases(filter) {
     if (p[0] !== last) { last = p[0]; const h = document.createElement('div'); h.className = 'phrase-cat'; h.textContent = p[0]; box.appendChild(h); }
     const row = document.createElement('div'); row.className = 'phrase';
     row.innerHTML = `<div><div class="it">${esc(p[1])}</div><div class="zh">${esc(p[2])}</div><div class="py">${esc(p[3])}</div></div>
-      <div class="acts"><button class="btn small" type="button">Ingrandisci</button><button class="btn small ghost" type="button" aria-label="Ascolta"></button></div>`;
+      <div class="acts"><button class="btn small" type="button">Ingrandisci</button><button class="btn small ghost" type="button" aria-label="Ascolta">Ascolta</button></div>`;
     const [show, say] = row.querySelectorAll('button');
     show.addEventListener('click', () => showBig(p[1], p[2], p[3]));
     say.addEventListener('click', () => speakZh(p[2]));
