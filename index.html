@@ -99,6 +99,14 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
 .hero-card { padding: 24px; }
 .hero-card h2 { margin: 0 0 8px; font-size: clamp(28px, 5vw, 40px); font-weight: 700; letter-spacing: -1px; }
 .hero-card p { margin: 0; color: var(--muted); max-width: 72ch; line-height: 1.5; }
+.trip-head { display: grid; grid-template-columns: 1fr auto; gap: 6px 16px; align-items: center; padding: 16px 20px; margin-bottom: 18px; }
+.trip-head h2 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -.6px; }
+.th-route { color: var(--muted); font-size: 15px; font-weight: 500; margin-top: 2px; }
+.th-count { text-align: right; }
+.th-count .big { font-size: 34px; font-weight: 700; line-height: 1; letter-spacing: -1px; }
+.th-count .label { color: var(--muted); font-size: 12px; font-weight: 500; margin-top: 3px; }
+.th-meta { grid-column: 1 / -1; display: flex; gap: 16px; color: var(--muted); font-size: 13px; padding-top: 10px; border-top: 0.5px solid var(--glass-border); }
+.th-meta strong { color: var(--text); font-weight: 700; }
 .hero-route { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; }
 .route-arr { color: var(--muted); font-size: 14px; line-height: 1; display: inline-flex; align-items: center; }
 .city-pill { padding: 8px 12px; line-height: 1.2; background: var(--surface-2); border-radius: 20px; font-size: 14px; font-weight: 500; }
@@ -333,27 +341,24 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
 </header>
 
 <main>
-  <section class="hero">
-    <div class="hero-card">
-      <h2 id="heroTitle"></h2>
-      <p id="heroText"></p>
-      <div class="hero-route" id="heroRoute"></div>
-    </div>
-    <div class="hero-card countdown">
-      <div>
+  <!-- DASHBOARD -->
+  <section id="dashboard" class="view active">
+    <div class="hero-card trip-head">
+      <div class="th-main">
+        <h2 id="heroTitle"></h2>
+        <div class="th-route" id="heroRoute"></div>
+      </div>
+      <div class="th-count">
         <div class="big" id="countdownValue">—</div>
         <div class="label" id="countdownLabel">al viaggio</div>
       </div>
-      <div class="countdown-meta">
-        <div class="metric"><strong id="cityCount">–</strong><span>città</span></div>
-        <div class="metric"><strong id="dayCount">–</strong><span>giorni</span></div>
-        <div class="metric"><strong id="progressCount">0%</strong><span>fatto</span></div>
+      <div class="th-meta">
+        <span><strong id="cityCount">–</strong> città</span>
+        <span><strong id="dayCount">–</strong> giorni</span>
+        <span><strong id="progressCount">0%</strong> fatto</span>
       </div>
     </div>
-  </section>
 
-  <!-- DASHBOARD -->
-  <section id="dashboard" class="view active">
     <div class="today-grid">
       <div class="today-card" id="todayMode"></div>
       <div class="today-card" id="todayNext"></div>
@@ -1589,7 +1594,7 @@ function setView(view) {
 
 document.querySelectorAll('.bottom-nav [data-view]').forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
 document.querySelectorAll('#utilNav [data-go]').forEach(b => b.addEventListener('click', () => $(b.dataset.go).scrollIntoView({ behavior: 'smooth', block: 'start' })));
-$('heroRoute').innerHTML = trip.cities.map(c => `<span class="city-pill">${esc(c.name)}</span>`).join('<span class="route-arr">→</span>');
+{ const cn = trip.cities.map(c => c.name); $('heroRoute').textContent = cn.length > 1 ? cn[0] + ' → ' + cn[cn.length - 1] : ''; $('heroRoute').hidden = cn.length < 2; }
 $('cityCount').textContent = trip.cities.length;
 $('dayCount').textContent = trip.days.length;
 $('closeModal').addEventListener('click', closeModal);
@@ -1645,7 +1650,7 @@ if (meta.apps && meta.apps.length) {
 document.title = meta.title;
 const _am = document.querySelector('meta[name="apple-mobile-web-app-title"]'); if (_am) _am.content = meta.title;
 $('brandLogo').textContent = meta.logo; $('brandTitle').textContent = meta.title; $('brandSub').textContent = meta.subtitle;
-$('heroTitle').innerHTML = meta.heroTitle; $('heroText').textContent = ''; $('heroText').hidden = true;
+$('heroTitle').textContent = meta.countryIt || meta.title;
 $('sosNote').textContent = meta.emergencyNote;
 $('sosGrid').innerHTML = meta.emergency.map(e => `<div style="padding:10px; background:var(--surface-2); border-radius:12px;"><strong>${esc(e[0])}</strong><br><small>${esc(e[1])}</small></div>`).join('');
 $('sosAssist').href = 'tel:' + meta.assistance.tel; $('sosAssist').textContent = '☎ ' + meta.assistance.label;
