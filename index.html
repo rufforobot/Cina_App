@@ -619,7 +619,7 @@ main { padding: 16px 16px 140px; }
       <div class="wallet-grid" id="walletGrid"></div></details>
 
     <details class="wsec" id="secUtil"><summary><span>Utilità</span><small id="cntUtil"></small></summary>
-      <div class="wallet-grid" id="utilGrid"></div></details>
+      <div class="wallet-grid" id="walUtilGrid"></div></details>
 
     <details class="wsec" id="secImp" hidden><summary><span>Importate da email</span><small id="cntImp"></small></summary>
       <div class="wallet-grid" id="impGrid"></div></details>
@@ -1231,7 +1231,7 @@ function exportTransfersICS() {
 const isTransportRes = r => /treno|volo|aere|bus|traghetto/i.test(r.type);
 function resExtra(id) { state.resNotes = state.resNotes || {}; return state.resNotes[id] || (state.resNotes[id] = { note: '', codes: [] }); }
 function renderWallet() {
-  const hotelWrap = $('hotelGrid'), attrWrap = $('walletGrid'), utilWrap = $('utilGrid'); hotelWrap.innerHTML = ''; attrWrap.innerHTML = ''; utilWrap.innerHTML = '';
+  const hotelWrap = $('hotelGrid'), attrWrap = $('walletGrid'), utilWrap = $('walUtilGrid'); hotelWrap.innerHTML = ''; attrWrap.innerHTML = ''; utilWrap.innerHTML = '';
   const list = reservations.filter(r => !isTransportRes(r));
   /* gli hotel vengono da tutta la sezione "# Hotel" del viaggio, non solo dalle righe di "# Prenotazioni" */
   const hotels = Object.keys(HOTELS).map(k => { const h = hotelInfo(k); return { hk: k, id: 'hotel-' + k.toLowerCase(), type: 'Hotel · ' + h.city, title: L(h.name.replace(/ \(.*$/, '').replace(/ = .*$/, '')), date: h.nights, ref: h.booking || '—', fileBooked: !!h.booking, status: h.booking ? 'Prenotato' : 'Da prenotare' }; });
