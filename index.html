@@ -1734,7 +1734,7 @@ function renderDay(day, target) {
     ${day.alert ? `<div class="alert"><b>Attenzione</b> ${esc(day.alert)}</div>` : ''}
     ${hk && isCheckinDay(day, hk) ? `<div class="hotel-box" data-hotel>${hotelBoxHTML(hk, false)}</div>` : ''}
     <div class="day-map" data-daymap><div class="dm-mini"></div><div class="dm-chip"></div></div>
-    ${meta.racconto ? `<a class="btn block racconto-link" href="${esc(meta.racconto)}" target="_blank" rel="noopener" style="margin:0 0 14px;">Leggi il racconto del giorno</a>` : ''}
+    ${meta.racconto ? `<a class="btn block racconto-link" href="${esc(meta.racconto)}#giorno-${day.day}" style="margin:0 0 14px;">Leggi il racconto del giorno</a>` : ''}
     <div class="timeline"></div>
     <div class="note-area">
       <label class="lbl" for="note-${day.day}">Diario della giornata</label>
