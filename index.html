@@ -515,6 +515,8 @@ main { padding: 16px 16px 140px; }
 .seg button { border: none; background: none; color: var(--text); font-weight: 600; padding: 8px 4px; border-radius: 10px; }
 .seg button.on { background: var(--surface); box-shadow: 0 1px 4px rgba(0,0,0,.12); }
 .day-card .timeline { }
+
+#ptr { position: fixed; top: calc(env(safe-area-inset-top) + 8px); left: 50%; transform: translate(-50%,0); opacity: 0; z-index: 9999; pointer-events: none; padding: 8px 16px; border-radius: 999px; background: rgba(255,255,255,.85); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); box-shadow: 0 2px 12px rgba(0,0,0,.12); font: 600 13px/1 -apple-system, system-ui, sans-serif; color: #000; transition: opacity .15s; }
 </style>
 </head>
 <body>
@@ -2039,7 +2041,11 @@ function setupOffline() {
     el.textContent = 'Non attiva: la pagina è aperta come file locale. Pubblica la cartella su un indirizzo https, aprila da lì e aggiungila alla schermata Home: da quel momento funziona anche senza rete.';
     return;
   }
-  navigator.serviceWorker.register('sw.js').catch(() => { el.textContent = 'Non attiva: registrazione non riuscita.'; });
+  if (navigator.serviceWorker.controller) {
+    let reloaded = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => { if (reloaded) return; reloaded = true; location.reload(); });
+  }
+  navigator.serviceWorker.register('sw.js').then(reg => { try { reg.update(); } catch {} }).catch(() => { el.textContent = 'Non attiva: registrazione non riuscita.'; });
   navigator.serviceWorker.ready.then(() => { el.textContent = 'Attiva: l\'app si apre anche senza rete (dopo il primo caricamento online).'; });
   if (navigator.storage && navigator.storage.persist) navigator.storage.persist();
 }
@@ -2398,6 +2404,34 @@ setupOffline();
 const wxCache = readWxCache();
 if (navigator.onLine && (!wxCache || wxCache.v !== 2 || Date.now() - wxCache.ts > 3 * 3600 * 1000)) refreshWeather(false);
 setInterval(() => { renderBookingAlerts(); updateCountdown(); }, 60000);
+
+/* Tira giù dalla cima per aggiornare: svuota la cache e ricarica dalla rete */
+(function () {
+  let y0 = null, pull = 0, busy = false;
+  const bar = document.createElement('div');
+  bar.id = 'ptr'; bar.textContent = 'Tira per aggiornare';
+  document.body.appendChild(bar);
+  const top = () => (window.scrollY || document.documentElement.scrollTop || 0) <= 0;
+  const open = () => document.querySelector('.modal.open, .sheet.open, .backdrop.open, [role=dialog]:not([hidden])');
+  document.addEventListener('touchstart', e => { y0 = (!busy && top() && !open() && e.touches.length === 1) ? e.touches[0].clientY : null; pull = 0; }, { passive: true });
+  document.addEventListener('touchmove', e => {
+    if (y0 === null) return;
+    pull = Math.max(0, e.touches[0].clientY - y0);
+    if (pull > 8) { bar.style.transform = 'translate(-50%,' + Math.min(pull * .5, 46) + 'px)'; bar.style.opacity = Math.min(1, pull / 80); bar.textContent = pull > 80 ? 'Rilascia per aggiornare' : 'Tira per aggiornare'; }
+  }, { passive: true });
+  document.addEventListener('touchend', async () => {
+    if (y0 === null) return;
+    const go = pull > 80; y0 = null;
+    if (!go) { bar.style.opacity = 0; bar.style.transform = 'translate(-50%,0)'; return; }
+    busy = true; bar.textContent = 'Aggiorno…'; bar.style.opacity = 1; bar.style.transform = 'translate(-50%,46px)';
+    try {
+      if (navigator.onLine === false) { bar.textContent = 'Sei offline'; setTimeout(() => { bar.style.opacity = 0; busy = false; }, 1500); return; }
+      if ('serviceWorker' in navigator) { const r = await navigator.serviceWorker.getRegistration(); if (r) await r.update(); }
+      if (window.caches) { const ks = await caches.keys(); await Promise.all(ks.map(k => caches.delete(k))); }
+    } catch {}
+    location.reload();
+  }, { passive: true });
+})();
 </script>
 </body>
 </html>
