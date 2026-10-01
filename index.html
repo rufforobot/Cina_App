@@ -425,12 +425,7 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
     <input class="field" id="guideSearch" placeholder="Cerca una tappa (es. panda, tè, muraglia)">
     <div class="chips-nav" id="guideCities" style="margin-top:10px;"></div>
     <div class="chips-nav" id="guideTags"></div>
-    <div class="grid-2" style="margin:6px 0 16px; align-items:center;">
-      <span class="note-line" id="guideCount"></span>
-      <select class="field" id="ttsRate" aria-label="Velocità della voce">
-        <option value="0.8">Voce lenta</option><option value="0.95">Voce normale</option><option value="1.1">Voce veloce</option>
-      </select>
-    </div>
+    <div style="margin:6px 0 16px;"><span class="note-line" id="guideCount"></span></div>
     <div class="companion-grid" id="companionGrid"></div>
   </section>
 
@@ -1351,8 +1346,10 @@ function stopSpeech() {
 }
 function pickVoice(lang2) {
   const vs = speechSynthesis.getVoices().filter(v => v.lang.replace('_', '-').toLowerCase().startsWith(lang2));
-  return vs.find(v => /Siri|Premium|Migliorata|Enhanced/i.test(v.name)) || vs[0];
+  const q = v => (/premium|avanzat|enhanced|migliorat|neural|natural|siri/i.test(v.name) ? 2 : 0) + (v.localService ? 0.5 : 0);
+  return vs.slice().sort((a, b) => q(b) - q(a))[0];
 }
+if ('speechSynthesis' in window) { speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices(); }
 function speak(text, lang, btn, rate) {
   if (!('speechSynthesis' in window)) { toast('Voce non supportata'); return; }
   const same = !!btn && speech.btn === btn;
@@ -1435,7 +1432,7 @@ function renderCompanion() {
         <button class="btn small ghost listen-btn" type="button" data-label="Ascolta">Ascolta</button>
       </div>`;
     card.querySelector('.read-btn').addEventListener('click', () => openStop(list, i));
-    card.querySelector('.listen-btn').addEventListener('click', e => speak(stop.text, meta.guideLang || 'it-IT', e.currentTarget, Number(state.ttsRate) || 0.95));
+    card.querySelector('.listen-btn').addEventListener('click', e => speak(stop.text, meta.guideLang || 'it-IT', e.currentTarget, 0.95));
     card.querySelector('.fav').addEventListener('click', e => {
       if (state.favs[key]) delete state.favs[key]; else state.favs[key] = true;
       saveState();
@@ -1481,7 +1478,7 @@ function openStop(list, i) {
   { const host = box.querySelector('[data-go]');
     const g1 = routeRow(`${stop.title}, ${city}, ${meta.country}`, hanzi ? () => { stopSpeech(); showBig('Mostra all\'autista', hanzi, 'Mi porti qui, per favore.', ''); } : null);
     const listen = bAct('Ascolta', null, 'primary'); listen.dataset.label = 'Ascolta';
-    listen.addEventListener('click', e => speak(stop.text, meta.guideLang || 'it-IT', e.currentTarget, Number(state.ttsRate) || 0.95));
+    listen.addEventListener('click', e => speak(stop.text, meta.guideLang || 'it-IT', e.currentTarget, 0.95));
     const fav = bAct(state.favs[key] ? '★ Preferito' : '☆ Preferito', e => {
       if (state.favs[key]) delete state.favs[key]; else state.favs[key] = true;
       saveState(); e.currentTarget.textContent = state.favs[key] ? '★ Preferito' : '☆ Preferito';
@@ -1723,8 +1720,6 @@ $('checkAdd').addEventListener('click', () => {
   state.checkCustom.push({ id: 'c' + Date.now(), label }); i.value = ''; saveState(); renderChecklist();
 });
 $('guideSearch').addEventListener('input', e => { guide.q = e.target.value; stopSpeech(); renderCompanion(); });
-$('ttsRate').value = String(state.ttsRate);
-$('ttsRate').addEventListener('change', e => { state.ttsRate = Number(e.target.value); saveState(); });
 $('phraseSearch').addEventListener('input', e => renderPhrases(e.target.value));
 $('wxRefresh').addEventListener('click', () => refreshWeather(true));
 
