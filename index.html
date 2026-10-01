@@ -173,7 +173,7 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
 .day-title h4 { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.4px; }
 .day-title p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
 .timeline { padding: 8px 20px; }
-.stop { display: grid; grid-template-columns: 75px 1fr auto; gap: 12px; padding: 16px 0; border-bottom: 0.5px solid var(--border); align-items: start; }
+.stop { display: grid; grid-template-columns: 75px 1fr; gap: 12px; padding: 16px 0; border-bottom: 0.5px solid var(--border); align-items: start; }
 .stop:last-child { border-bottom: none; }
 .stop-tools { display: flex; align-items: center; gap: 10px; }
 .time { font-weight: 700; font-variant-numeric: tabular-nums; font-size: 15px; color: var(--accent-2); }
@@ -417,6 +417,14 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
       <div class="th-main">
         <h2 id="heroTitle"></h2>
         <div class="th-route" id="heroRoute"></div>
+      </div>
+      <div class="th-count">
+        <div class="big" id="countdownValue">—</div>
+        <div class="label" id="countdownLabel">al viaggio</div>
+      </div>
+      <div class="th-meta">
+        <span><strong id="cityCount">–</strong> città</span>
+        <span><strong id="dayCount">–</strong> giorni</span>
       </div>
     </div>
 
@@ -793,8 +801,20 @@ const cityOfDay = n => {
   return d ? d.city.split('→')[0].trim() : 'In viaggio';
 };
 
-function updateCountdown() {}
-function updateMetrics() {}
+function updateCountdown() {
+  const start = new Date(meta.start), end = new Date(meta.end);
+  const now = new Date();
+  const el = $('countdownValue'), label = $('countdownLabel');
+  if (now < start) {
+    const days = Math.ceil((start - now) / 86400000);
+    el.textContent = days; label.textContent = days === 1 ? 'giorno alla partenza' : 'giorni alla partenza';
+  } else if (now <= end) {
+    el.textContent = `D${tripDayIndex() + 1}`; label.textContent = 'del viaggio';
+  } else {
+    el.textContent = '\u2713'; label.textContent = 'Viaggio concluso';
+  }
+}
+function updateMetrics() { updateCountdown(); }
 
 /* ====================== MODALE ====================== */
 function openModal(title, html) { $('modalTitle').textContent = title; $('modalBody').innerHTML = html; $('modal').classList.add('open'); }
@@ -927,7 +947,9 @@ function renderToday() {
   const d = trip.days[tripDayIndex()];
   const tr = nextTransferObj();
   let label = '', time = '', title = '', sub = '', acts = null;
-  const nextIdx = started && !ended ? d.stops.findIndex((_, i) => !state.completed[`${d.day}-${i}`]) : -1;
+  const hm = new Date().toLocaleTimeString('en-GB', { timeZone: meta.tz, hour: '2-digit', minute: '2-digit' });
+  const nowMin = (+hm.slice(0, 2)) * 60 + (+hm.slice(3, 5));
+  const nextIdx = started && !ended ? d.stops.findIndex(st => { const m = String(st[0]).match(/^(\d{1,2})[:.](\d{2})/); return m ? (+m[1]) * 60 + (+m[2]) >= nowMin - 30 : false; }) : -1;
   const trSoon = tr && (new Date(tr.dep) - Date.now() < 86400000);
   if (ended) {
     label = 'Viaggio'; title = 'Concluso'; sub = 'Rivedi le note nell\'Itinerario.';
@@ -946,7 +968,7 @@ function renderToday() {
     title = L(st[1]); sub = L(st[2]);
     if (det) { const p = placeInfo(d, nextIdx); acts = routeRow(stopMapQ(d, det, p), p.zh ? () => showPlaceCard(stopCardData(d, nextIdx)) : null); }
   } else {
-    label = `Giorno ${d.day} · ${d.city}`; title = 'Giornata completata'; sub = 'Hai spuntato tutte le tappe di oggi.';
+    label = `Giorno ${d.day} · ${d.city}`; title = 'Giornata conclusa'; sub = 'Non ci sono altre tappe per oggi.';
   }
   box.innerHTML = `<div class="nc-top"><div class="companion-meta" style="margin:0;">${esc(label)}</div>${time ? `<span class="nc-time">${esc(time)}</span>` : ''}</div><h3>${esc(title)}</h3><p>${esc(sub)}</p>`;
   if (acts) box.appendChild(acts);
@@ -1308,21 +1330,13 @@ function renderDay(day, target) {
   day.stops.forEach((s, i) => {
     const row = document.createElement('div'); row.className = 'stop';
     const key = `${day.day}-${i}`;
-    const checked = !!state.completed[key];
     const st = day.det ? day.det[i] : null;
     const p = st ? placeInfo(day, i) : { zh: '', addr: '' };
     const hasPlace = !!(p.zh || p.addr);
     row.innerHTML = `<div class="time">${esc(s[0])}</div>
       <div><h5>${esc(L(s[1]))}</h5><p>${esc(L(s[2]))}</p>
 </div>
-      <div class="stop-tools"><input class="check" type="checkbox" aria-label="Completata" ${checked ? 'checked' : ''}></div>
       ${st ? `<div class="stop-acts"></div><div class="stop-det" hidden></div>` : ''}`;
-    if (checked) row.classList.add('done');
-    row.querySelector('.check').addEventListener('change', e => {
-      state.completed[key] = e.target.checked; saveState();
-      row.classList.toggle('done', e.target.checked);
-      renderToday();
-    });
     if (st) {
       const acts = row.querySelector('.stop-acts');
       const mq = stopMapQ(day, st, p);
@@ -2049,6 +2063,8 @@ const _am = document.querySelector('meta[name="apple-mobile-web-app-title"]'); i
 { const lg = $('brandLogo'), f = meta.icon && meta.icon['192'];
   if (f) { lg.textContent = ''; lg.style.background = 'none'; const im = document.createElement('img'); im.alt = ''; im.style.cssText = 'width:100%;height:100%;border-radius:10px;display:block'; im.src = f.includes('/') ? f : 'trips/' + window.TRIP_ID + '/' + f; lg.appendChild(im); } else lg.textContent = meta.logo; } $('brandTitle').textContent = meta.title; $('brandSub').textContent = meta.subtitle;
 $('heroTitle').textContent = meta.countryIt || meta.title;
+$('cityCount').textContent = trip.cities.length;
+$('dayCount').textContent = trip.days.length;
 $('sosNote').textContent = meta.emergencyNote;
 $('sosGrid').innerHTML = meta.emergency.map(e => `<div style="padding:10px; background:var(--fill); border-radius:12px;"><strong>${esc(e[0])}</strong><br><small>${esc(e[1])}</small></div>`).join('');
 $('sosAssist').href = 'tel:' + meta.assistance.tel; $('sosAssist').textContent = '' + meta.assistance.label;
