@@ -537,14 +537,33 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
 <script src="trip-md.js"></script>
 <script>
 /* Il viaggio da aprire si sceglie con ?t=nome (default: cina-2026): si legge trips/nome.md (o, in alternativa, trips/nome.js) */
+/* Se qualcosa si rompe, mostra l'errore in alto invece di lasciare la pagina vuota */
+(function () {
+  const show = msg => {
+    let b = document.getElementById('errBanner');
+    if (!b) { b = document.createElement('div'); b.id = 'errBanner'; b.style.cssText = 'position:fixed;left:0;right:0;top:0;z-index:99999;background:#b00020;color:#fff;font:13px/1.4 -apple-system,sans-serif;padding:10px 14px;white-space:pre-wrap;word-break:break-word'; document.body.appendChild(b); }
+    b.textContent = '⚠️ ' + msg;
+  };
+  window.addEventListener('error', e => show('Errore: ' + (e.message || e.error) + (e.lineno ? ' (riga ' + e.lineno + ')' : '')));
+  window.addEventListener('unhandledrejection', e => show('Errore: ' + (e.reason && e.reason.message || e.reason)));
+})();
 window.TRIP_ID = (new URLSearchParams(location.search).get('t') || 'cina-2026').replace(/[^a-z0-9_-]/gi, '');
 (async function () {
   const fail = msg => { document.body.innerHTML = '<div style="padding:32px 20px;font:16px -apple-system,sans-serif;line-height:1.5"><h2>Viaggio non trovato</h2><p>' + msg + '</p><p><a href="?t=cina-2026">Apri il viaggio predefinito</a></p></div>'; };
   try {
+    if (typeof TripMd === 'undefined') return fail('Manca il file <b>trip-md.js</b> nel repository (deve stare accanto a index.html).');
     let ok = false;
     try {
       const r = await fetch('trips/' + window.TRIP_ID + '.md');
-      if (r.ok) { window.TRIP_DATA = TripMd.parse(await r.text()); ok = true; }
+      if (r.ok) {
+        const d = TripMd.parse(await r.text());
+        const miss = [];
+        if (!d.meta.id) miss.push("l'intestazione iniziale tra --- (con id, title…)");
+        if (!d.trip.days.length) miss.push('la sezione "# Itinerario" con i giorni');
+        if (!Object.keys(d.HOTELS).length) miss.push('la sezione "# Hotel"');
+        if (miss.length) return fail('Ho letto <b>trips/' + window.TRIP_ID + '.md</b> ma non trovo: ' + miss.join(', ') + '.<br>Controlla che il file sia quello completo e inizi con <code>---</code>.');
+        window.TRIP_DATA = d; ok = true;
+      }
     } catch (e) { console.error(e); }
     if (!ok) {
       await new Promise(res => { const sc = document.createElement('script'); sc.src = 'trips/' + window.TRIP_ID + '.js'; sc.onload = res; sc.onerror = res; document.head.appendChild(sc); });
