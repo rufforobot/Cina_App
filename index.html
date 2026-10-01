@@ -99,8 +99,9 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
 .hero-card { padding: 24px; }
 .hero-card h2 { margin: 0 0 8px; font-size: clamp(28px, 5vw, 40px); font-weight: 700; letter-spacing: -1px; }
 .hero-card p { margin: 0; color: var(--muted); max-width: 72ch; line-height: 1.5; }
-.hero-route { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; }
-.city-pill { padding: 8px 12px; background: var(--surface-2); border-radius: 20px; font-size: 14px; font-weight: 500; }
+.hero-route { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; }
+.route-arr { color: var(--muted); font-size: 14px; line-height: 1; display: inline-flex; align-items: center; }
+.city-pill { padding: 8px 12px; line-height: 1.2; background: var(--surface-2); border-radius: 20px; font-size: 14px; font-weight: 500; }
 
 .countdown { padding: 24px; display: flex; flex-direction: column; justify-content: space-between; }
 .countdown .big { font-size: clamp(48px, 9vw, 72px); font-weight: 700; line-height: 1; letter-spacing: -2px; }
@@ -225,7 +226,9 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
 .weather-city:last-child { border-bottom: none; }
 .wc-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 4px 12px; margin-bottom: 8px; min-width: 0; }
 .wc-head > * { min-width: 0; overflow-wrap: anywhere; }
-.wx-line { margin-top: 4px; font-size: 13px; color: var(--muted); }
+.wx-line { margin-left: auto; flex: 0 0 auto; text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; max-width: 45%; }
+.wx-line .wx-ic { font-size: 38px; line-height: 1; }
+.wx-line .wx-tx { font-size: 12px; color: var(--muted); font-weight: 600; line-height: 1.3; }
 .wx-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
 .wx-slot { background: var(--surface-2); border-radius: 12px; padding: 8px 6px; text-align: center; font-size: 13px; }
 .wx-slot b { display: block; font-size: 12px; color: var(--muted); font-weight: 600; }
@@ -1128,20 +1131,17 @@ function detHTML(day, i) {
   const sec = (label, txt) => txt ? `<div class="sec"><b>${label}</b><div>${esc(L(txt))}</div></div>` : '';
   let h = '';
   if (p.zh || p.addr || st.editable) {
-    h += `<div class="pl">${(p.zh || p.addr) ? `<div class="pl-lat">${esc(L(p.py || st.title))}</div>${p.pya ? `<div class="pl-ad">${esc(p.pya)}</div>` : ''}<div class="py">I caratteri locali sono nel pulsante 🚕</div>` : '<div class="pl-empty">Indirizzo non ancora inserito: usa ✏️</div>'}</div>`;
+    h += `<div class="pl">${(p.zh || p.addr) ? `<div class="pl-lat">${esc(L(p.py || st.title))}</div>${p.pya ? `<div class="pl-ad">${esc(p.pya)}</div>` : ''}<div class="py">I caratteri locali sono nel pulsante 🚕</div>` : '<div class="pl-empty">Indirizzo non ancora inserito</div>'}</div>`;
   }
   h += sec('Come arrivare', st.how) + sec('Orari', st.hours) + sec('Costi', st.cost) + sec('Prenotazione', st.book);
   if (st.warn) h += `<div class="warnbox">⚠️ ${esc(L(st.warn))}</div>`;
   if (st.tips && st.tips.length) h += `<details class="more"><summary>Consigli (${st.tips.length})</summary><ul class="sec">${st.tips.map(t => `<li>${esc(L(t))}</li>`).join('')}</ul></details>`;
   const hk = st.h || DIARY[day.day].sleep;
   h += `<div class="act-row">
-    ${(p.zh || p.addr) ? `<button class="btn small taxi-btn" data-a="taxi">🚕 Tassista</button>` : ''}
+    ${(p.zh || p.addr) ? `<button class="btn small taxi-btn" data-a="taxi">🚕 Taxi</button>` : ''}
     ${st.tel ? `<a class="btn small" href="tel:${esc(st.tel)}">📞 Chiama</a>` : ''}
     <a class="btn small" href="${appleMaps(p.zh || `${st.title}, ${day.city}, ${meta.country}`)}">🧭 Mappa</a>
     <a class="btn small" href="${transitApple(p.zh || `${st.title}, ${day.city}, ${meta.country}`)}">🚇 Metro</a>
-    <button class="btn small" data-a="ed">✏️ Modifica</button>
-    ${hk ? `<button class="btn small" data-a="hotel">🏨 Hotel</button>` : ''}
-    ${st.guide ? `<button class="btn small" data-a="guide">🎧 Guida</button>` : ''}
   </div>
   <div class="vb">${st.v === 'ok' ? '✅ Dati letti su fonti online' : '🟡 Da verificare prima di partire'}${p.custom ? ' · ✏️ modificato da te' : ''}</div>`;
   return h;
@@ -1153,7 +1153,7 @@ function isCheckinDay(day, hk) {
 function renderDay(day, target) {
   const hk = hotelKeyForDay(day);
   const section = document.createElement('article'); section.className = 'day-card'; section.id = `day-${day.day}`;
-  section.innerHTML = `<div class="day-head"><div class="day-title"><h4>Giorno ${day.day} · ${esc(day.city)}</h4><p>${esc(day.date)} · ${esc(day.title)}</p><div class="wx-line" data-wxday="${day.day}"></div></div></div>
+  section.innerHTML = `<div class="day-head"><div class="day-title"><h4>Giorno ${day.day} · ${esc(day.city)}</h4><p>${esc(day.date)} · ${esc(day.title)}</p></div><div class="wx-line" data-wxday="${day.day}"></div></div>
     ${day.alert ? `<div class="alert">⚠️ ${esc(day.alert)}</div>` : ''}
     ${hk && isCheckinDay(day, hk) ? `<div class="hotel-box" data-hotel>${hotelBoxHTML(hk, false)}</div>` : ''}
     <div class="timeline"></div>
@@ -1174,7 +1174,7 @@ function renderDay(day, target) {
     row.innerHTML = `<div class="time">${esc(s[0])}</div>
       <div><h5>${esc(L(s[1]))}</h5><p>${esc(L(s[2]))}</p>
         ${st ? `<div class="stop-pills">
-          ${hasPlace ? `<button class="btn small taxi-btn" data-a="taxi">🚕 Tassista</button>` : ''}
+          ${st.guide ? `<button class="btn small" data-a="guide">🎧 Guida</button>` : ''}
           <button class="btn small" data-a="tg" aria-expanded="false">Dettagli ▾</button>
           ${st.v === 'ok' ? '' : '<span class="vdot" title="da verificare">🟡</span>'}</div>` : ''}</div>
       <div class="stop-tools"><input class="check" type="checkbox" aria-label="Completata" ${checked ? 'checked' : ''}></div>
@@ -1191,14 +1191,11 @@ function renderDay(day, target) {
         det.innerHTML = detHTML(day, i);
         const on = (a, fn) => { const b = det.querySelector(`[data-a="${a}"]`); if (b) b.onclick = fn; };
         on('taxi', () => showPlaceCard(stopCardData(day, i)));
-        on('ed', () => stopCardData(day, i).onEdit());
-        on('hotel', () => showPlaceCard(hotelCardData(st.h || DIARY[day.day].sleep)));
-        on('guide', () => openGuideByTitle(st.guide));
       };
       const setOpen = open => { det.hidden = !open; tg.setAttribute('aria-expanded', open); tg.textContent = open ? 'Chiudi ▴' : 'Dettagli ▾'; if (open) { fill(); detOpen.add(key); } else detOpen.delete(key); };
       tg.addEventListener('click', () => setOpen(det.hidden));
-      const tx = row.querySelector('.stop-pills [data-a="taxi"]');
-      if (tx) tx.addEventListener('click', () => showPlaceCard(stopCardData(day, i)));
+      const gd = row.querySelector('.stop-pills [data-a="guide"]');
+      if (gd) gd.addEventListener('click', () => openGuideByTitle(st.guide));
       if (detOpen.has(key)) setOpen(true);
     }
     timeline.appendChild(row);
@@ -1462,7 +1459,7 @@ function renderDayWeather() {
   document.querySelectorAll('[data-wxday]').forEach(el => {
     const day = trip.days.find(d => d.day === Number(el.dataset.wxday)); if (!day) return;
     const city = wxCityOf(day), f = city && wxFor(city, dayISO(day));
-    el.textContent = f ? wxText(f) : '';
+    el.innerHTML = f ? `<span class="wx-ic">${wxIcon(f.code)}</span><span class="wx-tx">${esc(wxText(f).replace(/^\S+\s/, ''))}</span>` : '';
   });
 }
 function renderHomeWeather() {
@@ -1592,7 +1589,7 @@ function setView(view) {
 
 document.querySelectorAll('.bottom-nav [data-view]').forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
 document.querySelectorAll('#utilNav [data-go]').forEach(b => b.addEventListener('click', () => $(b.dataset.go).scrollIntoView({ behavior: 'smooth', block: 'start' })));
-$('heroRoute').innerHTML = trip.cities.map(c => `<span class="city-pill">${esc(c.name)}</span>`).join(' → ');
+$('heroRoute').innerHTML = trip.cities.map(c => `<span class="city-pill">${esc(c.name)}</span>`).join('<span class="route-arr">→</span>');
 $('cityCount').textContent = trip.cities.length;
 $('dayCount').textContent = trip.days.length;
 $('closeModal').addEventListener('click', closeModal);
@@ -1648,7 +1645,7 @@ if (meta.apps && meta.apps.length) {
 document.title = meta.title;
 const _am = document.querySelector('meta[name="apple-mobile-web-app-title"]'); if (_am) _am.content = meta.title;
 $('brandLogo').textContent = meta.logo; $('brandTitle').textContent = meta.title; $('brandSub').textContent = meta.subtitle;
-$('heroTitle').innerHTML = meta.heroTitle; $('heroText').textContent = meta.heroText;
+$('heroTitle').innerHTML = meta.heroTitle; $('heroText').textContent = ''; $('heroText').hidden = true;
 $('sosNote').textContent = meta.emergencyNote;
 $('sosGrid').innerHTML = meta.emergency.map(e => `<div style="padding:10px; background:var(--surface-2); border-radius:12px;"><strong>${esc(e[0])}</strong><br><small>${esc(e[1])}</small></div>`).join('');
 $('sosAssist').href = 'tel:' + meta.assistance.tel; $('sosAssist').textContent = '☎ ' + meta.assistance.label;
