@@ -70,3 +70,10 @@ si riconosce da sola per cinese, giapponese, coreano e thai.
 - `apps` — pulsanti per aprire le app del posto (Alipay, PayPay…); senza `apps` la sezione sparisce.
 - `# Info paese` — schede pratiche (elettricità, mance, orari, pagamenti…); senza questa sezione la scheda sparisce.
 - `# Frasi` — se vuota, la sezione Frasi utili sparisce.
+
+## Reimport dell'itinerario (cina-2026)
+
+`trips/cina-2026/sorgente/Itinerario_Cina.md` è la fonte; la versione importata è nel front-matter di `cina-2026.md` (`itinerario: vNN`). A ogni reimport vanno **conservati** i campi aggiunti solo nel repo:
+- `racconto:` (link al racconto giorno per giorno) nell'intestazione;
+- le righe `mappa:` degli aeroporti nel Giorno 1;
+- le `news.json` (non fanno parte del sorgente, le aggiorna un'attività programmata).
