@@ -1429,6 +1429,8 @@ function stopCardData(day, i) {
     onEdit: () => editAddr(`${day.day}-${i}`, { zh: p.zh, addr: p.addr, lat: p.pya }, st.title, () => { renderItinerary(); renderToday(); }) };
 }
 function stopMapQ(day, st, p) {
+  /* pasti e riposo senza un luogo preciso non vanno cercati: "Cena, Shanghai" finiva su un punto a caso */
+  if (!p.zh && !p.addr && !st.map && /^(pranzo|cena|colazione|riposo|tempo libero|sera\b|mattina\b)/i.test(st.title)) return '';
   return p.zh || st.map || (/^(volo|treno|aereo|bus|traghetto)\b/i.test(st.title) ? '' : String(day.city).includes('→') ? `${st.title}, ${meta.country}` : `${st.title}, ${day.city}, ${meta.country}`);
 }
 const SVG = (d) => `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
@@ -1596,9 +1598,10 @@ function loadDay(day, onProg) {
     }
     if (!pts.some(p => p.ll) && netFail) throw new Error('rete');
     const ok = pts.filter(p => p.ll);
-    if (ok.length > 2) {
+    /* filtro anti-punti-sbagliati: solo nei giorni in una città (nei giorni «A → B» le tappe sono davvero lontane tra loro) */
+    if (ok.length > 2 && !String(day.city).includes('→')) {
       const lat = ok.map(p => p.ll[0]).sort((a, b) => a - b)[ok.length >> 1], lon = ok.map(p => p.ll[1]).sort((a, b) => a - b)[ok.length >> 1];
-      ok.forEach(p => { if (kmBetween([lat, lon], p.ll) > 80) p.ll = null; });
+      ok.forEach(p => { if (kmBetween([lat, lon], p.ll) > 120) p.ll = null; });
     }
     const found = pts.filter(p => p.ll); found.forEach((p, n) => p.n = n + 1);
     const res = { pts, found, geom: null, km: 0, exact: false, here: null };
