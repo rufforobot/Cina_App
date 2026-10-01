@@ -26,7 +26,11 @@
   --warn: light-dark(#ff9500, #ff9f0a);
   --danger: light-dark(#ff3b30, #ff453a);
   --ok: light-dark(#34c759, #30d158);
-  --shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255,255,255,.5);
+  --glass: light-dark(rgba(255,255,255,.55), rgba(44,44,46,.55));
+  --glass-strong: light-dark(rgba(255,255,255,.72), rgba(44,44,46,.72));
+  --glass-border: light-dark(rgba(255,255,255,.7), rgba(255,255,255,.12));
+  --glass-blur: blur(24px) saturate(180%);
   --radius: 20px;
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -34,18 +38,23 @@ html, body { scroll-behavior: smooth; overflow-x: hidden; width: 100%; max-width
 body {
   margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   background: var(--bg); color: var(--text); padding-bottom: env(safe-area-inset-bottom);
+  background-image:
+    radial-gradient(60vw 50vh at 10% -5%, light-dark(rgba(0,122,255,.22), rgba(10,132,255,.28)), transparent 70%),
+    radial-gradient(55vw 45vh at 95% 15%, light-dark(rgba(255,59,48,.16), rgba(255,69,58,.2)), transparent 70%),
+    radial-gradient(60vw 50vh at 50% 105%, light-dark(rgba(52,199,89,.16), rgba(48,209,88,.16)), transparent 70%);
+  background-attachment: fixed;
 }
 button, input, textarea, select { font: inherit; }
 button, .btn, a.btn { cursor: pointer; }
 a { color: inherit; text-decoration: none; }
 
-#app { min-height: 100vh; background: var(--bg); overflow-x: hidden; width: 100%; }
+#app { min-height: 100vh; background: transparent; overflow-x: hidden; width: 100%; }
 
 header {
   position: sticky; top: 0; z-index: 40;
-  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  background: color-mix(in srgb, var(--bg) 70%, transparent);
-  border-bottom: 0.5px solid var(--border); padding-top: env(safe-area-inset-top);
+  backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+  background: var(--glass-strong);
+  border-bottom: 0.5px solid var(--glass-border); padding-top: env(safe-area-inset-top);
 }
 .header-inner {
   max-width: 1180px; margin: 0 auto; padding: 12px 18px;
@@ -63,8 +72,8 @@ header {
 .clocks { display: flex; flex-wrap: wrap; gap: 6px; font-size: 12px; font-weight: 600; color: var(--text); background: var(--surface-2); padding: 6px 10px; border-radius: 10px; justify-content: center; }
 
 .icon-btn, .btn {
-  background: var(--surface-2); color: var(--accent-2);
-  border: none; border-radius: 12px; padding: 10px 14px;
+  background: var(--glass); border: 0.5px solid var(--glass-border); color: var(--accent-2);
+  border-radius: 12px; padding: 10px 14px;
   display: inline-flex; align-items: center; justify-content: center; gap: 7px;
   font-weight: 600; transition: transform 0.1s; text-align: center;
 }
@@ -79,8 +88,12 @@ header {
 main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
 
 .hero-card, .panel, .day-card, .city-card, .companion-card, .note-card, .wallet-card, .expense-card, .utility-card {
-  background: var(--surface); border: none; box-shadow: var(--shadow); border-radius: var(--radius);
+  background: var(--glass); border: 0.5px solid var(--glass-border); box-shadow: var(--shadow); border-radius: var(--radius);
+  backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
 }
+.home-pair { display: grid; grid-template-columns: 1fr; gap: 0 18px; margin-bottom: 24px; }
+.home-pair > div { min-width: 0; }
+@media (min-width: 900px) { .home-pair { grid-template-columns: 1fr 1fr; } }
 
 .hero { display: grid; grid-template-columns: 1.5fr .9fr; gap: 18px; margin-bottom: 24px; }
 .hero-card { padding: 24px; }
@@ -149,14 +162,14 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
 .badge.done { background: color-mix(in srgb, var(--ok) 20%, var(--surface)); color: var(--ok); }
 
 .today-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
-.today-card { padding: 20px; background: var(--surface); box-shadow: var(--shadow); border-radius: var(--radius); }
+.today-card { padding: 20px; background: var(--glass); border: 0.5px solid var(--glass-border); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); box-shadow: var(--shadow); border-radius: var(--radius); }
 .today-card h3 { margin: 0 0 6px; font-size: 20px; font-weight: 700; letter-spacing: -0.4px; }
 .today-card p { margin: 4px 0 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
 
 .bottom-nav {
   display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
-  background: color-mix(in srgb, var(--surface) 80%, transparent); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  border-top: 0.5px solid var(--border); padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
+  background: var(--glass-strong); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+  border-top: 0.5px solid var(--glass-border); padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
   max-width: 1180px; margin: 0 auto;
 }
 .bottom-nav button { border: none; background: transparent; color: var(--muted); padding: 4px; font-size: 10px; font-weight: 500; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: 0.2s; }
@@ -172,8 +185,8 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
 
 .chips-nav { display: flex; gap: 8px; overflow-x: auto; padding: 4px 0 8px; scrollbar-width: none; }
 .chips-nav::-webkit-scrollbar { display: none; }
-.chip-btn.on { background: var(--accent-2); color: #fff; }
-.chip-btn { flex: 0 0 auto; border: none; background: var(--surface); color: var(--accent-2); padding: 9px 14px; border-radius: 18px; font-weight: 600; font-size: 14px; box-shadow: var(--shadow); }
+.chip-btn.on { background: var(--accent-2); color: #fff; border-color: transparent; }
+.chip-btn { flex: 0 0 auto; border: 0.5px solid var(--glass-border); background: var(--glass); color: var(--text); padding: 8px 14px; border-radius: 999px; font-weight: 600; font-size: 14px; box-shadow: 0 2px 10px rgba(0,0,0,.06), inset 0 1px 0 rgba(255,255,255,.45); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); }
 
 /* Budget */
 .expense-total { font-size: clamp(24px, 7vw, 32px); font-weight: 800; letter-spacing: -1px; margin-top: 8px; word-break: break-word; }
@@ -210,7 +223,8 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
 /* Meteo */
 .weather-city { padding: 12px 0; border-bottom: 0.5px solid var(--border); }
 .weather-city:last-child { border-bottom: none; }
-.wc-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.wc-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 4px 12px; margin-bottom: 8px; min-width: 0; }
+.wc-head > * { min-width: 0; overflow-wrap: anywhere; }
 .wx-line { margin-top: 4px; font-size: 13px; color: var(--muted); }
 .wx-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
 .wx-slot { background: var(--surface-2); border-radius: 12px; padding: 8px 6px; text-align: center; font-size: 13px; }
@@ -346,11 +360,16 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
 
     <div id="todayHotel" style="margin-bottom: 24px;"></div>
 
-    <div class="section-title"><div><h3>🧳 Prossimo trasferimento</h3><p>Volo o treno in arrivo. Aggiungi posto, binario o gate.</p></div></div>
-    <div id="nextTransfer" style="margin-bottom: 24px;"></div>
-
-    <div class="section-title"><div><h3>🎧 Guide nella tua città</h3><p>Tocca una tappa per leggerla o ascoltarla.</p></div></div>
-    <div id="todayGuides" style="margin-bottom: 24px;"></div>
+    <div class="home-pair">
+      <div>
+        <div class="section-title"><div><h3>🧳 Prossimo trasferimento</h3><p>Volo o treno in arrivo. Aggiungi posto, binario o gate.</p></div></div>
+        <div id="nextTransfer"></div>
+      </div>
+      <div>
+        <div class="section-title"><div><h3>🎧 Guide nella tua città</h3><p>Tocca una tappa per leggerla o ascoltarla.</p></div></div>
+        <div id="todayGuides"></div>
+      </div>
+    </div>
 
     <div class="section-title" id="bookingAlertsTitle" style="display:none;">
       <div><h3>🔔 Alert Prenotazioni</h3><p>Da prenotare, in ordine di apertura (orario italiano).</p></div>
@@ -920,7 +939,6 @@ function renderNextTransfer(force) {
   const nxt = transfers.find(t => new Date(t.dep) > Date.now());
   if (!nxt) { box.innerHTML = '<div class="utility-card">Nessun trasferimento in programma.</div>'; return; }
   const card = transferCard(nxt, 'next');
-  card.style.maxWidth = '520px';
   box.appendChild(card);
 }
 
@@ -1082,7 +1100,7 @@ function renderCities() {
       <div class="city-dates">${esc(h.en || '')}</div>
       <div class="city-actions">
         <button class="btn small primary go-it">Itinerario</button>
-        <button class="btn small taxi-btn go-taxi">🚕 Hotel al tassista</button>
+        <button class="btn small taxi-btn go-taxi">🚕 Indicazioni per taxi</button>
         ${h.tel ? `<a class="btn small" href="tel:${esc(h.tel)}">📞</a>` : ''}
       </div>`;
     card.querySelector('.go-it').addEventListener('click', () => {
