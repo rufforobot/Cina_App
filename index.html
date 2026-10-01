@@ -1520,18 +1520,21 @@ function getHere() {
   });
 }
 const MAP_STYLES = {
-  chiara: { name: 'Chiara', url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', att: '&copy; OpenStreetMap &copy; CARTO', sub: 'abcd' },
-  minimal: { name: 'Minimal', url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', att: '&copy; OpenStreetMap &copy; CARTO', sub: 'abcd' },
-  satellite: { name: 'Satellite', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', att: 'Esri, Maxar' },
-  osm: { name: 'Classica', url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', att: '&copy; OpenStreetMap' }
+  chiara: { name: 'Chiara', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', att: 'Esri, HERE, Garmin, OpenStreetMap', max: 19 },
+  minimal: { name: 'Minimal', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', att: 'Esri, HERE, Garmin', max: 16 },
+  satellite: { name: 'Satellite', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', att: 'Esri, Maxar', max: 19 },
+  osm: { name: 'Classica', url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', att: '&copy; OpenStreetMap', max: 19 }
 };
 const getMapStyle = () => { try { const k = localStorage.getItem('map-style'); if (MAP_STYLES[k]) return k; } catch {} return 'chiara'; };
 const setMapStyle = k => { try { localStorage.setItem('map-style', k); } catch {} };
-function addTiles(map) {
-  const st = MAP_STYLES[getMapStyle()];
+function addTiles(map, key) {
+  const k = key || getMapStyle(), st = MAP_STYLES[k];
   if (map._tiles) map.removeLayer(map._tiles);
-  map._tiles = window.L.tileLayer(st.url, { maxZoom: 19, attribution: st.att, subdomains: st.sub || 'abc' }).addTo(map);
-  map._tiles.bringToBack();
+  const lay = map._tiles = window.L.tileLayer(st.url, { maxZoom: 19, maxNativeZoom: st.max, attribution: st.att }).addTo(map);
+  lay.bringToBack();
+  let errs = 0;
+  /* se lo stile non carica (blocco, chiave richiesta) si torna alla mappa classica */
+  if (k !== 'osm') lay.on('tileerror', () => { if (++errs === 4 && map._tiles === lay) addTiles(map, 'osm'); });
 }
 function loadDay(day, onProg) {
   const job = dayJobs[day.day] || (dayJobs[day.day] = { cbs: [], prom: null });
