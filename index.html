@@ -1363,9 +1363,17 @@ function renderWallet() {
   const items = [];
   transfers.forEach(t => { const fl = /Volo/.test(t.type); items.push({ cat: fl ? 'Voli' : 'Treni', ic: fl ? 'flight' : 'train', iso: t.dep.slice(0, 10), ms: new Date(t.dep).getTime(), t: trCities(t).join(' → '), s: `${trCode(t)} · ${t.dep.slice(11, 16)}`, st: new Date(t.dep) > now ? null : { txt: 'Partito', cls: 'mute' }, open: () => openSheetNode(t.title, () => journeySheet(t)) }); });
   hotels.forEach(r => { const iso = hotelStartISO(r.date); items.push({ cat: 'Hotel', ic: 'hotel', iso, ms: iso ? new Date(iso + 'T15:00:00+08:00').getTime() : 9e15, t: short(r.title), s: `${r.city || ''}${r.city ? ' · ' : ''}${r.date}`, st: isBk(r) ? { txt: 'Prenotato', cls: 'ok' } : { txt: 'Da prenotare', cls: 'warn' }, res: r, open: () => openSheetNode(r.title, () => resCard(r)) }); });
+  const ATT_KEY = { cooking: /xiaolongbao/i, mutianyu: /mutianyu/i, panda: /panda/i, tianmen: /tianmen shan/i, terracotta: /terracotta/i, forbidden: /proibita/i, tiananmen: /ti[ae]nanmen/i };
+  const attTime = r => {
+    const k = ATT_KEY[r.id], day = k && trip.days.find(d => d.date === String(r.date).padStart(5, '0')); if (!day) return '';
+    const st = ((DIARY[day.day] || {}).stops || []).find(x => /^\d{1,2}:\d{2}$/.test(x.t) && k.test(x.title) && !/^(hotel|verso|treno|pranzo|cena|rientro|volo)/i.test(x.title));
+    if (st) return st.t;
+    const dep = ((DIARY[day.day] || {}).stops || []).find(x => /^\d{1,2}:\d{2}$/.test(x.t) && /^hotel/i.test(x.title) && k.test(x.title));
+    return dep ? 'partenza ' + dep.t : '';
+  };
   rest.forEach(r => {
-    const att = isAttr(r), m = String(r.date).match(/^(\d{1,2})\/(\d{1,2})$/), iso = m ? iso2(m[2], m[1]) : '';
-    items.push({ cat: att ? 'Biglietti' : 'Altro', ic: att ? 'ticket' : (/sim/i.test(r.type + r.title) ? 'sim' : /assic/i.test(r.type + r.title) ? 'shield' : 'info'), iso, ms: iso ? new Date(iso + 'T12:00:00+08:00').getTime() : -1, t: short(r.title), s: r.date, st: isBk(r) ? { txt: 'Prenotato', cls: 'ok' } : { txt: 'Da prenotare', cls: 'warn' }, res: r, open: () => openSheetNode(r.title, () => resCard(r)) });
+    const att = isAttr(r), m = String(r.date).match(/^(\d{1,2})\/(\d{1,2})$/), iso = m ? iso2(m[2], m[1]) : '', tm = att ? attTime(r) : '';
+    items.push({ cat: att ? 'Biglietti' : 'Altro', ic: att ? 'ticket' : (/sim/i.test(r.type + r.title) ? 'sim' : /assic/i.test(r.type + r.title) ? 'shield' : 'info'), iso, ms: iso ? new Date(iso + 'T' + ((tm.match(/\d{1,2}:\d{2}/) || ['12:00'])[0]) + ':00+08:00').getTime() : -1, t: short(r.title), s: tm ? `${r.date} · ${tm}` : r.date, st: isBk(r) ? { txt: 'Prenotato', cls: 'ok' } : { txt: 'Da prenotare', cls: 'warn' }, res: r, open: () => openSheetNode(r.title, () => resCard(r)) });
   });
   (state.imported || []).forEach(x => items.push({ cat: 'Altro', ic: 'mail', iso: x.date || '', ms: x.date ? new Date(x.date + 'T12:00:00+08:00').getTime() : 8e15, t: x.title, s: [x.date && x.date.split('-').reverse().join('/'), x.time].filter(Boolean).join(' · ') || 'Importata da email', st: { txt: 'Email', cls: 'mute' }, open: () => openSheetNode(x.title, () => importedCard(x)) }));
   items.sort((a, b) => a.ms - b.ms);
