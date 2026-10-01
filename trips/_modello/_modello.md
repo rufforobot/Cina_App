@@ -28,6 +28,7 @@ assistance:
   label: Assistenza assicurazione
   tel: +390000000000
 maps: google
+taxi: Uber
 guideLang: it-IT
 apps:
   - 💳 Apri PayPay | paypay://

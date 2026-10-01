@@ -63,6 +63,7 @@ La frase per il tassista è la prima di `# Frasi tassista`. La scrittura locale 
 si riconosce da sola per cinese, giapponese, coreano e thai.
 
 ## Impostazioni per paese (nell'intestazione del viaggio)
+- `taxi: DiDi` (facoltativo) — nome dell'app taxi del paese: cambia l'etichetta del pulsante Taxi (predefinito: Taxi).
 - `maps: apple | google | amap` — app di mappe usata dai pulsanti 🧭 Mappa e 🚇 Metro (predefinita: apple).
 - `guideLang: it-IT` — lingua di lettura delle guide; `tts` — lingua di lettura delle frasi locali.
 - `currency` — se non è l'euro compaiono convertitore e scelta valuta nelle spese.

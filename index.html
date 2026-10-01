@@ -765,7 +765,7 @@ function bAct(label, fn, cls) { const b = document.createElement('button'); b.ty
 function bLink(label, href, cls, ext) { const a = document.createElement('a'); a.className = 'btn small ' + (cls || ''); a.href = href; a.textContent = label; if (ext) { a.target = '_blank'; a.rel = 'noopener'; } return a; }
 function routeRow(q, taxiFn) {
   const it = [];
-  if (taxiFn) it.push(bAct('Taxi', taxiFn));
+  if (taxiFn) it.push(bAct(meta.taxi || 'Taxi', taxiFn));
   if (q) { it.push(bLink('Mappa', appleMaps(q))); it.push(bLink('Metro', transitApple(q))); }
   return it.length ? btnGrid(it) : null;
 }
