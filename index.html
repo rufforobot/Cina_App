@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="Viaggio">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="apple-touch-icon" href="trips/cina-2026/apple-touch-icon.png">
 <title>Viaggio</title>
 <style>
 :root {
@@ -554,10 +554,10 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
 </div>
 </div>
 
-<script src="trip-md.js"></script>
-<script src="qr.js"></script>
+<script src="app/trip-md.js"></script>
+<script src="app/qr.js"></script>
 <script>
-/* Il viaggio da aprire si sceglie con ?t=nome (default: cina-2026): si legge trips/nome.md (o, in alternativa, trips/nome.js) */
+/* Il viaggio da aprire si sceglie con ?t=nome (default: cina-2026): si legge trips/nome/nome.md */
 /* Se qualcosa si rompe, mostra l'errore in alto invece di lasciare la pagina vuota */
 (function () {
   const show = msg => {
@@ -572,18 +572,18 @@ window.TRIP_ID = (new URLSearchParams(location.search).get('t') || 'cina-2026').
 (async function () {
   const fail = msg => { document.body.innerHTML = '<div style="padding:32px 20px;font:16px -apple-system,sans-serif;line-height:1.5"><h2>Viaggio non trovato</h2><p>' + msg + '</p><p><a href="?t=cina-2026">Apri il viaggio predefinito</a></p></div>'; };
   try {
-    if (typeof TripMd === 'undefined') return fail('Manca il file <b>trip-md.js</b> nel repository (deve stare accanto a index.html).');
+    if (typeof TripMd === 'undefined') return fail('Manca il file <b>app/trip-md.js</b> nel repository.');
     let ok = false;
     try {
-      let r = await fetch('trips/' + window.TRIP_ID + '.md');
-      if (!r.ok) r = await fetch(window.TRIP_ID + '.md');   // se il file è stato caricato nella radice invece che in trips/
+      let r = await fetch('trips/' + window.TRIP_ID + '/' + window.TRIP_ID + '.md');
+      if (!r.ok) r = await fetch('trips/' + window.TRIP_ID + '.md');   // vecchia posizione
       if (r.ok) {
         const d = TripMd.parse(await r.text());
         const miss = [];
         if (!d.meta.id) miss.push("l'intestazione iniziale tra --- (con id, title…)");
         if (!d.trip.days.length) miss.push('la sezione "# Itinerario" con i giorni');
         if (!Object.keys(d.HOTELS).length) miss.push('la sezione "# Hotel"');
-        if (miss.length) return fail('Ho letto <b>trips/' + window.TRIP_ID + '.md</b> ma non trovo: ' + miss.join(', ') + '.<br>Controlla che il file sia quello completo e inizi con <code>---</code>.');
+        if (miss.length) return fail('Ho letto <b>trips/' + window.TRIP_ID + '/' + window.TRIP_ID + '.md</b> ma non trovo: ' + miss.join(', ') + '.<br>Controlla che il file sia quello completo e inizi con <code>---</code>.');
         window.TRIP_DATA = d; ok = true;
       }
     } catch (e) { console.error(e); }
@@ -592,7 +592,7 @@ window.TRIP_ID = (new URLSearchParams(location.search).get('t') || 'cina-2026').
       ok = !!window.TRIP_DATA;
     }
     if (!ok && location.protocol === 'file:') return fail('Questa app legge i viaggi via web: aprila dall\'indirizzo GitHub Pages (https://…github.io/…), non facendo doppio clic sul file.');
-    if (!ok) return fail('Non trovo <b>trips/' + window.TRIP_ID + '.md</b>. Controlla il nome nell\'indirizzo (?t=...) e che il file sia stato caricato.');
+    if (!ok) return fail('Non trovo <b>trips/' + window.TRIP_ID + '/' + window.TRIP_ID + '.md</b>. Controlla il nome nell\'indirizzo (?t=...) e che il file sia stato caricato.');
     const sc = document.createElement('script'); sc.textContent = document.getElementById('appcode').textContent; document.body.appendChild(sc);
   } catch (e) { fail('Errore nella lettura del viaggio: ' + String(e.message || e)); }
 })();
@@ -1667,7 +1667,8 @@ if (meta.apps && meta.apps.length) {
 (function () { try {
   const base = location.origin + location.pathname.replace(/[^/]*$/, '');
   const ic = meta.icon || {};
-  const icon192 = base + (ic['192'] || 'icon-192.png'), icon512 = base + (ic['512'] || 'icon-512.png');
+  const ip = (f, d) => base + (f ? (f.includes('/') ? f : 'trips/' + window.TRIP_ID + '/' + f) : d);
+  const icon192 = ip(ic['192'], 'app/icons/icon-192.png'), icon512 = ip(ic['512'], 'app/icons/icon-512.png');
   const manifest = {
     name: meta.title, short_name: meta.shortTitle || meta.title, description: meta.subtitle || meta.title,
     start_url: base + 'index.html?t=' + window.TRIP_ID, scope: base, display: 'standalone', orientation: 'portrait',
@@ -1677,11 +1678,12 @@ if (meta.apps && meta.apps.length) {
   const mf = document.querySelector('link[rel="manifest"]');
   if (mf) mf.href = URL.createObjectURL(new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' }));
   const ti = document.querySelector('link[rel="apple-touch-icon"]');
-  if (ti && ic.apple) ti.href = base + ic.apple;
+  if (ti) ti.href = ip(ic.apple, 'app/icons/apple-touch-icon.png');
 } catch (e) { /* manifest statico di riserva */ } })();
 document.title = meta.title;
 const _am = document.querySelector('meta[name="apple-mobile-web-app-title"]'); if (_am) _am.content = meta.title;
-$('brandLogo').textContent = meta.logo; $('brandTitle').textContent = meta.title; $('brandSub').textContent = meta.subtitle;
+{ const lg = $('brandLogo'), f = meta.icon && meta.icon['192'];
+  if (f) { lg.textContent = ''; lg.style.background = 'none'; const im = document.createElement('img'); im.alt = ''; im.style.cssText = 'width:100%;height:100%;border-radius:10px;display:block'; im.src = f.includes('/') ? f : 'trips/' + window.TRIP_ID + '/' + f; lg.appendChild(im); } else lg.textContent = meta.logo; } $('brandTitle').textContent = meta.title; $('brandSub').textContent = meta.subtitle;
 $('heroTitle').textContent = meta.countryIt || meta.title;
 $('sosNote').textContent = meta.emergencyNote;
 $('sosGrid').innerHTML = meta.emergency.map(e => `<div style="padding:10px; background:var(--surface-2); border-radius:12px;"><strong>${esc(e[0])}</strong><br><small>${esc(e[1])}</small></div>`).join('');

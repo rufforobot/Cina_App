@@ -1,6 +1,6 @@
 /* Service worker: cache-first con aggiornamento in background, solo per file dello stesso sito. */
-const CACHE = 'viaggio-v32';
-const SHELL = ['./', 'index.html', 'manifest.json', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png', 'trip-md.js','qr.js', 'trips/cina-2026.md','trips/cina-2026-icon-192.png','trips/cina-2026-icon-512.png','trips/cina-2026-apple-touch-icon.png'];
+const CACHE = 'viaggio-v33';
+const SHELL = ['./', 'index.html', 'manifest.json', 'app/trip-md.js', 'app/qr.js', 'app/icons/icon-192.png', 'app/icons/icon-512.png', 'app/icons/apple-touch-icon.png', 'trips/cina-2026/cina-2026.md', 'trips/cina-2026/icon-192.png', 'trips/cina-2026/icon-512.png', 'trips/cina-2026/apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => Promise.all(SHELL.map(u => c.add(u).catch(() => {})))).then(() => self.skipWaiting()));

@@ -3,21 +3,25 @@
 Un'unica app (`index.html`) che legge i contenuti di ogni viaggio da un file **markdown** in `trips/`.
 Per cambiare viaggio non si tocca il codice: si cambia solo il file `.md`.
 
-## File da pubblicare
+## Struttura delle cartelle
 ```
-index.html            ← l'app (uguale per tutti i viaggi)
-trip-md.js            ← legge i file markdown dei viaggi
-sw.js                 ← funzionamento offline
-manifest.json  icon-192.png  icon-512.png  apple-touch-icon.png
-trips/cina-2026.md    ← i dati del viaggio in Cina
-trips/_modello.md     ← modello vuoto per un nuovo viaggio
+index.html, sw.js, manifest.json   ← l'app (uguale per tutti i viaggi)
+app/                               ← tutto ciò che è comune
+  trip-md.js, qr.js                   (lettura dei file viaggio, generatore QR)
+  icons/                              (icone di base)
+trips/
+  cina-2026/                       ← tutto ciò che è solo della Cina
+    cina-2026.md                      (i dati del viaggio)
+    icon-192.png, icon-512.png, apple-touch-icon.png
+  _modello/_modello.md             ← modello vuoto per un nuovo viaggio
 ```
+Un nuovo viaggio = una nuova cartella in `trips/` con lo stesso nome del file `.md` (e, se vuoi, le sue icone).
 
 ## Pubblicare su GitHub Pages
 1. github.com → **New repository** → nome (es. `viaggi`) → **Public** → Create.
-2. **Add file → Upload files**: carica `index.html`, `trip-md.js`, `sw.js`, `manifest.json` e le tre icone nella radice.
-3. Crea la cartella `trips`: **Add file → Create new file**, nome `trips/cina-2026.md`, incolla il contenuto del file, Commit.
-   Ripeti per `trips/_modello.md` (facoltativo).
+2. **Add file → Upload files**: carica `index.html`, `sw.js`, `manifest.json` e la cartella `app/` (con `trip-md.js`, `qr.js` e le icone).
+3. Crea la cartella `trips`: **Add file → Create new file**, nome `trips/cina-2026/cina-2026.md`, incolla il contenuto del file, Commit.
+   Ripeti per `trips/_modello/_modello.md` (facoltativo).
 4. **Settings → Pages → Build and deployment → Deploy from a branch → `main` / `(root)` → Save**.
 5. Dopo 1–2 minuti l'app è su `https://TUOUTENTE.github.io/viaggi/`.
 6. Sul telefono apri l'indirizzo in Safari → Condividi → **Aggiungi a Home**.
@@ -27,22 +31,22 @@ trips/_modello.md     ← modello vuoto per un nuovo viaggio
 ## Se la pagina è vuota o non risponde
 1. Crea nel repository un file vuoto chiamato **`.nojekyll`** (Add file → Create new file → nome `.nojekyll` → Commit).
    Senza, GitHub Pages può trasformare i file `.md` in pagine web e l'app non li trova più.
-2. Apri nel browser `https://TUOUTENTE.github.io/NOMEREPO/trips/cina-2026.md`: deve comparire il testo del viaggio (non un errore 404).
-3. Controlla che nella radice ci siano `index.html`, `trip-md.js`, `sw.js` e che il viaggio sia in `trips/`.
+2. Apri nel browser `https://TUOUTENTE.github.io/NOMEREPO/trips/cina-2026/cina-2026.md`: deve comparire il testo del viaggio (non un errore 404).
+3. Controlla che nella radice ci siano `index.html`, `sw.js`, la cartella `app/` e che il viaggio sia in `trips/NOME/`.
 4. Se l'app ha comunque un problema, in alto compare una striscia rossa con l'errore.
 5. Sul telefono: Impostazioni → Safari → Avanzate → Dati dei siti web → elimina quello del sito, poi riapri (cancella la vecchia versione in cache).
 
 ## Aprire un viaggio
 - `https://TUOUTENTE.github.io/viaggi/` apre la Cina (predefinito).
-- `https://TUOUTENTE.github.io/viaggi/?t=giappone-2027` apre `trips/giappone-2027.md`.
+- `https://TUOUTENTE.github.io/viaggi/?t=giappone-2027` apre `trips/giappone-2027/giappone-2027.md`.
 Ogni viaggio ha i propri dati salvati sul telefono (spunte, spese, note), separati dagli altri.
 
 ## Modificare un viaggio
-Su GitHub apri il file in `trips/`, matita ✏️, modifica, **Commit**. Per far arrivare subito la modifica sul telefono
+Su GitHub apri il file nella cartella del viaggio in `trips/`, matita ✏️, modifica, **Commit**. Per far arrivare subito la modifica sul telefono
 cambia anche il numero in `sw.js` (`viaggio-v19` → `viaggio-v20`); altrimenti compare alla seconda apertura.
 
 ## Come è scritto un file di viaggio
-Parti da `trips/_modello.md` (ha una nota per ogni sezione). In breve:
+Parti da `trips/_modello/_modello.md` (ha una nota per ogni sezione). In breve:
 - **Intestazione** tra `---`: titolo, fuso orario, valuta, numeri di emergenza, coordinate delle città per il meteo.
 - **Sezioni** con `# Città`, `# Hotel`, `# Itinerario`, `# Trasferimenti`, `# Prenotazioni`, `# Checklist`, `# Guide`, `# Frasi`, `# Frasi tassista`.
 - Ogni dato è una riga `- chiave: valore`; gli elenchi sono righe `  - voce` sotto la chiave.
@@ -52,7 +56,7 @@ Parti da `trips/_modello.md` (ha una nota per ogni sezione). In breve:
 
 ## Nome e icona sulla Home
 Nome, icona e indirizzo di avvio vengono dall'intestazione del viaggio (`title`, e se vuoi `shortTitle`, `themeColor`, `icon`).
-Ogni viaggio può avere la sua icona: metti i PNG (192, 512 e 180 px) in `trips/` e indicali in `icon:` (`192`, `512`, `apple`). Per cambiarla rimuovi e riaggiungi l app alla Home.
+Ogni viaggio può avere la sua icona: metti i PNG (192, 512 e 180 px) nella cartella del viaggio e indicali (solo il nome del file) in `icon:` (`192`, `512`, `apple`). Per cambiarla rimuovi e riaggiungi l app alla Home.
 
 ## Lingua e scrittura locale
 La frase per il tassista è la prima di `# Frasi tassista`. La scrittura locale (da togliere dalle schermate generali)
