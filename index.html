@@ -418,15 +418,6 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
         <h2 id="heroTitle"></h2>
         <div class="th-route" id="heroRoute"></div>
       </div>
-      <div class="th-count">
-        <div class="big" id="countdownValue">—</div>
-        <div class="label" id="countdownLabel">al viaggio</div>
-      </div>
-      <div class="th-meta">
-        <span><strong id="cityCount">–</strong> città</span>
-        <span><strong id="dayCount">–</strong> giorni</span>
-        <span><strong id="progressCount">0%</strong> fatto</span>
-      </div>
     </div>
 
     <div class="now-card" id="nowCard"></div>
@@ -802,25 +793,8 @@ const cityOfDay = n => {
   return d ? d.city.split('→')[0].trim() : 'In viaggio';
 };
 
-function updateCountdown() {
-  const start = new Date(meta.start), end = new Date(meta.end);
-  const now = new Date();
-  const el = $('countdownValue'), label = $('countdownLabel');
-  if (now < start) {
-    const days = Math.ceil((start - now) / 86400000);
-    el.textContent = days; label.textContent = days === 1 ? 'giorno alla partenza' : 'giorni alla partenza';
-  } else if (now <= end) {
-    el.textContent = `D${tripDayIndex() + 1}`; label.textContent = 'del viaggio';
-  } else {
-    el.textContent = '✓'; label.textContent = 'Viaggio concluso';
-  }
-}
-function updateMetrics() {
-  let total = 0, done = 0;
-  trip.days.forEach(d => d.stops.forEach((_, i) => { total++; if (state.completed[`${d.day}-${i}`]) done++; }));
-  $('progressCount').textContent = `${Math.round(done / total * 100)}%`;
-  updateCountdown();
-}
+function updateCountdown() {}
+function updateMetrics() {}
 
 /* ====================== MODALE ====================== */
 function openModal(title, html) { $('modalTitle').textContent = title; $('modalBody').innerHTML = html; $('modal').classList.add('open'); }
@@ -2029,8 +2003,6 @@ function renderUtilHome() {
 }
 document.querySelectorAll('[data-uback]').forEach(b => b.addEventListener('click', () => showUtil('')));
 { const cn = trip.cities.map(c => c.name); $('heroRoute').textContent = cn.length > 1 ? cn[0] + ' → ' + cn[cn.length - 1] : ''; $('heroRoute').hidden = cn.length < 2; }
-$('cityCount').textContent = trip.cities.length;
-$('dayCount').textContent = trip.days.length;
 $('closeModal').addEventListener('click', closeModal);
 $('modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
