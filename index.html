@@ -493,7 +493,7 @@ main { padding: 16px 16px 140px; }
     <div class="brand">
       <div class="logo" id="brandLogo"></div>
       <div>
-        <p class="brand-state" id="brandState"></p>
+        <p class="brand-state" id="brandState" hidden></p>
         <h1 id="brandTitle">Viaggio</h1>
         <small id="brandSub"></small>
       </div>
@@ -512,6 +512,7 @@ main { padding: 16px 16px 140px; }
   <section id="dashboard" class="view active">
     <section class="card ov">
       <h2 id="heroTitle"></h2>
+      <p class="th-route" id="heroRoute"></p>
       <div class="stat-row">
         <div><span class="n" id="countdownValue">-</span> <small id="countdownLabel">al viaggio</small></div>
         <div><span class="n" id="cityCount">-</span> <small>città</small></div>
@@ -2281,7 +2282,7 @@ function renderUtilHome() {
   });
 }
 document.querySelectorAll('[data-uback]').forEach(b => b.addEventListener('click', () => showUtil('')));
-{ const cn = trip.cities.map(c => c.name); $('brandState').textContent = cn.length > 1 ? cn[0] + ' → ' + cn[cn.length - 1] : (cn[0] || ''); }
+{ const cn = trip.cities.map(c => c.name); $('heroRoute').textContent = cn.length > 1 ? cn[0] + ' → ' + cn[cn.length - 1] : ''; $('heroRoute').hidden = cn.length < 2; }
 $('closeModal').addEventListener('click', closeModal);
 $('modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
