@@ -486,6 +486,12 @@ main { padding: 16px 16px 140px; }
 .details-content .hotel-line { color: var(--text); font-weight: 600; }
 .details-content .btn-grid { margin-top: 12px; }
 @keyframes fadeInDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+.today-list { margin-top: 4px; }
+.today-row { display: grid; grid-template-columns: 56px 1fr; gap: 12px; width: 100%; text-align: left; border: none; background: none; color: var(--text); padding: 12px 0; border-top: 1px solid var(--glass-border); }
+.today-row .tr-time { color: var(--muted); font-weight: 700; font-size: .95rem; }
+.today-row.next .tr-time { color: var(--accent); }
+.today-row .tr-main b { display: block; font-size: 1rem; font-weight: 600; }
+.today-row .tr-main small { display: block; color: var(--muted); font-size: .85rem; margin-top: 2px; line-height: 1.4; }
 /* sotto-schede */
 .seg { background: light-dark(rgba(118,118,128,.14), rgba(118,118,128,.3)); }
 .seg.two { grid-template-columns: 1fr 1fr; margin: 0 0 16px; }
@@ -530,13 +536,11 @@ main { padding: 16px 16px 140px; }
       </div>
     </section>
 
-    <div class="now-card" id="nowCard"></div>
+    <section class="card" id="nowCard"></section>
 
-
-    <div id="todayWeather" style="margin-bottom: 24px;"></div>
-
-    <div class="section-title"><div><h3>Guide nella tua città</h3></div></div>
     <div id="todayGuides" style="margin-bottom:24px;"></div>
+
+
 
     <section class="card" id="bookingAlertsTitle" style="display:none;">
       <h3>Da fare</h3>
@@ -544,11 +548,6 @@ main { padding: 16px 16px 140px; }
       <div class="todo-list" id="bookingAlertsGrid"></div>
     </section>
 
-    <section class="card card-no-pad" id="logistica">
-      <h3 style="padding: 20px 20px 4px;">Logistica</h3>
-      <details class="wsec"><summary><span>Trasferimenti</span><small id="logTrCount"></small></summary><div class="details-content" id="logTr"></div></details>
-      <details class="wsec"><summary><span>Hotel</span><small id="logHotelNote"></small></summary><div class="details-content" id="logHotel"></div></details>
-    </section>
 
     <section class="card">
       <h3>Strumenti</h3>
@@ -563,8 +562,6 @@ main { padding: 16px 16px 140px; }
     <div class="section-title"><div><h3>Guide nella tua città</h3></div></div>
     <div id="todayGuides" style="margin-bottom:24px;"></div>
 
-    <div class="section-title"><div><h3>Le Tappe</h3></div></div>
-    <div class="city-grid" id="cityGrid"></div>
   </section>
 
   <!-- ITINERARIO E DIARIO -->
@@ -1071,34 +1068,20 @@ function renderToday() {
   const today = destToday();
   const started = today >= dayISO(trip.days[0]);
   const ended = today > dayISO(trip.days[trip.days.length - 1]);
+  if (ended) { box.innerHTML = '<h3>Viaggio concluso</h3><p>Rivedi le note nell\'Itinerario.</p>'; return; }
   const d = trip.days[tripDayIndex()];
-  const tr = nextTransferObj();
-  let label = '', time = '', title = '', sub = '', acts = null;
   const hm = new Date().toLocaleTimeString('en-GB', { timeZone: meta.tz, hour: '2-digit', minute: '2-digit' });
   const nowMin = (+hm.slice(0, 2)) * 60 + (+hm.slice(3, 5));
-  const nextIdx = started && !ended ? d.stops.findIndex(st => { const m = String(st[0]).match(/^(\d{1,2})[:.](\d{2})/); return m ? (+m[1]) * 60 + (+m[2]) >= nowMin - 30 : false; }) : -1;
-  const trSoon = tr && (new Date(tr.dep) - Date.now() < 86400000);
-  if (ended) {
-    label = 'Viaggio'; title = 'Concluso'; sub = 'Rivedi le note nell\'Itinerario.';
-  } else if (tr && (!started || nextIdx < 0 || trSoon)) {
-    const ms = new Date(tr.dep) - Date.now();
-    const isFl = /Volo/.test(tr.type);
-    const depName = tr.title.split('→')[0].replace(/^[A-Z0-9]{2,7}\s*(\([^)]*\))?\s*·\s*/, '').trim();
-    label = (started ? 'Adesso' : 'Prima della partenza') + ' · ' + tr.type;
-    time = 'tra ' + relTime(ms);
-    title = tr.title; sub = 'Partenza ' + fmtLocal(tr.dep) + ' (ora locale)';
-    const q = tr.zh || (depName + (isFl ? ' airport' : ' station'));
-    acts = routeRow(q, tr.zh ? () => showPlaceCard({ title: depName, zh: tr.zh, latName: depName }) : null);
-  } else if (nextIdx >= 0) {
-    const st = d.stops[nextIdx], det = d.det && d.det[nextIdx];
-    label = `Adesso · Giorno ${d.day} · ${d.city}`; time = st[0];
-    title = L(st[1]); sub = L(st[2]);
-    if (det) { const p = placeInfo(d, nextIdx); acts = routeRow(stopMapQ(d, det, p), p.zh ? () => showPlaceCard(stopCardData(d, nextIdx)) : null); }
-  } else {
-    label = `Giorno ${d.day} · ${d.city}`; title = 'Giornata conclusa'; sub = 'Non ci sono altre tappe per oggi.';
-  }
-  box.innerHTML = `<div class="nc-top"><div class="companion-meta" style="margin:0;">${esc(label)}</div>${time ? `<span class="nc-time">${esc(time)}</span>` : ''}</div><h3>${esc(title)}</h3><p>${esc(sub)}</p>`;
-  if (acts) box.appendChild(acts);
+  const nextIdx = started ? d.stops.findIndex(st => { const m = String(st[0]).match(/^(\d{1,2})[:.](\d{2})/); return m ? (+m[1]) * 60 + (+m[2]) >= nowMin - 30 : false; }) : 0;
+  box.innerHTML = `<div class="companion-meta">${started ? 'Oggi' : 'Primo giorno'} · Giorno ${d.day} · ${esc(d.date)}</div><h3>${esc(d.city)}</h3><p style="margin-bottom:6px;">${esc(d.title)}</p>`;
+  const list = document.createElement('div'); list.className = 'today-list';
+  d.stops.forEach((st, i) => {
+    const r = document.createElement('button'); r.type = 'button'; r.className = 'today-row' + (i === nextIdx ? ' next' : '');
+    r.innerHTML = `<span class="tr-time">${esc(st[0])}</span><span class="tr-main"><b>${esc(L(st[1]))}</b><small>${esc(L(st[2]))}</small></span>`;
+    r.onclick = () => { setView('itinerary'); setTimeout(() => { const e = $('day-' + d.day); if (e) e.scrollIntoView({ block: 'start' }); }, 60); };
+    list.appendChild(r);
+  });
+  box.appendChild(list);
 }
 function renderNextTransfer() { renderToday(); }
 
@@ -1380,7 +1363,7 @@ function setupConverter() {
 
 /* ====================== CITTÀ / ITINERARIO ====================== */
 function renderCities() {
-  const wrap = $('cityGrid'); wrap.innerHTML = '';
+  const wrap = $('cityGrid'); if (!wrap) return; wrap.innerHTML = '';
   trip.cities.forEach(city => {
     const h = hotelInfo(city.key);
     const card = document.createElement('div'); card.className = 'city-card';
