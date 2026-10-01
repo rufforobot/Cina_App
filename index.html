@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f2f2f7">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -403,6 +403,8 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
 .sec { margin-top: 10px; }
 .sec div, .sec li { font-size: 14px; line-height: 1.5; }
 
+html, body { touch-action: manipulation; }
+input, select, textarea { font-size: 16px; }
 /* ===== TEMA CARD iOS (design fornito dall'utente) ===== */
 :root {
   --bg: light-dark(#F2F2F7, #000000);
@@ -2249,7 +2251,9 @@ function goTool(id) {
   if (id === 'cambio') setTimeout(() => { const c = $('convYuan'); if (c) c.focus({ preventScroll: true }); }, 50);
 }
 document.querySelectorAll('.tool-btn[data-go]').forEach(b => b.addEventListener('click', () => goTool(b.dataset.go)));
+document.querySelectorAll('.bottom-nav [data-view]').forEach(b => b.addEventListener('click', () => { if (b.dataset.view === 'useful') showUtil(''); setView(b.dataset.view); }));
 initSubTabs();
+['gesturestart','gesturechange','gestureend'].forEach(ev => document.addEventListener(ev, e => e.preventDefault()));
 
 /* Utili: griglia di riquadri, ogni argomento in una schermata propria */
 function showUtil(id) {
