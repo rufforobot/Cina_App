@@ -458,7 +458,7 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
   <!-- UTILI -->
   <section id="useful" class="view">
     <div class="chips-nav" id="utilNav">
-      <button class="chip-btn" id="navPay" data-go="sec-pay">Pagamenti</button>
+      <button class="chip-btn" id="navPay" data-go="quickApps">Pagamenti</button>
       <button class="chip-btn" id="navConv" data-go="sec-conv">Cambio</button>
       <button class="chip-btn" data-go="sec-budget">Budget</button>
       <button class="chip-btn" data-go="sec-check">Checklist</button>
@@ -468,9 +468,6 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
       <button class="chip-btn" data-go="sec-sos">Emergenze</button>
       <button class="chip-btn" data-go="sec-backup">Backup</button>
     </div>
-
-    <div class="section-title" id="sec-pay" hidden><div><h3>App utili</h3></div></div>
-    <div class="quick-apps" id="quickApps" style="margin-bottom: 24px;" hidden></div>
 
     <div class="section-title" id="sec-conv"><div><h3>Convertitore Rapido</h3><p id="rateLabel">Calcolo istantaneo offline.</p></div></div>
     <div class="utility-card" id="convCard" style="margin-bottom: 24px;">
@@ -486,6 +483,8 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
         </div>
       </div>
     </div>
+
+    <div class="quick-apps" id="quickApps" style="margin-bottom: 24px; scroll-margin-top: 90px;" hidden></div>
 
     <div class="section-title" id="sec-budget"><div><h3>Gestione Budget</h3></div></div>
     <div class="expense-card" style="margin-bottom: 24px;">
@@ -1733,7 +1732,7 @@ const foreignCur = !!(meta.currency && meta.currency.symbol && meta.currency.sym
 $('navPay').hidden = !(meta.apps && meta.apps.length);
 if (!foreignCur) { const ec = $('expenseCurrency'); ec.value = '€'; ec.hidden = true; }
 if (meta.apps && meta.apps.length) {
-  $('sec-pay').hidden = false; const qa = $('quickApps'); qa.hidden = false;
+  const qa = $('quickApps'); qa.hidden = false;
   qa.innerHTML = meta.apps.map(a => { const [label, url] = String(a).split(' | '); return `<a href="${esc((url || '').trim())}">${esc((label || '').trim())}</a>`; }).join('');
 }
 (function () { try {
