@@ -1204,11 +1204,13 @@ function detHTML(day, i) {
   if (st.warn) h += `<div class="warnbox">⚠️ ${esc(L(st.warn))}</div>`;
   if (st.tips && st.tips.length) h += `<details class="more"><summary>Consigli (${st.tips.length})</summary><ul class="sec">${st.tips.map(t => `<li>${esc(L(t))}</li>`).join('')}</ul></details>`;
   const hk = st.h || DIARY[day.day].sleep;
+  /* destinazione per le mappe: indirizzo locale, oppure «mappa:» del file, oppure titolo + città; per voli e treni nessuna mappa, salvo «mappa:» nel file; nei giorni con più città si usa titolo + paese */
+  const mapQ = p.zh || st.map || (/^(volo|treno|aereo|bus|traghetto)\b/i.test(st.title) ? '' : String(day.city).includes('→') ? `${st.title}, ${meta.country}` : `${st.title}, ${day.city}, ${meta.country}`);
   h += `<div class="act-row">
     ${(p.zh || p.addr) ? `<button class="btn small taxi-btn" data-a="taxi">🚕 Taxi</button>` : ''}
     ${st.tel ? `<a class="btn small" href="tel:${esc(st.tel)}">📞 Chiama</a>` : ''}
-    <a class="btn small" href="${appleMaps(p.zh || `${st.title}, ${day.city}, ${meta.country}`)}">🧭 Mappa</a>
-    <a class="btn small" href="${transitApple(p.zh || `${st.title}, ${day.city}, ${meta.country}`)}">🚇 Metro</a>
+    ${mapQ ? `<a class="btn small" href="${appleMaps(mapQ)}">🧭 Mappa</a>
+    <a class="btn small" href="${transitApple(mapQ)}">🚇 Metro</a>` : ''}
   </div>
   <div class="vb">${st.v === 'ok' ? '✅ Dati letti su fonti online' : '🟡 Da verificare prima di partire'}${p.custom ? ' · ✏️ modificato da te' : ''}</div>`;
   return h;
