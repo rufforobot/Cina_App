@@ -402,6 +402,86 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
 .stop-det { padding: 12px; }
 .sec { margin-top: 10px; }
 .sec div, .sec li { font-size: 14px; line-height: 1.5; }
+
+/* ===== TEMA CARD iOS (design fornito dall'utente) ===== */
+:root {
+  --bg: light-dark(#F2F2F7, #000000);
+  --surface: light-dark(#FFFFFF, #1c1c1e);
+  --text: light-dark(#1C1C1E, #ffffff);
+  --muted: light-dark(#8E8E93, #98989d);
+  --accent: light-dark(#FF2D55, #ff375f);
+  --accent-2: var(--accent);
+  --fill: light-dark(#F2F2F7, rgba(118,118,128,.3));
+  --pill: light-dark(#FFFFFF, rgba(255,255,255,.14));
+  --glass: var(--surface);
+  --glass-strong: light-dark(rgba(255,255,255,.85), rgba(28,28,30,.85));
+  --glass-border: light-dark(rgba(0,0,0,.05), rgba(255,255,255,.1));
+  --glass-blur: none;
+  --shadow: 0 4px 24px rgba(0,0,0,.03);
+  --radius: 24px;
+}
+body { background: var(--bg); background-image: none; line-height: 1.4; -webkit-font-smoothing: antialiased; }
+h1, h2, h3 { letter-spacing: -0.03em; }
+header { background: light-dark(rgba(242,242,247,.75), rgba(0,0,0,.7)); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-bottom: 1px solid light-dark(rgba(0,0,0,.05), rgba(255,255,255,.08)); }
+.header-inner { padding: 12px 16px; }
+.brand { display: block; }
+.logo, .brand small { display: none; }
+.brand-state { margin: 0; font-size: .85rem; font-weight: 500; text-transform: uppercase; letter-spacing: .05em; color: var(--accent); }
+.brand h1 { font-size: 1.8rem; letter-spacing: -0.03em; line-height: 1.15; }
+.clocks { background: #000; color: #fff; border-radius: 999px; padding: 6px 14px; gap: 8px; font-size: .85rem; font-weight: 600; flex-wrap: nowrap; box-shadow: 0 4px 12px rgba(0,0,0,.15); }
+#clockItaly { color: #A1A1A6; font-weight: 400; }
+main { padding: 16px 16px 140px; }
+.btn, .icon-btn { background: var(--fill); border: none; color: var(--text); }
+.btn.primary { background: var(--accent); color: #fff; }
+.btn.ghost { background: transparent; color: var(--accent); }
+.hotel-box { background: var(--bg); border: none; }
+.hotel-box .btn, .pl .btn, .todo-list .btn { background: var(--surface); }
+.pl { background: var(--bg); border: none; }
+.live-line, .metric, .wx-slot, .wx-tile, .clocks-x { background: var(--bg); }
+
+/* nav fluttuante */
+.bottom-nav { grid-template-columns: repeat(4, 1fr); left: 16px; right: 16px; bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); max-width: 520px; margin: 0 auto; padding: 12px 8px; border-radius: 32px; background: light-dark(rgba(255,255,255,.85), rgba(28,28,30,.85)); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); box-shadow: 0 10px 40px rgba(0,0,0,.1); border: 1px solid light-dark(rgba(255,255,255,.4), rgba(255,255,255,.08)); }
+.bottom-nav button { font-size: .7rem; }
+.bottom-nav button.active { color: var(--accent); }
+.bottom-nav button.active svg { transform: scale(1.1); }
+.bottom-nav button svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; transition: transform .2s; }
+
+/* panoramica Home e strumenti */
+.stat-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: var(--bg); padding: 12px 16px; border-radius: 16px; margin-top: 14px; }
+.stat-row .n { font-size: 1.2rem; font-weight: 700; color: var(--text); }
+.stat-row small { color: var(--muted); }
+.ov h2 { margin: 0; font-size: 1.4rem; }
+.ov p { margin: 2px 0 0; }
+.card { background: var(--surface); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); border: 1px solid var(--glass-border); margin-bottom: 16px; }
+.card h3 { margin: 0 0 2px; font-size: 1.2rem; font-weight: 700; }
+.card > p { color: var(--muted); margin: 0 0 12px; font-size: .95rem; }
+.card-no-pad { padding: 0; overflow: hidden; }
+.tools-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+.tool-btn { background: var(--bg); border: none; border-radius: 16px; padding: 16px; text-align: center; font-weight: 600; font-size: .9rem; display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--text); }
+.tool-btn:active { transform: scale(.97); }
+.tool-btn svg { width: 26px; height: 26px; }
+.todo-list { display: flex; flex-direction: column; gap: 10px; }
+.todo-list .utility-card { background: var(--bg); box-shadow: none; border: none; border-radius: 16px; padding: 14px 16px; }
+
+/* liste espandibili (details) come nel design */
+.wsec { margin: 0; border-bottom: 1px solid var(--glass-border); }
+.wsec:last-child { border-bottom: none; }
+.wsec > summary { padding: 18px 20px; font-size: 1rem; font-weight: 600; letter-spacing: 0; background: none; border: none; box-shadow: none; border-radius: 0; }
+.wsec > summary::after { content: '\203A'; font-size: 1.5rem; line-height: 1; transform: none; }
+.wsec[open] > summary::after { transform: rotate(90deg); }
+.wsec > .wallet-grid, .wsec > .utility-card { margin: 0; padding: 0 16px 16px; }
+.wsec .wallet-card, .wsec .utility-card { background: var(--bg); box-shadow: none; border: none; }
+.wsec .wallet-card .btn, .wsec .utility-card .btn { background: var(--surface); }
+.wsec .wallet-card .field, .wsec .utility-card .field { background: var(--surface); }
+
+/* sotto-schede */
+.seg { background: light-dark(rgba(118,118,128,.14), rgba(118,118,128,.3)); }
+.seg.two { grid-template-columns: 1fr 1fr; margin: 0 0 16px; }
+.view > .field, .view > .guide-bar .field, .view > .guide-bar .btn, .view > .btn-grid > .btn, #docsBox > .btn-grid > .btn, #quickApps .btn { background: var(--surface); color: var(--text); }
+#quickApps a { background: var(--surface); color: var(--text); border: 1px solid var(--glass-border); box-shadow: var(--shadow); }
+.seg button { border: none; background: none; color: var(--text); font-weight: 600; padding: 8px 4px; border-radius: 10px; }
+.seg button.on { background: var(--surface); box-shadow: 0 1px 4px rgba(0,0,0,.12); }
+.day-card .timeline { }
 </style>
 </head>
 <body>
@@ -411,6 +491,7 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
     <div class="brand">
       <div class="logo" id="brandLogo"></div>
       <div>
+        <p class="brand-state" id="brandState"></p>
         <h1 id="brandTitle">Viaggio</h1>
         <small id="brandSub"></small>
       </div>
@@ -427,20 +508,15 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
 <main>
   <!-- DASHBOARD -->
   <section id="dashboard" class="view active">
-    <div class="hero-card trip-head">
-      <div class="th-main">
-        <h2 id="heroTitle"></h2>
-        <div class="th-route" id="heroRoute"></div>
+    <section class="card ov">
+      <h2 id="heroTitle"></h2>
+      <p class="th-route" id="heroRoute"></p>
+      <div class="stat-row">
+        <div><span class="n" id="countdownValue">-</span> <small id="countdownLabel">al viaggio</small></div>
+        <div><span class="n" id="cityCount">-</span> <small>città</small></div>
+        <div><span class="n" id="dayCount">-</span> <small>giorni</small></div>
       </div>
-      <div class="th-count">
-        <div class="big" id="countdownValue">—</div>
-        <div class="label" id="countdownLabel">al viaggio</div>
-      </div>
-      <div class="th-meta">
-        <span><strong id="cityCount">–</strong> città</span>
-        <span><strong id="dayCount">–</strong> giorni</span>
-      </div>
-    </div>
+    </section>
 
     <div class="now-card" id="nowCard"></div>
 
@@ -451,10 +527,24 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
     <div class="section-title"><div><h3>Guide nella tua città</h3></div></div>
     <div id="todayGuides" style="margin-bottom:24px;"></div>
 
-    <div class="section-title" id="bookingAlertsTitle" style="display:none;">
-      <div><h3>Da fare</h3><p>Promemoria e prenotazioni in scadenza (orario italiano).</p></div>
-    </div>
-    <div class="city-grid" id="bookingAlertsGrid" style="margin-bottom: 24px;"></div>
+    <section class="card" id="bookingAlertsTitle" style="display:none;">
+      <h3>Da fare</h3>
+      <p>Promemoria e prenotazioni in scadenza (orario italiano).</p>
+      <div class="todo-list" id="bookingAlertsGrid"></div>
+    </section>
+
+    <section class="card">
+      <h3>Strumenti</h3>
+      <div class="tools-grid">
+        <button type="button" class="tool-btn" data-go="cambio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 7.5 12 12l3.5-4.5M8.5 12h7M8.5 15h7M12 12v5"/></svg>Cambio valuta</button>
+        <button type="button" class="tool-btn" data-go="weather"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3"/><path d="M9 3v1.5M3 9h1.5M4.8 4.8l1 1M13.2 4.8l-1 1"/><path d="M8 19h9a3.5 3.5 0 0 0 .4-7A5 5 0 0 0 8 13a3 3 0 0 0 0 6z"/></svg>Meteo</button>
+        <button type="button" class="tool-btn" data-go="trans"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h9v7H8l-3 3v-3H4zM11 12v3h5l3 3v-3h1v-7h-5"/></svg>Traduttore</button>
+        <button type="button" class="tool-btn" data-go="budget"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>Budget</button>
+      </div>
+    </section>
+
+    <div class="section-title"><div><h3>Guide nella tua città</h3></div></div>
+    <div id="todayGuides" style="margin-bottom:24px;"></div>
 
     <div class="section-title"><div><h3>Le Tappe</h3></div></div>
     <div class="city-grid" id="cityGrid"></div>
@@ -477,6 +567,7 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
   <!-- WALLET -->
   <section id="wallet" class="view">
     <div class="btn-grid" style="--n:1; margin-bottom:12px;"><button class="btn small" id="impBtn" type="button">Importa da email</button></div>
+    <div class="card card-no-pad" id="wsecGroup">
     <details class="wsec" id="secTr"><summary><span>Trasferimenti</span><small id="cntTr"></small></summary>
       <div class="wallet-grid" id="transferGrid"></div></details>
 
@@ -497,11 +588,17 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
           <button class="btn primary" id="icsTr">Voli e treni</button>
         </div>
       </div></details>
+    </div>
 
     <div id="oldCodes" hidden>
       <div class="section-title"><div><h3>Altri codici</h3><p>Salvati in precedenza. Ora i codici e le note si inseriscono dentro ogni prenotazione.</p></div></div>
       <div class="utility-card"><div id="codeList"></div></div>
     </div>
+  </section>
+
+  <!-- DOCUMENTI -->
+  <section id="docsView" class="view">
+    <div id="docsBox" style="margin-bottom:24px;"></div>
   </section>
 
   <!-- UTILI -->
@@ -585,11 +682,6 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
       <a class="btn small" id="sosAssist" style="width:100%; margin-top:12px;"></a>
     </div>
     </div>
-    <div class="upanel" id="up-docs" hidden>
-      <button class="ubar" type="button" data-uback>&lsaquo; Utili</button>
-    <div class="section-title"><div><h3>Documenti</h3></div></div>
-    <div id="docsBox" style="margin-bottom:24px;"></div>
-    </div>
     <div class="upanel" id="up-remind" hidden>
       <button class="ubar" type="button" data-uback>&lsaquo; Utili</button>
     <div class="section-title"><div><h3>Promemoria</h3></div></div>
@@ -621,11 +713,10 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
 </main>
 
 <nav class="bottom-nav" id="bottomNav">
-  <button class="active" data-view="dashboard"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Home</button>
-  <button data-view="itinerary"><svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>Itinerario</button>
-  <button data-view="companion"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>Guida</button>
-  <button data-view="wallet"><svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>Prenotazioni</button>
-  <button data-view="useful"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>Utili</button>
+  <button class="active" data-view="dashboard"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>Oggi</button>
+  <button data-view="itinerary"><svg viewBox="0 0 24 24"><path d="M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 7zM9 4v13M15 7v12.5"/></svg>Tappe</button>
+  <button data-view="wallet"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="14" rx="3"/><path d="M3 10h18M16 15h2"/></svg>Doc</button>
+  <button data-view="useful"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>Utili</button>
 </nav>
 
 <div class="modal" id="modal">
@@ -818,7 +909,8 @@ const cityOfDay = n => {
 function updateCountdown() {
   const start = new Date(meta.start), end = new Date(meta.end);
   const now = new Date();
-  const el = $('countdownValue'), label = $('countdownLabel');
+  const el = $('countdownValue'), label = $('countdownLabel'), st = $('brandState');
+  if (st) st.textContent = now < start ? 'Prima della partenza' : now <= end ? 'Viaggio in corso' : 'Viaggio concluso';
   if (now < start) {
     const days = Math.ceil((start - now) / 86400000);
     el.textContent = days; label.textContent = days === 1 ? 'giorno alla partenza' : 'giorni alla partenza';
@@ -996,7 +1088,7 @@ function renderBookingAlerts() {
   const toBook = pendingReservations();
   const due = typeof dueReminders === 'function' ? dueReminders() : [];
   if (!toBook.length && !due.length) { title.style.display = 'none'; return; }
-  title.style.display = 'flex';
+  title.style.display = 'block';
   due.forEach(r => {
     const card = document.createElement('div'); card.className = 'utility-card';
     card.innerHTML = `<div class="companion-meta">Promemoria</div><h4 style="margin:0; font-size:18px;">${esc(r.title)}</h4><p style="margin:8px 0 0; font-size:14px; font-weight:500;">${esc(r.sub)}</p><p style="margin:4px 0 0; font-size:14px; font-weight:600; color:var(--accent-2);">${esc(fmtDT(r.at))}</p><button class="btn small" style="width:100%; margin-top:12px;">Fatto</button>`;
@@ -1418,8 +1510,8 @@ const pinIcon = n => window.L.divIcon({ className: 'dm-pin', html: `<span>${n}</
 function drawDay(map, d, small) {
   window.L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }).addTo(map);
   d.found.forEach(p => { p.mk = window.L.marker(p.ll, { icon: pinIcon(p.n), interactive: !small }).addTo(map); if (!small) p.mk.bindPopup(`<b>${esc(p.title)}</b><br>${esc(p.time)}`); });
-  if (d.geom) window.L.geoJSON(d.geom, { style: { color: '#007aff', weight: 4, opacity: .8 } }).addTo(map);
-  else if (d.found.length > 1) window.L.polyline(d.found.map(p => p.ll), { color: '#007aff', weight: 3, opacity: .8, dashArray: '6 8' }).addTo(map);
+  if (d.geom) window.L.geoJSON(d.geom, { style: { color: '#FF2D55', weight: 4, opacity: .8 } }).addTo(map);
+  else if (d.found.length > 1) window.L.polyline(d.found.map(p => p.ll), { color: '#FF2D55', weight: 3, opacity: .8, dashArray: '6 8' }).addTo(map);
   if (d.found.length === 1) map.setView(d.found[0].ll, 15); else map.fitBounds(d.found.map(p => p.ll), { padding: [small ? 22 : 30, small ? 22 : 30] });
 }
 const kmLabel = d => d.found.length > 1 ? `${fmtKm(d.km)}${d.exact ? '' : ' in linea d\'aria'}` : '';
@@ -2132,15 +2224,33 @@ function initExtras() {
 }
 
 /* ====================== NAVIGAZIONE / INIT ====================== */
+const NAV_PARENT = { companion: 'itinerary', docsView: 'wallet' };
 function setView(view) {
+  const nav = NAV_PARENT[view] || view;
   document.querySelectorAll('.bottom-nav button').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll(`.bottom-nav [data-view="${view}"]`).forEach(b => b.classList.add('active'));
+  document.querySelectorAll(`.bottom-nav [data-view="${nav}"]`).forEach(b => b.classList.add('active'));
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   $(view).classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+/* sotto-schede: Tappe = Itinerario | Guida, Doc = Prenotazioni | Documenti */
+function initSubTabs() {
+  const sets = [[['itinerary', 'Itinerario'], ['companion', 'Guida']], [['wallet', 'Prenotazioni'], ['docsView', 'Documenti']]];
+  sets.forEach(set => set.forEach(([id]) => {
+    const sec = $(id); if (!sec || sec.querySelector('.seg.two')) return;
+    const seg = document.createElement('div'); seg.className = 'seg two';
+    set.forEach(([vid, label]) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = label; if (vid === id) b.classList.add('on'); b.onclick = () => setView(vid); seg.appendChild(b); });
+    sec.insertBefore(seg, sec.firstChild);
+  }));
+}
+function goTool(id) {
+  setView('useful');
+  showUtil(id === 'cambio' ? '' : id);
+  if (id === 'cambio') setTimeout(() => { const c = $('convYuan'); if (c) c.focus({ preventScroll: true }); }, 50);
+}
+document.querySelectorAll('.tool-btn[data-go]').forEach(b => b.addEventListener('click', () => goTool(b.dataset.go)));
+initSubTabs();
 
-document.querySelectorAll('.bottom-nav [data-view]').forEach(b => b.addEventListener('click', () => { if (b.dataset.view === 'useful') showUtil(''); setView(b.dataset.view); }));
 /* Utili: griglia di riquadri, ogni argomento in una schermata propria */
 function showUtil(id) {
   $('utilHome').hidden = !!id;
@@ -2153,7 +2263,6 @@ function renderUtilHome() {
   const tiles = [
     ['budget', 'Budget', true, () => $('expenseTotal').textContent.replace(/ *\(.*\)/, '')],
     ['check', 'Checklist', true, () => $('checkProgress').textContent + ' completate'],
-    ['docs', 'Documenti', true, () => (state.docs || []).length ? state.docs.length + ' salvati' : 'Passaporto, visto'],
     ['remind', 'Promemoria', true, () => { const n = buildReminders().filter(r => !(state.remDone || {})[r.id]).length; return n + ' da fare'; }],
     ['info', 'Info paese', hasInfo, () => INFO.length + ' argomenti'],
     ['phrases', 'Frasi utili', hasPhr, () => phrases.length + ' frasi con audio'],
