@@ -163,29 +163,29 @@ atterraggio a Pudong alle 10:05 (18h00 totali con lo scalo ad Abu Dhabi). 1h-1h3
 
 | Orario | Destinazione | Trasporto | Note |
 |---|---|---|---|
-| **09:00** | Mercato locale (zona Xintiandi) | 🚇 L10, diretta | Nessun orario fisso |
-| **10:30** | Cangbao Lou / Fuyou Antique Market | 🚶 pochi isolati, o metro Yuyuan Garden | 4 piani, il 3°-4° vivi nel weekend |
+| **09:00** | Yu Garden | 🚶 10 min | 60-90 min, andateci all'apertura — ⚠️ chiuso il lunedì, per questo è qui |
+| **10:30** | Cangbao Lou / Fuyou Antique Market | 🚶 5-10 min da Yu Garden | 4 piani, il 3°-4° vivi nel weekend |
 | **12:00** | People's Park (mercato matrimoni) | 🚇 L10/8 | Solo sab-dom 12:00-17:00 |
 | **14:00** | Laboratorio di cucina (Xuhui) | 🚕 Didi | Verificare orario prenotazione — policy non rimborsabile |
 
-mattina dedicata alla vita locale, non alle attrazioni — **passeggiata libera in un mercato di quartiere** vicino a Xintiandi/Concessione Francese (senza orari fissi: banchi di verdura, pesce vivo nelle vasche, la contrattazione quotidiana), seguita da **Cangbao Lou / Fuyou Antique Market** (457 Fangbang Zhong Lu, angolo Henan Nan Lu) — non più Dongtai Road, che è stata demolita tra il 2014 e il 2018 e non esiste più come mercato: i venditori si sono spostati proprio qui. Un edificio di 4 piani, "torre del tesoro": il 1°-2° piano hanno rivenditori fissi tutti i giorni (9:00-17:00), ma il **3° e 4° piano prendono vita nei weekend** — essendo domenica, ci siete nel momento migliore. Porcellane, monete Qing, calligrafia, cimeli dell'era Mao. A due passi dalla metro Yuyuan Garden, la stessa fermata del vostro hotel. Chiudete la mattina al **People's Park (相亲角, "mercato dei matrimoni")** — proprio in zona hotel, quindi comodo come ultima tappa: genitori e nonni espongono su ombrelli aperti veri "curriculum" dei figli non sposati, cercando un abbinamento con altri genitori. Attivo solo sabato e domenica, 12:00-17:00 — essendo domenica ci siete in pieno.
+domenica è il giorno giusto per tutta la zona vecchia, perché **Yu Garden è chiuso il lunedì** (aperto martedì-domenica, circa 9:00-16:30, ultimo ingresso 16:00) e il 3°-4° piano di Cangbao Lou vive solo nei weekend. Si parte dallo **Yu Garden** appena apre, per godervi i giardini prima della folla della domenica (a due passi dall'hotel, 10 min a piedi), poi si prosegue a **Cangbao Lou / Fuyou Antique Market** (457 Fangbang Zhong Lu, angolo Henan Nan Lu), a pochi minuti a piedi — non più Dongtai Road, che è stata demolita tra il 2014 e il 2018 e non esiste più come mercato: i venditori si sono spostati proprio qui. Un edificio di 4 piani, "torre del tesoro": il 1°-2° piano hanno rivenditori fissi tutti i giorni (9:00-17:00), ma il **3° e 4° piano prendono vita nei weekend** — essendo domenica, ci siete nel momento migliore. Porcellane, monete Qing, calligrafia, cimeli dell'era Mao. A due passi dalla metro Yuyuan Garden, la stessa fermata del vostro hotel. Chiudete la mattina al **People's Park (相亲角, "mercato dei matrimoni")**: genitori e nonni espongono su ombrelli aperti veri "curriculum" dei figli non sposati, cercando un abbinamento con altri genitori. Attivo solo sabato e domenica, 12:00-17:00 — essendo domenica ci siete in pieno.
 
 **Primo pomeriggio: laboratorio di cucina — xiaolongbao con Chef Yin.** Lezione hands-on di 2,5h (impasto, ripieno, la piega classica), gruppi piccoli (max 15), ottime recensioni — si mangia quello che si prepara, di fatto diventa anche il pranzo/prima cena. Da 35$ a persona (~65€ per due). Si prenota su [Viator](https://www.viator.com/tours/Shanghai/3-Hour-Chinese-Kitchen-Cooking-Class-Xiaolongbao-Soup-Dumplings/d325-7137P182) (stessa esperienza anche su TripAdvisor). Sede: 2° piano, Building 17, Alley 190, Si Wei Village, Guangyuan Road, distretto di Xuhui. ⚠️ **Policy non rimborsabile e non modificabile**: prenotate solo quando siete certi della data (vedi sezione 10).
 
-Sera libera per riposare con calma — il giorno dopo (Yu Garden + Nanjing Road) è già pieno.
+Sera libera per riposare con calma — il giorno dopo (mercato locale, Nanjing Road e Concessione Francese) è già pieno.
 
 **Giorno 4 (lunedì 19/10):**
 
 | Orario | Destinazione | Trasporto | Note |
 |---|---|---|---|
-| **08:30** | Yu Garden | 🚶 10 min | 60-90 min, andateci in apertura |
-| **10:00** | Nanjing Road | 🚶 10 min | 30-45 min, solo un passaggio veloce |
+| **09:00** | Mercato locale (zona Xintiandi) | 🚇 L10, diretta | Nessun orario fisso — di lunedì è più autentico che nel weekend |
+| **10:30** | Nanjing Road (pedonale) | 🚇 L10, poche fermate | 30-45 min, solo un passaggio veloce |
 | **11:30** | Pranzo | 🚶 | |
 | **13:00** | Wukang Mansion | 🚇 L10/11, Jiao Tong University (uscita 7) | inizio passeggiata |
 | **13:00-17:00** | Wukang Rd → Wuyuan Rd → Anfu Rd → lilong → Fuxing Park | 🚶 | 2,5km, 4h — luce migliore su Wukang Mansion tra le 16:00-17:30 |
 | **19:00** | Cena in zona | 🚶 | Concessione Francese, molte opzioni |
 
-**Yu Garden** e la Città Vecchia — andateci appena aprono (le 8:30). Un passaggio veloce su **Nanjing Road** pedonale, poi pranzo.
+⚠️ **Lunedì lo Yu Garden è chiuso** (l'abbiamo spostato al Giorno 3, domenica). La mattina è quindi per la vita locale: **passeggiata libera in un mercato di quartiere** vicino a Xintiandi/Concessione Francese (senza orari fissi: banchi di verdura, pesce vivo nelle vasche, la contrattazione quotidiana — di lunedì è la vita di tutti i giorni, non il weekend). Poi un passaggio veloce su **Nanjing Road** pedonale, e pranzo.
 
 **Pomeriggio: Concessione Francese, sul serio** — non una passeggiata serale di un'ora, ma il quartiere vissuto per quello che è: **Wukang Mansion** (il palazzo Normandie del 1924, il più fotografato della città), poi **Wukang Road** (oltre 50 edifici storici anni '20-'30, stili francese/spagnolo/inglese/Art Déco mescolati), **Wuyuan Road** (caffè indipendenti), **Anfu Road** (boutique, moda giovane), i piccoli **lilong** residenziali lungo il percorso, fino a **Fuxing Park** — 2,5 km, 3-4 ore con calma, il modo in cui i viaggiatori aggiornati al 2026 descrivono davvero questo quartiere: a piedi, senza fretta, deviando in un vicolo quando qualcosa attira l'occhio.
 
@@ -543,7 +543,7 @@ con il volo Etihad delle 19:45 da Daxing, la mattina resta libera ma la sera no.
 **Totale: 15 notti in Cina**, tra l'atterraggio a Shanghai sabato 17/10 mattina e la partenza da Pechino domenica 1/11 sera (atterraggio a Milano lunedì 2/11 mattina). Se contate le ferie, mettete in conto anche lunedì 2/11 come giorno di rientro/recupero.
 
 **Se doveste comunque tagliare un giorno** (ferie più corte, imprevisti), l'ordine di priorità è:
-1. Saltare il **Giorno 3 a Shanghai** (mercato, Cangbao Lou, mercato dei matrimoni, laboratorio di cucina) — il taglio più indolore in assoluto (attenzione però: resta anche il vostro margine di recupero dopo un volo di 18h00 con scalo)
+1. Saltare il **Giorno 3 a Shanghai** (Yu Garden, Cangbao Lou, mercato dei matrimoni, laboratorio di cucina) — il taglio più indolore in assoluto (attenzione però: resta anche il vostro margine di recupero dopo un volo di 18h00 con scalo)
 2. Ridurre **Zhangjiajie a 1 sola notte**, tenendo solo il trekking a Yuanjiajie (traccia breve) e sacrificando Tianmen Shan — è la tappa a cui avete tenuto di più, quindi valutatela per ultima tra le vere rinunce
 3. Ridurre **Chongqing a 1 sola notte** (vedreste comunque Hongyadong, Shibati e la crociera con i droni se cade nel giorno giusto)
 4. Accorciare la giornata di **Xi'an**, tenendo solo l'Esercito di Terracotta e rimandando le Mura a un futuro viaggio
@@ -634,4 +634,4 @@ Man mano che prenoti qualcosa, dimmi la cifra e aggiorno la tabella.
 
 *Prossimi passi: proseguire con treni, hotel e biglietti seguendo il calendario in sezione 10. Lungo il percorso trovate sempre le due opzioni 📸/🔸 affiancate — decidete giorno per giorno.*
 
-*Versione v11 — 01/10/2026*
+*Versione v12 — 01/10/2026*
