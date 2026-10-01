@@ -266,7 +266,12 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
 .phrase .py { color: var(--muted); font-size: 18px; margin-top: 2px; }
 .phrase { grid-template-columns: 1fr; }
 .phrase .acts { justify-content: flex-start; }
-.uinline { margin-bottom: 8px; }
+.upane[hidden] { display: none; }
+.ugroup .seg.two { margin: 0 0 14px; }
+.ugroup .expense-card, .ugroup .utility-card { box-shadow: none; border: 0; padding: 0; background: none; }
+.wx-chips { display: flex; gap: 6px; overflow-x: auto; margin: 0 0 12px; padding-bottom: 2px; }
+.wx-chips button { flex: 0 0 auto; border: 0; background: var(--fill); color: var(--text); font-size: 13px; font-weight: 600; padding: 7px 12px; border-radius: 999px; }
+.wx-chips button.on { background: var(--accent); color: #fff; }
 .phrase .acts { display: flex; gap: 6px; }
 
 /* Meteo */
@@ -648,8 +653,11 @@ main { padding: 16px 16px 140px; }
   <!-- UTILI -->
   <section id="useful" class="view">
     <div id="utilHome">
-    <div class="section-title" id="sec-conv" style="margin-top:4px;"><div><h3>Cambio</h3><p id="rateLabel">Calcolo istantaneo offline.</p></div></div>
-    <div class="utility-card" id="convCard" style="margin-bottom: 24px;">
+    <section class="card ugroup" id="up-money">
+      <div class="seg two"><button type="button" class="on" data-pane="up-conv">Cambio</button><button type="button" data-pane="up-budget">Budget</button></div>
+<div class="upane" id="up-conv">
+    <p class="note-line" id="rateLabel" style="margin:0 0 10px;">Calcolo istantaneo offline.</p>
+    <div class="utility-card" id="convCard">
       <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: center;">
         <div>
           <label for="convYuan" style="font-size: 13px; color: var(--muted); font-weight: 600; display: block; margin-bottom: 8px; text-align: center;" id="convLabel"></label>
@@ -662,18 +670,9 @@ main { padding: 16px 16px 140px; }
         </div>
       </div>
     </div>
-    <div class="quick-apps" id="quickApps" style="margin-bottom: 24px; scroll-margin-top: 90px;" hidden></div>
-    <div class="uinline" id="up-trans">
-    <div class="section-title"><div><h3>Traduttore</h3></div></div>
-    <div id="transBox" style="margin-bottom:24px;"></div>
-    </div>
-    <div class="uinline" id="up-weather">
-    <div class="section-title" id="sec-weather"><div><h3>Meteo</h3><p id="wxStamp"></p></div><button class="btn small" id="wxRefresh" style="flex:0 0 auto;">Aggiorna</button></div>
-    <div class="wx-cities" id="weatherBox" style="margin-bottom: 24px;"></div>
-    </div>
-    <div class="uinline" id="up-budget">
-    <div class="section-title" id="sec-budget"><div><h3>Gestione Budget</h3></div></div>
-    <div class="expense-card" style="margin-bottom: 24px;">
+</div>
+<div class="upane" id="up-budget" hidden>
+        <div class="expense-card" >
       <div style="width: 100%;">
         <div class="companion-meta">Totale Viaggio</div>
         <div class="expense-total" id="expenseTotal">€0,00</div>
@@ -692,14 +691,26 @@ main { padding: 16px 16px 140px; }
       <div class="sub-title">Elenco spese</div>
       <div class="expense-list" id="expenseList"></div>
     </div>
-    </div>
-    <div class="uinline" id="up-phrases">
-    <div class="section-title" id="sec-phrases"><div><h3>Frasi utili</h3></div></div>
-    <div class="utility-card" id="phrasesCard" style="margin-bottom: 24px;">
+</div>
+    </section>
+    <section class="card ugroup" id="up-lang">
+      <div class="seg two"><button type="button" class="on" data-pane="up-trans">Traduttore</button><button type="button" id="tabPhrases" data-pane="up-phrases">Frasi utili</button></div>
+<div class="upane" id="up-trans">
+        <div id="transBox"></div>
+</div>
+<div class="upane" id="up-phrases" hidden>
+        <div class="utility-card" id="phrasesCard">
       <input class="field" id="phraseSearch" placeholder="Cerca (es. bagno, conto, allergico)">
       <div id="phrasesBox"></div>
     </div>
-    </div>
+</div>
+    </section>
+    <section class="card" id="up-weather">
+        <div class="section-title" id="sec-weather"><div><h3>Meteo</h3><p id="wxStamp"></p></div><button class="btn small" id="wxRefresh" style="flex:0 0 auto;">Aggiorna</button></div>
+    <div class="wx-cities" id="weatherBox"></div>
+    </section>
+    <div class="quick-apps" id="quickApps" style="margin-bottom: 24px; scroll-margin-top: 90px;" hidden></div>
+    <div class="section-title"><div><h3>Altro</h3></div></div>
     <div class="section-title"><div><h3>Altro</h3></div></div>
       <div class="util-grid" id="utilGrid"></div>
     </div>
@@ -1976,7 +1987,6 @@ function renderChecklist() {
 function speakZh(text) { speak(text.replace(/…/g, ''), meta.tts, null, 0.85); }
 function renderPhrases(filter) {
   const box = $('phrasesBox'); box.innerHTML = '';
-  { const up = $('up-phrases'); if (up) up.hidden = !hasPhr; }
   const q = (filter || '').trim().toLowerCase();
   const list = phrases.filter(p => !q || p[1].toLowerCase().includes(q) || p[3].toLowerCase().includes(q) || p[2].includes(q) || p[0].toLowerCase().includes(q));
   if (!list.length) { box.innerHTML = '<p class="note-line" style="margin-top:12px;">Nessuna frase trovata.</p>'; return; }
@@ -2051,6 +2061,7 @@ function renderHomeWeather() {
   box.querySelector('.wx-more').onclick = () => goTool('weather');
 }
 function readWxCache() { try { return JSON.parse(localStorage.getItem(WX_KEY)); } catch { return null; } }
+let wxSel = null;
 function renderWeather() {
   renderHomeWeather(); renderDayWeather();
   const box = $('weatherBox'), stamp = $('wxStamp');
@@ -2058,6 +2069,7 @@ function renderWeather() {
   if (!cache) { stamp.textContent = ''; box.innerHTML = '<p class="note-line">Nessun dato salvato. Tocca "Aggiorna" con la connessione attiva.</p>'; return; }
   stamp.textContent = 'Aggiornato: ' + new Date(cache.ts).toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'short' });
   box.innerHTML = '';
+  const els = [];
   trip.cities.forEach(city => {
     const w = cache.data[city.name]; if (!w || !w.daily) return;
     const today = destToday();
@@ -2075,8 +2087,13 @@ function renderWeather() {
     el.innerHTML = `<div class="wx-top"><div><div class="wx-name">${esc(city.name)}</div><div class="wx-sub">${esc(note)}</div></div>
       ${w.current ? `<div class="wx-now"><span class="wi">${wxIcon(w.current.weather_code)}</span><span class="wt">${Math.round(w.current.temperature_2m)}°</span></div>` : ''}</div>
       <div class="wx-rail">${tiles}</div>`;
-    box.appendChild(el);
+    els.push({ name: city.name, el });
   });
+  if (!els.length) return;
+  if (!els.some(x => x.name === wxSel)) { const cur = trip.days.map(wxCityOf).find((c, i) => c && dayISO(trip.days[i]) >= destToday()); wxSel = els.some(x => x.name === cur) ? cur : els[0].name; }
+  const chips = document.createElement('div'); chips.className = 'wx-chips';
+  els.forEach(x => { const b = document.createElement('button'); b.type = 'button'; b.textContent = x.name; if (x.name === wxSel) b.className = 'on'; b.onclick = () => { wxSel = x.name; renderWeather(); }; chips.appendChild(b); });
+  box.appendChild(chips); box.appendChild(els.find(x => x.name === wxSel).el);
 }
 async function refreshWeather(manual) {
   const btn = $('wxRefresh'); btn.disabled = true; btn.textContent = 'Aggiorno…';
@@ -2404,11 +2421,18 @@ function initSubTabs() {
     sec.insertBefore(seg, sec.firstChild);
   }));
 }
+function selPane(pid) {
+  const pn = $(pid); if (!pn) return null;
+  const g = pn.closest('.ugroup'); if (!g) return pn;
+  g.querySelectorAll('.upane').forEach(x => { x.hidden = x.id !== pid; });
+  g.querySelectorAll('.seg [data-pane]').forEach(b => b.classList.toggle('on', b.dataset.pane === pid));
+  return g;
+}
 function goTool(id) {
   setView('useful');
-  const inl = ['weather', 'budget', 'phrases', 'trans'].includes(id);
-  showUtil(id === 'cambio' || inl ? '' : id);
-  if (inl) setTimeout(() => { const e = $('up-' + id); if (e) window.scrollTo({ top: Math.max(0, e.getBoundingClientRect().top + window.scrollY - 90), behavior: 'smooth' }); }, 450);
+  const inl = ['weather', 'budget', 'phrases', 'trans', 'cambio'].includes(id);
+  showUtil(inl ? '' : id);
+  if (inl) setTimeout(() => { const e = selPane(id === 'cambio' ? 'up-conv' : 'up-' + id); if (e) window.scrollTo({ top: Math.max(0, e.getBoundingClientRect().top + window.scrollY - 90), behavior: 'smooth' }); }, 450);
   if (id === 'cambio') setTimeout(() => { const c = $('convYuan'); if (c) c.focus({ preventScroll: true }); }, 50);
 }
 document.querySelectorAll('.tool-btn[data-go]').forEach(b => b.addEventListener('click', () => goTool(b.dataset.go)));
@@ -2438,6 +2462,7 @@ function renderUtilHome() {
     b.onclick = () => showUtil(id); g.appendChild(b);
   });
 }
+document.querySelectorAll('.ugroup .seg [data-pane]').forEach(b => b.addEventListener('click', () => selPane(b.dataset.pane)));
 document.querySelectorAll('[data-uback]').forEach(b => b.addEventListener('click', () => showUtil('')));
 $('closeModal').addEventListener('click', closeModal);
 $('modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
@@ -2456,7 +2481,7 @@ $('wxRefresh').addEventListener('click', () => refreshWeather(true));
 /* personalizzazione dal file del viaggio */
 const hasInfo = INFO.length > 0, hasPhr = phrases.length > 0;
 ['sec-info', 'infoBox'].forEach(id => { $(id).hidden = !hasInfo; });
-['sec-phrases', 'phrasesCard'].forEach(id => { $(id).hidden = !hasPhr; });
+$('tabPhrases').hidden = !hasPhr;
 if (hasInfo) $('infoBox').innerHTML = INFO.map(g => `<details class="more" style="margin-top:8px"><summary><b>${esc(g.title)}</b></summary><ul class="sec" style="margin-top:8px">${g.items.map(i => `<li>${esc(i)}</li>`).join('')}</ul></details>`).join('');
 const foreignCur = !!(meta.currency && meta.currency.symbol && meta.currency.symbol !== '€');
 if (!foreignCur) { const ec = $('expenseCurrency'); ec.value = '€'; ec.hidden = true; }
