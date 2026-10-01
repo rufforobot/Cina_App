@@ -524,6 +524,8 @@ main { padding: 16px 16px 140px; }
 .dm-styles button.on { background: var(--surface, #fff); box-shadow: 0 1px 3px rgba(0,0,0,.12); }
 .badge { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
 .utility-card { min-width: 0; overflow-wrap: anywhere; }
+.tl-soft { filter: saturate(.55) brightness(1.06) contrast(.92); }
+.tl-gray { filter: grayscale(1) brightness(1.08) contrast(.88); }
 </style>
 </head>
 <body>
@@ -1520,9 +1522,9 @@ function getHere() {
   });
 }
 const MAP_STYLES = {
-  chiara: { name: 'Chiara', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', att: 'Esri, HERE, Garmin, OpenStreetMap', max: 19 },
-  minimal: { name: 'Minimal', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', att: 'Esri, HERE, Garmin', max: 16 },
-  satellite: { name: 'Satellite', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', att: 'Esri, Maxar', max: 19 },
+  chiara: { name: 'Soft', url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', att: '&copy; OpenStreetMap', max: 19, cls: 'tl-soft' },
+  minimal: { name: 'Grigia', url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', att: '&copy; OpenStreetMap', max: 19, cls: 'tl-gray' },
+  satellite: { name: 'Satellite', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', att: 'Esri, Maxar', max: 17 },
   osm: { name: 'Classica', url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', att: '&copy; OpenStreetMap', max: 19 }
 };
 const getMapStyle = () => { try { const k = localStorage.getItem('map-style'); if (MAP_STYLES[k]) return k; } catch {} return 'chiara'; };
@@ -1530,11 +1532,11 @@ const setMapStyle = k => { try { localStorage.setItem('map-style', k); } catch {
 function addTiles(map, key) {
   const k = key || getMapStyle(), st = MAP_STYLES[k];
   if (map._tiles) map.removeLayer(map._tiles);
-  const lay = map._tiles = window.L.tileLayer(st.url, { maxZoom: 19, maxNativeZoom: st.max, attribution: st.att }).addTo(map);
+  const lay = map._tiles = window.L.tileLayer(st.url, { maxZoom: 19, maxNativeZoom: st.max, attribution: st.att, className: st.cls || '' }).addTo(map);
   lay.bringToBack();
   let errs = 0;
   /* se lo stile non carica (blocco, chiave richiesta) si torna alla mappa classica */
-  if (k !== 'osm') lay.on('tileerror', () => { if (++errs === 4 && map._tiles === lay) addTiles(map, 'osm'); });
+  if (k === 'satellite') lay.on('tileerror', () => { if (++errs === 4 && map._tiles === lay) addTiles(map, 'osm'); });
 }
 function loadDay(day, onProg) {
   const job = dayJobs[day.day] || (dayJobs[day.day] = { cbs: [], prom: null });
@@ -1607,7 +1609,7 @@ function initMini(day, host) {
       const map = window.L.map(box, { zoomControl: false, dragging: false, touchZoom: false, scrollWheelZoom: false, doubleClickZoom: false, boxZoom: false, keyboard: false, tap: false, attributionControl: true });
       map.attributionControl.setPrefix('');
       drawDay(map, d, true);
-      chip.textContent = `${d.found.length} tappe${(d.found.length > 1 || d.here) ? ' · ' + kmLabel(d) : ''}${d.here ? ' da qui' : ''}`;
+      chip.textContent = `${d.found.length} ${d.found.length === 1 ? 'tappa' : 'tappe'}${(d.found.length > 1 || d.here) ? ' · ' + kmLabel(d) : ''}${d.here ? ' da qui' : ''}`;
       host.classList.add('ready');
     } catch { chip.textContent = 'Mappa non caricata · tocca per riprovare'; host.classList.remove('ready'); host._failed = true; }
   };
