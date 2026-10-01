@@ -126,6 +126,19 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
 .wsec > summary::after { content: '▾'; color: var(--muted); font-size: 16px; transition: transform .2s; }
 .wsec[open] > summary::after { transform: rotate(180deg); }
 .wsec > .wallet-grid, .wsec > .utility-card { margin-top: 12px; }
+.guide-bar { display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-top: 10px; }
+.guide-bar .btn { padding: 0 18px; }
+.seg { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; margin-top: 10px; padding: 3px; border-radius: 12px; background: var(--surface-2); }
+.seg button { border: none; background: none; color: var(--text); font-size: 13px; font-weight: 600; padding: 8px 2px; border-radius: 10px; white-space: nowrap; }
+.seg button.on { background: var(--surface); box-shadow: 0 1px 4px rgba(0,0,0,.15); }
+.util-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.util-tile { text-align: left; border: 0.5px solid var(--glass-border); background: var(--glass); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); box-shadow: var(--shadow); border-radius: var(--radius); padding: 16px 16px 14px; color: var(--text); min-height: 92px; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; }
+.util-tile:active { transform: scale(.98); }
+.util-tile b { font-size: 17px; letter-spacing: -.3px; display: flex; justify-content: space-between; align-items: center; }
+.util-tile b::after { content: '\203A'; color: var(--muted); font-size: 22px; font-weight: 400; }
+.util-tile span { color: var(--muted); font-size: 13px; line-height: 1.35; }
+.ubar { border: none; background: none; color: var(--accent-2); font-size: 17px; font-weight: 600; padding: 4px 0 8px; margin-bottom: 4px; }
+.upanel .section-title:first-of-type { margin-top: 4px; }
 .view { display: none; animation: fadeIn 0.3s ease; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 .view.active { display: block; }
@@ -437,8 +450,8 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
   <!-- AUDIOGUIDA -->
   <section id="companion" class="view">
     <input class="field" id="guideSearch" placeholder="Cerca una tappa (es. panda, tè, muraglia)">
-    <div class="chips-nav" id="guideCities" style="margin-top:10px;"></div>
-    <div class="chips-nav" id="guideTags"></div>
+    <div class="guide-bar"><select class="field" id="guideCities" aria-label="Città"></select><button class="btn" id="guideFav" type="button">Preferiti</button></div>
+    <div class="seg" id="guideTags" role="tablist"></div>
     <div style="margin:6px 0 16px;"><span class="note-line" id="guideCount"></span></div>
     <div class="companion-grid" id="companionGrid"></div>
   </section>
@@ -471,18 +484,12 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
 
   <!-- UTILI -->
   <section id="useful" class="view">
-    <div class="chips-nav" id="utilNav">
-      <button class="chip-btn" id="navPay" data-go="quickApps">Pagamenti</button>
-      <button class="chip-btn" id="navConv" data-go="sec-conv">Cambio</button>
-      <button class="chip-btn" data-go="sec-budget">Budget</button>
-      <button class="chip-btn" data-go="sec-check">Checklist</button>
-      <button class="chip-btn" id="navInfo" data-go="sec-info">Info paese</button>
-      <button class="chip-btn" id="navPhr" data-go="sec-phrases">Frasi</button>
-      <button class="chip-btn" data-go="sec-weather">Meteo</button>
-      <button class="chip-btn" data-go="sec-sos">Emergenze</button>
-      <button class="chip-btn" data-go="sec-backup">Backup</button>
+    <div id="utilHome">
+    <div class="quick-apps" id="quickApps" style="margin-bottom: 24px; scroll-margin-top: 90px;" hidden></div>
+      <div class="util-grid" id="utilGrid"></div>
     </div>
-
+    <div class="upanel" id="up-conv" hidden>
+      <button class="ubar" type="button" data-uback>&lsaquo; Utili</button>
     <div class="section-title" id="sec-conv"><div><h3>Convertitore Rapido</h3><p id="rateLabel">Calcolo istantaneo offline.</p></div></div>
     <div class="utility-card" id="convCard" style="margin-bottom: 24px;">
       <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: center;">
@@ -497,9 +504,9 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
         </div>
       </div>
     </div>
-
-    <div class="quick-apps" id="quickApps" style="margin-bottom: 24px; scroll-margin-top: 90px;" hidden></div>
-
+    </div>
+    <div class="upanel" id="up-budget" hidden>
+      <button class="ubar" type="button" data-uback>&lsaquo; Utili</button>
     <div class="section-title" id="sec-budget"><div><h3>Gestione Budget</h3></div></div>
     <div class="expense-card" style="margin-bottom: 24px;">
       <div style="width: 100%;">
@@ -520,7 +527,9 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
       <div class="sub-title">Elenco spese</div>
       <div class="expense-list" id="expenseList"></div>
     </div>
-
+    </div>
+    <div class="upanel" id="up-check" hidden>
+      <button class="ubar" type="button" data-uback>&lsaquo; Utili</button>
     <div class="section-title" id="sec-check"><div><h3>Checklist pre-partenza</h3><p>Completate: <strong id="checkProgress">0/0</strong></p></div></div>
     <div class="utility-card" style="margin-bottom: 24px;">
       <div id="checklistBox"></div>
@@ -529,26 +538,36 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
         <button class="btn" id="checkAdd">Aggiungi</button>
       </div>
     </div>
-
+    </div>
+    <div class="upanel" id="up-info" hidden>
+      <button class="ubar" type="button" data-uback>&lsaquo; Utili</button>
     <div class="section-title" id="sec-info" hidden><div><h3>Info paese</h3></div></div>
     <div class="utility-card" id="infoBox" style="margin-bottom: 24px;" hidden></div>
-
+    </div>
+    <div class="upanel" id="up-phrases" hidden>
+      <button class="ubar" type="button" data-uback>&lsaquo; Utili</button>
     <div class="section-title" id="sec-phrases"><div><h3>Frasi utili</h3></div></div>
     <div class="utility-card" id="phrasesCard" style="margin-bottom: 24px;">
       <input class="field" id="phraseSearch" placeholder="Cerca (es. bagno, conto, allergico)">
       <div id="phrasesBox"></div>
     </div>
-
+    </div>
+    <div class="upanel" id="up-weather" hidden>
+      <button class="ubar" type="button" data-uback>&lsaquo; Utili</button>
     <div class="section-title" id="sec-weather"><div><h3>Meteo</h3><p id="wxStamp"></p></div><button class="btn small" id="wxRefresh" style="flex:0 0 auto;">Aggiorna</button></div>
     <div class="wx-cities" id="weatherBox" style="margin-bottom: 24px;"></div>
-
+    </div>
+    <div class="upanel" id="up-sos" hidden>
+      <button class="ubar" type="button" data-uback>&lsaquo; Utili</button>
     <div class="section-title" id="sec-sos"><div><h3>Emergenze</h3><p id="sosNote"></p></div></div>
     <div class="utility-card" style="margin-bottom: 24px;">
       <h4 style="margin:0; font-size:18px;">Numeri Utili</h4>
       <div id="sosGrid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center; margin-top: 12px;"></div>
       <a class="btn small warn" id="sosAssist" style="width:100%; margin-top:12px;"></a>
     </div>
-
+    </div>
+    <div class="upanel" id="up-backup" hidden>
+      <button class="ubar" type="button" data-uback>&lsaquo; Utili</button>
     <div class="section-title" id="sec-backup"><div><h3>Backup e offline</h3><p>I dati stanno solo in questo browser: fai un backup ogni tanto.</p></div></div>
     <div class="utility-card">
       <div class="note-line" id="backupInfo"></div>
@@ -562,6 +581,7 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
       </div>
       <div class="sub-title">Modalità offline</div>
       <div class="note-line" id="offlineStatus">Verifica in corso…</div>
+    </div>
     </div>
   </section>
 </main>
@@ -1402,19 +1422,21 @@ function filteredStops() {
 }
 
 function renderGuideControls() {
-  const mk = (label, on, fn) => {
-    const b = document.createElement('button'); b.type = 'button'; b.className = 'chip-btn' + (on ? ' on' : ''); b.textContent = label;
-    b.addEventListener('click', fn); return b;
-  };
-  const rowC = $('guideCities'); rowC.innerHTML = '';
-  rowC.appendChild(mk('Tutte', guide.city === 'all', () => { guide.city = 'all'; refreshGuide(); }));
+  const sel = $('guideCities'); sel.innerHTML = '';
+  const opt = (v, l) => { const o = document.createElement('option'); o.value = v; o.textContent = l; sel.appendChild(o); };
+  opt('all', 'Tutte le città');
   const today = todayGuideCity();
-  if (today) rowC.appendChild(mk(tripStarted() ? 'Oggi' : 'Prima tappa', guide.city === today, () => { guide.city = today; refreshGuide(); }));
-  companionData.forEach(c => rowC.appendChild(mk(`${c.name} (${c.stops.length})`, guide.city === c.name, () => { guide.city = c.name; refreshGuide(); })));
-  const rowT = $('guideTags'); rowT.innerHTML = '';
-  [['all', 'Tutti i tipi'], ['influencer', TAGS.influencer], ['local', TAGS.local], ['classic', 'Classiche']]
-    .forEach(([k, l]) => rowT.appendChild(mk(l, guide.tag === k, () => { guide.tag = k; refreshGuide(); })));
-  rowT.appendChild(mk('Preferiti', guide.favOnly, () => { guide.favOnly = !guide.favOnly; refreshGuide(); }));
+  if (today) opt(today, (tripStarted() ? 'Oggi · ' : 'Prima tappa · ') + today);
+  companionData.forEach(c => { if (c.name !== today) opt(c.name, `${c.name} (${c.stops.length})`); });
+  sel.value = guide.city; if (sel.value !== guide.city) sel.value = 'all';
+  sel.onchange = () => { guide.city = sel.value; refreshGuide(); };
+  const fav = $('guideFav'); fav.classList.toggle('primary', !!guide.favOnly);
+  fav.onclick = () => { guide.favOnly = !guide.favOnly; refreshGuide(); };
+  const seg = $('guideTags'); seg.innerHTML = '';
+  [['all', 'Tutti'], ['classic', 'Classiche'], ['influencer', 'Influencer'], ['local', 'Local']].forEach(([k, l]) => {
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = l; b.className = guide.tag === k ? 'on' : '';
+    b.onclick = () => { guide.tag = k; refreshGuide(); }; seg.appendChild(b);
+  });
 }
 function refreshGuide() { stopSpeech(); renderGuideControls(); renderCompanion(); }
 
@@ -1714,8 +1736,34 @@ function setView(view) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-document.querySelectorAll('.bottom-nav [data-view]').forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
-document.querySelectorAll('#utilNav [data-go]').forEach(b => b.addEventListener('click', () => $(b.dataset.go).scrollIntoView({ behavior: 'smooth', block: 'start' })));
+document.querySelectorAll('.bottom-nav [data-view]').forEach(b => b.addEventListener('click', () => { if (b.dataset.view === 'useful') showUtil(''); setView(b.dataset.view); }));
+/* Utili: griglia di riquadri, ogni argomento in una schermata propria */
+function showUtil(id) {
+  $('utilHome').hidden = !!id;
+  document.querySelectorAll('.upanel').forEach(pn => { pn.hidden = pn.id !== 'up-' + id; });
+  if (!id) renderUtilHome();
+  window.scrollTo({ top: 0, behavior: 'auto' });
+}
+function renderUtilHome() {
+  const cache = readWxCache();
+  const tiles = [
+    ['conv', 'Cambio', foreignCur, () => `1 € = ${rate().toFixed(2)} ${meta.currency.symbol}`],
+    ['budget', 'Budget', true, () => $('expenseTotal').textContent.replace(/ *\(.*\)/, '')],
+    ['check', 'Checklist', true, () => $('checkProgress').textContent + ' completate'],
+    ['info', 'Info paese', hasInfo, () => INFO.length + ' argomenti'],
+    ['phrases', 'Frasi utili', hasPhr, () => phrases.length + ' frasi con audio'],
+    ['weather', 'Meteo', true, () => cache ? 'Aggiornato ' + new Date(cache.ts).toLocaleDateString('it-IT', { day: 'numeric', month: 'short' }) : 'Da scaricare'],
+    ['sos', 'Emergenze', true, () => (meta.emergency[0] ? meta.emergency[0][0] + ' · ' + meta.emergency[0][1] : 'Numeri utili')],
+    ['backup', 'Backup', true, () => state.lastBackup ? 'Ultimo: ' + new Date(state.lastBackup).toLocaleDateString('it-IT', { day: 'numeric', month: 'short' }) : 'Mai eseguito']
+  ];
+  const g = $('utilGrid'); g.innerHTML = '';
+  tiles.filter(t => t[2]).forEach(([id, title, , prev]) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'util-tile';
+    b.innerHTML = `<b>${esc(title)}</b><span>${esc(prev())}</span>`;
+    b.onclick = () => showUtil(id); g.appendChild(b);
+  });
+}
+document.querySelectorAll('[data-uback]').forEach(b => b.addEventListener('click', () => showUtil('')));
 { const cn = trip.cities.map(c => c.name); $('heroRoute').textContent = cn.length > 1 ? cn[0] + ' → ' + cn[cn.length - 1] : ''; $('heroRoute').hidden = cn.length < 2; }
 $('cityCount').textContent = trip.cities.length;
 $('dayCount').textContent = trip.days.length;
@@ -1735,12 +1783,10 @@ $('wxRefresh').addEventListener('click', () => refreshWeather(true));
 
 /* personalizzazione dal file del viaggio */
 const hasInfo = INFO.length > 0, hasPhr = phrases.length > 0;
-['sec-info', 'infoBox', 'navInfo'].forEach(id => { $(id).hidden = !hasInfo; });
-['sec-phrases', 'phrasesCard', 'navPhr'].forEach(id => { $(id).hidden = !hasPhr; });
+['sec-info', 'infoBox'].forEach(id => { $(id).hidden = !hasInfo; });
+['sec-phrases', 'phrasesCard'].forEach(id => { $(id).hidden = !hasPhr; });
 if (hasInfo) $('infoBox').innerHTML = INFO.map(g => `<details class="more" style="margin-top:8px"><summary><b>${esc(g.title)}</b></summary><ul class="sec" style="margin-top:8px">${g.items.map(i => `<li>${esc(i)}</li>`).join('')}</ul></details>`).join('');
 const foreignCur = !!(meta.currency && meta.currency.symbol && meta.currency.symbol !== '€');
-['sec-conv', 'convCard', 'navConv'].forEach(id => { $(id).hidden = !foreignCur; });
-$('navPay').hidden = !(meta.apps && meta.apps.length);
 if (!foreignCur) { const ec = $('expenseCurrency'); ec.value = '€'; ec.hidden = true; }
 if (meta.apps && meta.apps.length) {
   const qa = $('quickApps'); qa.hidden = false;
@@ -1772,7 +1818,7 @@ $('sosGrid').innerHTML = meta.emergency.map(e => `<div style="padding:10px; back
 $('sosAssist').href = 'tel:' + meta.assistance.tel; $('sosAssist').textContent = '' + meta.assistance.label;
 $('convLabel').textContent = `${meta.currency.name} (${meta.currency.symbol})`; $('curOpt').textContent = meta.currency.symbol;
 setupConverter(); setupExpenseForm(); setupBackup(); refreshRate();
-renderCities(); renderItinerary(); renderGuideControls(); renderCompanion(); renderTodayGuides(); renderTransfers(); renderWallet(); renderCodes();
+renderCities(); renderUtilHome(); renderItinerary(); renderGuideControls(); renderCompanion(); renderTodayGuides(); renderTransfers(); renderWallet(); renderCodes();
 renderExpenses(); renderBookingAlerts(); renderToday(); renderNextTransfer(true);
 renderChecklist(); renderPhrases(''); renderWeather(); renderBackupInfo(); updateRateUI(); updateMetrics();
 setupOffline();
