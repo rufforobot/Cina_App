@@ -328,7 +328,8 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
 .dm-pin span { width: 30px; height: 30px; border-radius: 50%; background: var(--accent-2); color: #fff; font-weight: 700; font-size: 14px; display: grid; place-items: center; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,.35); }
 /* --- diario dettagliato --- */
 .hotel-box { margin: 14px 20px 4px; padding: 14px 16px; border-radius: 16px; background: var(--glass-strong); border: 0.5px solid var(--glass-border); }
-.hotel-box .hb-ic { display: none; }
+.hb-ic { display: none; }
+.details-content .hb-name { color: var(--text); font-weight: 600; }
 .hotel-box .btn { background: var(--fill); border-color: transparent; }
 .hotel-box h5 { margin: 0 0 2px; font-size: 15px; }
 .hotel-box .zh, .pl-zh { font-size: 22px; font-weight: 800; line-height: 1.35; color: var(--text); }
@@ -403,8 +404,10 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
 .sec { margin-top: 10px; }
 .sec div, .sec li { font-size: 14px; line-height: 1.5; }
 
-html, body { touch-action: manipulation; }
-input, select, textarea { font-size: 16px; }
+html, body { touch-action: pan-x pan-y; overscroll-behavior-y: none; -webkit-text-size-adjust: 100%; }
+* { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+input, textarea, select, [contenteditable] { -webkit-user-select: auto; user-select: auto; font-size: 16px; }
+.leaflet-container { touch-action: none; }
 /* ===== TEMA CARD iOS (design fornito dall'utente) ===== */
 :root {
   --bg: light-dark(#F2F2F7, #000000);
@@ -428,7 +431,7 @@ header { background: light-dark(rgba(242,242,247,.75), rgba(0,0,0,.7)); backdrop
 .header-inner { padding: 12px 16px; }
 .brand { display: block; }
 .logo, .brand small { display: none; }
-.brand-state { margin: 0; font-size: .85rem; font-weight: 600; letter-spacing: .01em; color: var(--accent); }
+.brand-state { margin: 0; font-size: .85rem; font-weight: 500; text-transform: uppercase; letter-spacing: .05em; color: var(--accent); }
 .brand h1 { font-size: 1.8rem; letter-spacing: -0.03em; line-height: 1.15; }
 .clocks { background: #000; color: #fff; border-radius: 999px; padding: 6px 14px; gap: 8px; font-size: .85rem; font-weight: 600; flex-wrap: nowrap; box-shadow: 0 4px 12px rgba(0,0,0,.15); }
 #clockItaly { color: #A1A1A6; font-weight: 400; }
@@ -476,6 +479,13 @@ main { padding: 16px 16px 140px; }
 .wsec .wallet-card .btn, .wsec .utility-card .btn { background: var(--surface); }
 .wsec .wallet-card .field, .wsec .utility-card .field { background: var(--surface); }
 
+.stat-row .stat { display: flex; flex-direction: column; align-items: center; text-align: center; flex: 1; }
+.details-content { padding: 0 20px 20px; color: var(--muted); font-size: .95rem; animation: fadeInDown .3s ease-out forwards; }
+.details-content .lg-row { padding: 6px 0; line-height: 1.45; }
+.details-content .lg-row strong { color: var(--text); }
+.details-content .hotel-line { color: var(--text); font-weight: 600; }
+.details-content .btn-grid { margin-top: 12px; }
+@keyframes fadeInDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
 /* sotto-schede */
 .seg { background: light-dark(rgba(118,118,128,.14), rgba(118,118,128,.3)); }
 .seg.two { grid-template-columns: 1fr 1fr; margin: 0 0 16px; }
@@ -514,25 +524,30 @@ main { padding: 16px 16px 140px; }
       <h2 id="heroTitle"></h2>
       <p class="th-route" id="heroRoute"></p>
       <div class="stat-row">
-        <div><span class="n" id="countdownValue">-</span> <small id="countdownLabel">al viaggio</small></div>
-        <div><span class="n" id="cityCount">-</span> <small>città</small></div>
-        <div><span class="n" id="dayCount">-</span> <small>giorni</small></div>
+        <div class="stat"><span class="n" id="countdownValue">-</span><small id="countdownLabel">al viaggio</small></div>
+        <div class="stat"><span class="n" id="cityCount">-</span><small>città</small></div>
+        <div class="stat"><span class="n" id="dayCount">-</span><small>giorni totali</small></div>
       </div>
     </section>
 
     <div class="now-card" id="nowCard"></div>
 
-    <div id="todayWeather" style="margin-bottom: 24px;"></div>
 
-    <div id="todayHotel" style="margin-bottom: 24px;"></div>
+    <div id="todayWeather" style="margin-bottom: 24px;"></div>
 
     <div class="section-title"><div><h3>Guide nella tua città</h3></div></div>
     <div id="todayGuides" style="margin-bottom:24px;"></div>
 
     <section class="card" id="bookingAlertsTitle" style="display:none;">
       <h3>Da fare</h3>
-      <p>Promemoria e prenotazioni in scadenza (orario italiano).</p>
+      <p>Promemoria e prenotazioni in scadenza.</p>
       <div class="todo-list" id="bookingAlertsGrid"></div>
+    </section>
+
+    <section class="card card-no-pad" id="logistica">
+      <h3 style="padding: 20px 20px 4px;">Logistica</h3>
+      <details class="wsec"><summary><span>Trasferimenti</span><small id="logTrCount"></small></summary><div class="details-content" id="logTr"></div></details>
+      <details class="wsec"><summary><span>Hotel</span><small id="logHotelNote"></small></summary><div class="details-content" id="logHotel"></div></details>
     </section>
 
     <section class="card">
@@ -912,9 +927,10 @@ function updateCountdown() {
   const start = new Date(meta.start), end = new Date(meta.end);
   const now = new Date();
   const el = $('countdownValue'), label = $('countdownLabel'), st = $('brandState');
+  if (st) { st.textContent = now >= start ? (now <= end ? 'Viaggio in corso' : 'Viaggio concluso') : ''; st.hidden = !st.textContent; }
   if (now < start) {
     const days = Math.ceil((start - now) / 86400000);
-    el.textContent = days; label.textContent = days === 1 ? 'giorno alla partenza' : 'giorni alla partenza';
+    el.textContent = days; label.textContent = 'alla partenza';
   } else if (now <= end) {
     el.textContent = `D${tripDayIndex() + 1}`; label.textContent = 'del viaggio';
   } else {
@@ -1028,14 +1044,18 @@ function hotelActs(k, host) {
   if (h.tel) host.appendChild(btnGrid([bLink('Chiama', 'tel:' + h.tel)]));
 }
 function renderTodayHotel() {
-  const box = $('todayHotel'); if (!box) return;
-  const d = trip.days[tripDayIndex()], k = hotelKeyForDay(d);
-  box.innerHTML = '';
-  if (!k) return;
-  const card = document.createElement('div'); card.className = 'utility-card';
-  card.innerHTML = hotelBoxHTML(k, true);
-  hotelActs(k, card);
-  box.appendChild(card);
+  const tr = $('logTr'), hb = $('logHotel'); if (!tr || !hb) return;
+  const up = transfers.filter(t => new Date(t.dep) > Date.now()).slice(0, 3);
+  $('logTrCount').textContent = up.length ? up.length + ' in arrivo' : 'nessuno';
+  tr.innerHTML = up.length ? up.map(t => `<div class="lg-row"><strong>${esc(fmtLocal(t.dep))}</strong> · ${esc(t.title)}</div>`).join('') : '<div class="lg-row">Nessun trasferimento in programma.</div>';
+  let d = trip.days[tripDayIndex()], k = hotelKeyForDay(d);
+  hb.innerHTML = '';
+  if (!k) { for (let i = tripDayIndex(); i < trip.days.length && !k; i++) { const dd = trip.days[i]; const kk = hotelKeyForDay(dd); if (kk) { k = kk; d = dd; } } }
+  if (!k) { $('logHotelNote').textContent = ''; hb.innerHTML = '<div class="lg-row">Nessun hotel in programma.</div>'; return; }
+  const isToday = d === trip.days[tripDayIndex()];
+  $('logHotelNote').textContent = isToday ? (isCheckinDay(d, k) ? 'Check-in oggi' : 'Soggiorno') : 'Dal ' + d.date;
+  const w = document.createElement('div'); w.innerHTML = hotelBoxHTML(k, true);
+  hb.appendChild(w); hotelActs(k, hb);
 }
 
 /* ====================== CARD OGGI ====================== */
