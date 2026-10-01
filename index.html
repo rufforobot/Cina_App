@@ -126,6 +126,14 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
 .wsec > summary::after { content: '▾'; color: var(--muted); font-size: 16px; transition: transform .2s; }
 .wsec[open] > summary::after { transform: rotate(180deg); }
 .wsec > .wallet-grid, .wsec > .utility-card { margin-top: 12px; }
+.utility-card.glist { padding: 16px 0 4px; }
+.glist .companion-meta { padding: 0 20px 6px; }
+.grow { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 10px; border: none; background: none; color: var(--text); text-align: left; padding: 12px 20px; border-top: 0.5px solid var(--glass-border); }
+.grow::after { content: '\203A'; color: var(--muted); font-size: 22px; line-height: 1; }
+.grow b { display: block; font-size: 16px; font-weight: 600; }
+.grow small { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+.grow.more b { color: var(--accent-2); }
+.grow:active { background: var(--surface-2); }
 .guide-bar { display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-top: 10px; }
 .guide-bar .btn { padding: 0 18px; }
 .seg { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; margin-top: 10px; padding: 3px; border-radius: 12px; background: var(--surface-2); }
@@ -428,7 +436,7 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
         <div id="nextTransfer"></div>
       </div>
       <div>
-        <div class="section-title"><div><h3>Guide nella tua città</h3><p>Tocca una tappa per leggerla o ascoltarla.</p></div></div>
+        <div class="section-title"><div><h3>Guide nella tua città</h3></div></div>
         <div id="todayGuides"></div>
       </div>
     </div>
@@ -438,7 +446,7 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
     </div>
     <div class="city-grid" id="bookingAlertsGrid" style="margin-bottom: 24px;"></div>
 
-    <div class="section-title"><div><h3>Le Tappe</h3><p>Accedi rapidamente ai giorni del viaggio e alle indicazioni per il taxi.</p></div></div>
+    <div class="section-title"><div><h3>Le Tappe</h3></div></div>
     <div class="city-grid" id="cityGrid"></div>
   </section>
 
@@ -1529,13 +1537,19 @@ function renderTodayGuides() {
   const box = $('todayGuides'); box.innerHTML = '';
   const city = todayGuideCity(); if (!city) return;
   const list = allStops().filter(x => x.city === city);
-  const card = document.createElement('div'); card.className = 'utility-card';
-  card.innerHTML = `<div class="companion-meta">${tripStarted() ? 'Oggi' : 'Prima tappa'} · ${esc(city)}</div><div class="chip-row" style="margin-top:6px;"></div>`;
-  const row = card.querySelector('.chip-row');
-  list.forEach((x, i) => {
-    const b = document.createElement('button'); b.type = 'button'; b.className = 'chip-btn'; b.textContent = x.stop.title;
-    b.addEventListener('click', () => openStop(list, i)); row.appendChild(b);
+  const card = document.createElement('div'); card.className = 'utility-card glist';
+  card.innerHTML = `<div class="companion-meta">${tripStarted() ? 'Oggi' : 'Prima tappa'} · ${esc(city)}</div>`;
+  const MAX = 4;
+  list.slice(0, MAX).forEach((x, i) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'grow';
+    b.innerHTML = `<span><b>${esc(x.stop.title)}</b><small>${esc(tagLabel(x.stop.tag))}</small></span>`;
+    b.addEventListener('click', () => openStop(list, i)); card.appendChild(b);
   });
+  if (list.length > MAX) {
+    const m = document.createElement('button'); m.type = 'button'; m.className = 'grow more';
+    m.innerHTML = `<span><b>Tutte le guide (${list.length})</b></span>`;
+    m.addEventListener('click', () => { guide.city = city; guide.tag = 'all'; guide.favOnly = false; refreshGuide(); setView('companion'); }); card.appendChild(m);
+  }
   box.appendChild(card);
 }
 
