@@ -1441,7 +1441,7 @@ function isCheckinDay(day, hk) {
   return !first || first.day === day.day;
 }
 /* ====================== MAPPA DEL GIORNO ====================== */
-const GEO_KEY = (meta.id || 'trip') + '-geo', ROUTE_KEY = (meta.id || 'trip') + '-route';
+const GEO_KEY = (meta.id || 'trip') + '-geo2', ROUTE_KEY = (meta.id || 'trip') + '-route';
 const readLS = k => { try { return JSON.parse(localStorage.getItem(k)) || {}; } catch { return {}; } };
 const geoCache = readLS(GEO_KEY), routeCache = readLS(ROUTE_KEY);
 const saveLS = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
@@ -1489,7 +1489,8 @@ function dayPoints(day) {
     const st = day.det && day.det[i]; if (!st) return;
     const p = placeInfo(day, i);
     if (!stopMapQ(day, st, p)) return;
-    const cands = [st.map, `${L(st.title)}, ${city}${meta.country}`, p.zh, p.addr].filter(Boolean);
+    /* ogni query porta la città: il solo nome cinese (es. 新天地, 人民公园) esiste in molte città e finiva fuori zona */
+    const cands = [st.map, `${L(st.title)}, ${city}${meta.country}`, p.zh && `${p.zh}, ${city}${meta.country}`, p.addr && `${p.addr}, ${city}${meta.country}`].filter(Boolean);
     out.push({ i, time: s[0], title: L(s[1]), cands });
   });
   return out;
