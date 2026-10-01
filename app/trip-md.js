@@ -136,6 +136,13 @@
       DIARY[n] = { sleep: df.dorme && df.dorme !== '-' ? df.dorme : null, stops };
     });
 
+    /* racconto (testo lungo per giorno, markdown semplice) */
+    const RACCONTO = {};
+    splitAt(S['racconto'] || [], 2).parts.forEach(p => {
+      const m = p.title.match(/(\d+)\s*(?:[—–-]\s*(.*))?/); if (!m) return;
+      RACCONTO[Number(m[1])] = { title: (m[2] || '').trim(), text: p.lines.join('\n').trim() };
+    });
+
     /* trasferimenti */
     const transfers = splitAt(S['trasferimenti'] || [], 2).parts.map(p => {
       const t = p.title.split(' · ').map(x => x.trim());
@@ -177,7 +184,7 @@
       const y0 = Number(sISO.slice(0, 4)), m0 = Number(sISO.slice(5, 7)), last = days[days.length - 1].date;
       trip.end = `${Number(last.slice(3, 5)) < m0 ? y0 + 1 : y0}-${last.slice(3, 5)}-${last.slice(0, 2)}`;
     }
-    return { meta, trip, companionData, HOTELS, DRIVER_PHRASES, DIARY, CITY_KEY, reservations, transfers, checklistData, phrases, CATS, INFO };
+    return { meta, trip, RACCONTO, companionData, HOTELS, DRIVER_PHRASES, DIARY, CITY_KEY, reservations, transfers, checklistData, phrases, CATS, INFO };
   }
 
   return { parse, esc, FIELDS: { HOTEL, STOP, TRANSFER, GUIDE, LISTS }, DEFAULT_CATS };

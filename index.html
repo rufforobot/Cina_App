@@ -865,7 +865,7 @@ const EMO = /[\p{Extended_Pictographic}\uFE0F\u200D]/gu;
     else strip(v, key);
   }
 })(window.TRIP_DATA);
-const { meta, trip, companionData, HOTELS, DRIVER_PHRASES, DIARY, CITY_KEY, reservations, transfers, checklistData, phrases, CATS } = window.TRIP_DATA;
+const { meta, trip, RACCONTO = {}, companionData, HOTELS, DRIVER_PHRASES, DIARY, CITY_KEY, reservations, transfers, checklistData, phrases, CATS } = window.TRIP_DATA;
 const INFO = window.TRIP_DATA.INFO || [];
 /* collega diario e hotel ai dati base */
 trip.cities.forEach(c => { const h = HOTELS[CITY_KEY[c.name]]; c.key = CITY_KEY[c.name]; c.hotel = h.name; c.hotelZh = h.zh; });
@@ -1727,6 +1727,33 @@ async function showDayMap(day) {
   });
 }
 
+function raccontoHTML(t) {
+  const inl = x => esc(x).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/\*(.+?)\*/g, '<em>$1</em>');
+  let out = '', ul = false;
+  t.split('\n').forEach(l => {
+    l = l.trim();
+    if (/^- /.test(l)) { if (!ul) { out += '<ul style="padding-left:20px;margin:0 0 12px;">'; ul = true; } out += `<li style="margin:3px 0;">${inl(l.slice(2))}</li>`; return; }
+    if (ul) { out += '</ul>'; ul = false; }
+    if (!l) return;
+    if (/^\*\*[^*]+\*\*$/.test(l)) out += `<div style="font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:16px 0 4px;">${esc(l.slice(2, -2))}</div>`;
+    else if (/^\*[^*]+\*$/.test(l) && l.includes(' · ')) out += `<p style="color:var(--muted);font-size:14px;margin:0 0 8px;">${esc(l.slice(1, -1))}</p>`;
+    else out += `<p style="margin:0 0 12px;">${inl(l)}</p>`;
+  });
+  return out + (ul ? '</ul>' : '');
+}
+function openRacconto(n) {
+  const r = RACCONTO[n]; if (!r) return;
+  const box = document.createElement('div');
+  box.innerHTML = `<div style="font-size:19px;font-weight:700;line-height:1.25;margin-bottom:6px;">Giorno ${n}${r.title ? ' — ' + esc(r.title) : ''}</div>${raccontoHTML(r.text)}
+    <div class="act-row" style="display:flex;gap:8px;margin-top:14px;"><button class="btn" type="button" data-go="${n - 1}" style="flex:1;"${RACCONTO[n - 1] ? '' : ' disabled'}>← Giorno ${n - 1}</button><button class="btn" type="button" data-go="${n + 1}" style="flex:1;"${RACCONTO[n + 1] ? '' : ' disabled'}>Giorno ${n + 1} →</button></div>`;
+  box.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => openRacconto(Number(b.dataset.go))));
+  $('modalTitle').textContent = 'Il racconto';
+  $('modalBody').replaceChildren(box);
+  $('modal').classList.add('open');
+  const card = document.querySelector('.modal-card'); if (card) card.scrollTop = 0;
+}
+document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-racconto]'); if (b) openRacconto(Number(b.dataset.racconto)); });
+
 function renderDay(day, target) {
   const hk = hotelKeyForDay(day);
   const section = document.createElement('article'); section.className = 'day-card'; section.id = `day-${day.day}`;
@@ -1734,7 +1761,7 @@ function renderDay(day, target) {
     ${day.alert ? `<div class="alert"><b>Attenzione</b> ${esc(day.alert)}</div>` : ''}
     ${hk && isCheckinDay(day, hk) ? `<div class="hotel-box" data-hotel>${hotelBoxHTML(hk, false)}</div>` : ''}
     <div class="day-map" data-daymap><div class="dm-mini"></div><div class="dm-chip"></div></div>
-    ${meta.racconto ? `<a class="btn block racconto-link" href="${esc(meta.racconto)}#giorno-${day.day}" style="margin:0 0 14px;">Leggi il racconto del giorno</a>` : ''}
+    ${RACCONTO[day.day] ? `<button class="btn block racconto-link" type="button" data-racconto="${day.day}" style="margin:0 0 14px;">Leggi il racconto del giorno</button>` : ''}
     <div class="timeline"></div>
     <div class="note-area">
       <label class="lbl" for="note-${day.day}">Diario della giornata</label>
