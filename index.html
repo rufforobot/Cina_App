@@ -567,6 +567,8 @@ main { padding: 16px 16px 140px; }
       </div>
     </section>
 
+    <section class="card" id="todayWeather" hidden></section>
+
     <section class="card" id="nowCard"></section>
 
     <div id="todayGuides" style="margin-bottom:24px;"></div>
@@ -579,6 +581,16 @@ main { padding: 16px 16px 140px; }
       <div class="todo-list" id="bookingAlertsGrid"></div>
     </section>
 
+
+    <section class="card">
+      <h3>Strumenti</h3>
+      <div class="tools-grid">
+        <button type="button" class="tool-btn" data-go="cambio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 7.5 12 12l3.5-4.5M8.5 12h7M8.5 15h7M12 12v5"/></svg>Cambio valuta</button>
+        <button type="button" class="tool-btn" data-go="weather"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3"/><path d="M9 3v1.5M3 9h1.5M4.8 4.8l1 1M13.2 4.8l-1 1"/><path d="M8 19h9a3.5 3.5 0 0 0 .4-7A5 5 0 0 0 8 13a3 3 0 0 0 0 6z"/></svg>Meteo</button>
+        <button type="button" class="tool-btn" data-go="trans"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h9v7H8l-3 3v-3H4zM11 12v3h5l3 3v-3h1v-7h-5"/></svg>Traduttore</button>
+        <button type="button" class="tool-btn" data-go="budget"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>Budget</button>
+      </div>
+    </section>
 
     <div class="section-title"><div><h3>Guide nella tua città</h3></div></div>
     <div id="todayGuides" style="margin-bottom:24px;"></div>
@@ -2403,7 +2415,9 @@ function initSubTabs() {
 }
 function goTool(id) {
   setView('useful');
-  showUtil(id === 'cambio' ? '' : id);
+  const inl = ['weather', 'budget', 'phrases'].includes(id);
+  showUtil(id === 'cambio' || inl ? '' : id);
+  if (inl) setTimeout(() => { const e = $('up-' + id); if (e) e.scrollIntoView({ behavior: 'auto', block: 'start' }); window.scrollBy(0, -70); }, 50);
   if (id === 'cambio') setTimeout(() => { const c = $('convYuan'); if (c) c.focus({ preventScroll: true }); }, 50);
 }
 document.querySelectorAll('.tool-btn[data-go]').forEach(b => b.addEventListener('click', () => goTool(b.dataset.go)));
