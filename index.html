@@ -554,7 +554,8 @@ window.TRIP_ID = (new URLSearchParams(location.search).get('t') || 'cina-2026').
     if (typeof TripMd === 'undefined') return fail('Manca il file <b>trip-md.js</b> nel repository (deve stare accanto a index.html).');
     let ok = false;
     try {
-      const r = await fetch('trips/' + window.TRIP_ID + '.md');
+      let r = await fetch('trips/' + window.TRIP_ID + '.md');
+      if (!r.ok) r = await fetch(window.TRIP_ID + '.md');   // se il file è stato caricato nella radice invece che in trips/
       if (r.ok) {
         const d = TripMd.parse(await r.text());
         const miss = [];
