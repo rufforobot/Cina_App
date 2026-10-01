@@ -433,7 +433,8 @@ h1, h2, h3 { letter-spacing: -0.03em; }
 header { background: light-dark(rgba(242,242,247,.75), rgba(0,0,0,.7)); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-bottom: 1px solid light-dark(rgba(0,0,0,.05), rgba(255,255,255,.08)); }
 .header-inner { padding: 12px 16px; }
 .brand { display: block; }
-.logo, .brand small { display: none; }
+.logo { display: none; }
+.brand small { display: block; color: var(--muted); font-size: 14px; font-weight: 500; margin-top: 3px; }
 .brand-state { margin: 0; font-size: .85rem; font-weight: 500; text-transform: uppercase; letter-spacing: .05em; color: var(--accent); }
 .brand h1 { font-size: 1.8rem; letter-spacing: -0.03em; line-height: 1.15; }
 .clocks { background: #000; color: #fff; border-radius: 999px; padding: 6px 14px; gap: 8px; font-size: .85rem; font-weight: 600; flex-wrap: nowrap; box-shadow: 0 4px 12px rgba(0,0,0,.15); }
@@ -557,16 +558,6 @@ main { padding: 16px 16px 140px; }
 <main>
   <!-- DASHBOARD -->
   <section id="dashboard" class="view active">
-    <section class="card ov">
-      <h2 id="heroTitle"></h2>
-      <p class="th-route" id="heroRoute"></p>
-      <div class="stat-row">
-        <div class="stat"><span class="n" id="countdownValue">-</span><small id="countdownLabel">al viaggio</small></div>
-        <div class="stat"><span class="n" id="cityCount">-</span><small>città</small></div>
-        <div class="stat"><span class="n" id="dayCount">-</span><small>giorni totali</small></div>
-      </div>
-    </section>
-
     <section class="card" id="todayWeather" hidden></section>
 
     <section class="card" id="nowCard"></section>
@@ -669,6 +660,10 @@ main { padding: 16px 16px 140px; }
       </div>
     </div>
     <div class="quick-apps" id="quickApps" style="margin-bottom: 24px; scroll-margin-top: 90px;" hidden></div>
+    <div class="uinline" id="up-trans">
+    <div class="section-title"><div><h3>Traduttore</h3></div></div>
+    <div id="transBox" style="margin-bottom:24px;"></div>
+    </div>
     <div class="uinline" id="up-weather">
     <div class="section-title" id="sec-weather"><div><h3>Meteo</h3><p id="wxStamp"></p></div><button class="btn small" id="wxRefresh" style="flex:0 0 auto;">Aggiorna</button></div>
     <div class="wx-cities" id="weatherBox" style="margin-bottom: 24px;"></div>
@@ -734,11 +729,6 @@ main { padding: 16px 16px 140px; }
       <button class="ubar" type="button" data-uback>&lsaquo; Utili</button>
     <div class="section-title"><div><h3>Promemoria</h3></div></div>
     <div id="remBox" style="margin-bottom:24px;"></div>
-    </div>
-    <div class="upanel" id="up-trans" hidden>
-      <button class="ubar" type="button" data-uback>&lsaquo; Utili</button>
-    <div class="section-title"><div><h3>Traduttore</h3></div></div>
-    <div id="transBox" style="margin-bottom:24px;"></div>
     </div>
     <div class="upanel" id="up-backup" hidden>
       <button class="ubar" type="button" data-uback>&lsaquo; Utili</button>
@@ -957,16 +947,14 @@ const cityOfDay = n => {
 function updateCountdown() {
   const start = new Date(meta.start), end = new Date(meta.end);
   const now = new Date();
-  const el = $('countdownValue'), label = $('countdownLabel'), st = $('brandState');
+  const st = $('brandState'), sub = $('brandSub');
   if (st) { st.textContent = now >= start ? (now <= end ? 'Viaggio in corso' : 'Viaggio concluso') : ''; st.hidden = !st.textContent; }
-  if (now < start) {
-    const days = Math.ceil((start - now) / 86400000);
-    el.textContent = days; label.textContent = 'alla partenza';
-  } else if (now <= end) {
-    el.textContent = `D${tripDayIndex() + 1}`; label.textContent = 'del viaggio';
-  } else {
-    el.textContent = '\u2713'; label.textContent = 'Viaggio concluso';
-  }
+  const cn = trip.cities.map(c => c.name);
+  const route = cn.length > 1 ? cn[0] + ' \u2192 ' + cn[cn.length - 1] : '';
+  let cd = '';
+  if (now < start) { const days = Math.ceil((start - now) / 86400000); cd = days + (days === 1 ? ' giorno' : ' giorni') + ' alla partenza'; }
+  else if (now <= end) cd = 'Giorno ' + (tripDayIndex() + 1);
+  if (sub) { sub.textContent = [route, cd].filter(Boolean).join(' \u00b7 '); sub.hidden = !sub.textContent; }
 }
 function updateMetrics() { updateCountdown(); }
 
@@ -2415,9 +2403,9 @@ function initSubTabs() {
 }
 function goTool(id) {
   setView('useful');
-  const inl = ['weather', 'budget', 'phrases'].includes(id);
+  const inl = ['weather', 'budget', 'phrases', 'trans'].includes(id);
   showUtil(id === 'cambio' || inl ? '' : id);
-  if (inl) setTimeout(() => { const e = $('up-' + id); if (e) e.scrollIntoView({ behavior: 'auto', block: 'start' }); window.scrollBy(0, -70); }, 50);
+  if (inl) setTimeout(() => { const e = $('up-' + id); if (e) window.scrollTo({ top: Math.max(0, e.getBoundingClientRect().top + window.scrollY - 90), behavior: 'smooth' }); }, 450);
   if (id === 'cambio') setTimeout(() => { const c = $('convYuan'); if (c) c.focus({ preventScroll: true }); }, 50);
 }
 document.querySelectorAll('.tool-btn[data-go]').forEach(b => b.addEventListener('click', () => goTool(b.dataset.go)));
@@ -2437,7 +2425,6 @@ function renderUtilHome() {
     ['check', 'Checklist', true, () => $('checkProgress').textContent + ' completate'],
     ['remind', 'Promemoria', true, () => { const n = buildReminders().filter(r => !(state.remDone || {})[r.id]).length; return n + ' da fare'; }],
     ['info', 'Info paese', hasInfo, () => INFO.length + ' argomenti'],
-    ['trans', 'Traduttore', true, () => 'Italiano e lingua locale'],
     ['sos', 'Emergenze', true, () => (meta.emergency[0] ? meta.emergency[0][0] + ' · ' + meta.emergency[0][1] : 'Numeri utili')],
     ['backup', 'Backup', true, () => state.lastBackup ? 'Ultimo: ' + new Date(state.lastBackup).toLocaleDateString('it-IT', { day: 'numeric', month: 'short' }) : 'Mai eseguito']
   ];
@@ -2449,7 +2436,6 @@ function renderUtilHome() {
   });
 }
 document.querySelectorAll('[data-uback]').forEach(b => b.addEventListener('click', () => showUtil('')));
-{ const cn = trip.cities.map(c => c.name); $('heroRoute').textContent = cn.length > 1 ? cn[0] + ' → ' + cn[cn.length - 1] : ''; $('heroRoute').hidden = cn.length < 2; }
 $('closeModal').addEventListener('click', closeModal);
 $('modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
@@ -2495,9 +2481,7 @@ document.title = meta.title;
 const _am = document.querySelector('meta[name="apple-mobile-web-app-title"]'); if (_am) _am.content = meta.title;
 { const lg = $('brandLogo'), f = meta.icon && meta.icon['192'];
   if (f) { lg.textContent = ''; lg.style.background = 'none'; const im = document.createElement('img'); im.alt = ''; im.style.cssText = 'width:100%;height:100%;border-radius:10px;display:block'; im.src = f.includes('/') ? f : 'trips/' + window.TRIP_ID + '/' + f; lg.appendChild(im); } else lg.textContent = meta.logo; } $('brandTitle').textContent = meta.title; $('brandSub').textContent = meta.subtitle;
-$('heroTitle').textContent = meta.countryIt || meta.title;
-$('cityCount').textContent = trip.cities.length;
-$('dayCount').textContent = trip.days.length;
+$('brandTitle').textContent = meta.countryIt || meta.title;
 $('sosNote').textContent = meta.emergencyNote;
 $('sosGrid').innerHTML = meta.emergency.map(e => `<div style="padding:10px; background:var(--fill); border-radius:12px;"><strong>${esc(e[0])}</strong><br><small>${esc(e[1])}</small></div>`).join('');
 $('sosAssist').href = 'tel:' + meta.assistance.tel; $('sosAssist').textContent = '' + meta.assistance.label;
