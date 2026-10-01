@@ -555,6 +555,7 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
 </div>
 
 <script src="trip-md.js"></script>
+<script src="qr.js"></script>
 <script>
 /* Il viaggio da aprire si sceglie con ?t=nome (default: cina-2026): si legge trips/nome.md (o, in alternativa, trips/nome.js) */
 /* Se qualcosa si rompe, mostra l'errore in alto invece di lasciare la pagina vuota */
@@ -737,6 +738,14 @@ function showBig(title, big, sub, icon) {
       <div style="font-size: 38px; font-weight: 800; line-height: 1.4; color: var(--text);">${esc(big)}</div>
       ${sub ? `<p style="margin-top: 20px; font-size: 16px; color: var(--muted);">${esc(sub)}</p>` : ''}
     </div>`);
+}
+function showQR(title, text) {
+  let svg = '';
+  try { const q = qrcode(0, 'M'); q.addData(text); q.make(); svg = q.createSvgTag({ cellSize: 8, margin: 0, scalable: true }); } catch (e) { svg = ''; }
+  openModal(title, `<div style="display:flex; flex-direction:column; align-items:center; gap:16px; text-align:center;">
+    <div style="background:#fff; padding:18px; border-radius:16px; width:min(64vw,250px);">${svg || '<p>QR non generabile</p>'}</div>
+    <div style="font-size:20px; font-weight:700; word-break:break-all;">${esc(text)}</div>
+    <p class="note-line">Questo QR contiene solo il numero. Se all'ingresso serve il QR ufficiale, salva anche quello (screenshot) nella galleria.</p></div>`);
 }
 function transitApple(q) {
   const e = encodeURIComponent(q), m = String(meta.maps || 'apple').toLowerCase();
@@ -1006,6 +1015,20 @@ function renderWallet() {
       </div><p style="margin:0; font-size: 15px;"><strong>Date:</strong> ${esc(r.date)}</p><p style="margin:4px 0 0; color:var(--muted); font-size: 13px;">Rif: ${esc(r.ref)}</p>`;
     const toggle = (val) => { if (val) state.booked[r.id] = true; else delete state.booked[r.id]; saveState(); renderBookingAlerts(); renderWallet(); renderToday(); };
     if (state.booked[r.id]) {
+      state.resCodes = state.resCodes || {};
+      const code = state.resCodes[r.id];
+      const box = document.createElement('div'); box.style.marginTop = '12px';
+      if (code) {
+        box.innerHTML = `<div class="companion-meta" style="margin:0;">N° prenotazione</div><div class="val" style="font-weight:700; word-break:break-all; margin:2px 0 8px;">${esc(code)}</div>
+          <div class="city-actions" style="margin-top:0;"><button class="btn small primary" data-q="qr">📱 Mostra QR</button><button class="btn small" data-q="ed">Modifica</button></div>`;
+        box.querySelector('[data-q="qr"]').onclick = () => showQR(r.title, code);
+        box.querySelector('[data-q="ed"]').onclick = () => { const v = prompt('Numero di prenotazione (vuoto per rimuoverlo):', code); if (v === null) return; if (v.trim()) state.resCodes[r.id] = v.trim(); else delete state.resCodes[r.id]; saveState(); renderWallet(); };
+      } else {
+        box.innerHTML = `<div class="grid-2" style="grid-template-columns:1fr auto;"><input class="field" placeholder="N° prenotazione (se c'è il QR)" aria-label="Numero prenotazione"><button class="btn">Salva</button></div>`;
+        const inp = box.querySelector('input');
+        box.querySelector('button').onclick = () => { const v = inp.value.trim(); if (!v) return; state.resCodes[r.id] = v; saveState(); renderWallet(); };
+      }
+      card.appendChild(box);
       const b = document.createElement('button'); b.className = 'btn small'; b.style.marginTop = '12px'; b.textContent = '↩️ Non ancora prenotato';
       b.onclick = () => toggle(false); card.appendChild(b);
     } else if (r.status.includes('Da prenotare')) {
