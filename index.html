@@ -893,7 +893,7 @@ function renderBookingAlerts() {
       <p style="margin: 8px 0 0; font-size:14px; font-weight: 500;">Per il: ${esc(r.date)}</p>
       ${when ? `<p style="margin: 4px 0 0; font-size:14px; font-weight: 700; color: var(--warn);">⏰ ${esc(when)}</p>` : ''}
       <button class="btn warn small" style="width:100%; margin-top: 12px;">✅ Fatto</button>`;
-    card.querySelector('button').onclick = () => { state.booked[r.id] = true; saveState(); renderBookingAlerts(); renderWallet(); renderToday(); };
+    card.querySelector('button').onclick = () => { if (!confirm('Confermi di aver già prenotato "' + r.title + '"?')) return; state.booked[r.id] = true; saveState(); renderBookingAlerts(); renderWallet(); renderToday(); };
     wrap.appendChild(card);
   });
 }
@@ -1004,6 +1004,14 @@ function renderWallet() {
         <div><div class="companion-meta">${esc(r.type)}</div><h4 style="margin:0; font-size:18px;">${esc(r.title)}</h4></div>
         <span class="badge ${isBooked ? 'done' : 'warn'}">${isBooked ? 'Prenotato' : 'Da Fare'}</span>
       </div><p style="margin:0; font-size: 15px;"><strong>Date:</strong> ${esc(r.date)}</p><p style="margin:4px 0 0; color:var(--muted); font-size: 13px;">Rif: ${esc(r.ref)}</p>`;
+    const toggle = (val) => { if (val) state.booked[r.id] = true; else delete state.booked[r.id]; saveState(); renderBookingAlerts(); renderWallet(); renderToday(); };
+    if (state.booked[r.id]) {
+      const b = document.createElement('button'); b.className = 'btn small'; b.style.marginTop = '12px'; b.textContent = '↩️ Non ancora prenotato';
+      b.onclick = () => toggle(false); card.appendChild(b);
+    } else if (r.status.includes('Da prenotare')) {
+      const b = document.createElement('button'); b.className = 'btn small'; b.style.marginTop = '12px'; b.textContent = '✅ Segna come prenotato';
+      b.onclick = () => toggle(true); card.appendChild(b);
+    }
     wrap.appendChild(card);
   });
 }
