@@ -1,5 +1,5 @@
 /* Service worker: cache-first con aggiornamento in background, solo per file dello stesso sito. */
-const CACHE = 'viaggio-v39';
+const CACHE = 'viaggio-v40';
 const SHELL = ['./', 'index.html', 'manifest.json', 'app/trip-md.js', 'app/qr.js', 'app/icons/icon-192.png', 'app/icons/icon-512.png', 'app/icons/apple-touch-icon.png', 'trips/cina-2026/cina-2026.md', 'trips/cina-2026/icon-192.png', 'trips/cina-2026/icon-512.png', 'trips/cina-2026/apple-touch-icon.png'];
 
 self.addEventListener('install', e => {

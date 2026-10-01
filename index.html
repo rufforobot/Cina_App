@@ -278,6 +278,12 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
 .hotel-box .ad, .pl-ad { font-size: 15px; line-height: 1.45; margin-top: 2px; }
 .py { color: var(--muted); font-size: 13px; margin-top: 2px; }
 .live-line { margin-top:8px; padding:8px 10px; border-radius:10px; background:var(--surface-2); font-weight:700; font-size:15px; }
+.btn-grid { display: grid; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
+.stop-acts { grid-column: 1 / -1; }
+.stop-acts > .btn-grid:first-child { margin-top: 0; }
+.btn-grid > .btn { background: var(--surface-2); width: 100%; min-height: 42px; padding: 8px 4px; border-radius: 12px; white-space: nowrap; min-width: 0; text-decoration: none; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.btn-grid > .btn.taxi-btn { background: var(--warn); color: #fff; border-color: transparent; font-weight: 700; }
+.btn-grid > .btn.primary { background: var(--accent-2); color: #fff; border-color: transparent; }
 .act-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .act-row .btn, .act-row a.btn { text-decoration: none; }
 .act-row .btn, .stop-pills .btn { background: var(--surface); }
@@ -681,6 +687,20 @@ setInterval(updateClocks, 1000);
 updateClocks();
 
 /* Mappe: si sceglie per viaggio con "maps:" nell'intestazione (apple, google o amap) */
+/* Pulsanti di percorso e azioni: sempre in righe a griglia, stessa larghezza, stesso ordine (Taxi · Mappa · Metro) */
+function btnGrid(items) {
+  const d = document.createElement('div'); d.className = 'btn-grid'; d.style.setProperty('--n', items.length);
+  items.forEach(i => d.appendChild(i)); return d;
+}
+function bAct(label, fn, cls) { const b = document.createElement('button'); b.type = 'button'; b.className = 'btn small ' + (cls || ''); b.textContent = label; if (fn) b.addEventListener('click', fn); return b; }
+function bLink(label, href, cls, ext) { const a = document.createElement('a'); a.className = 'btn small ' + (cls || ''); a.href = href; a.textContent = label; if (ext) { a.target = '_blank'; a.rel = 'noopener'; } return a; }
+function routeRow(q, taxiFn) {
+  const it = [];
+  if (taxiFn) it.push(bAct('🚕 Taxi', taxiFn, 'taxi-btn'));
+  if (q) { it.push(bLink('🧭 Mappa', appleMaps(q))); it.push(bLink('🚇 Metro', transitApple(q))); }
+  return it.length ? btnGrid(it) : null;
+}
+const hotelQ = h => h.zh || h.addr || [h.name && h.name.replace(/ \(.*$/, ''), h.city, meta.country].filter(Boolean).join(', ');
 function appleMaps(q) {
   const e = encodeURIComponent(q), m = String(meta.maps || 'apple').toLowerCase();
   if (m === 'google') return `https://www.google.com/maps/search/?api=1&query=${e}`;
@@ -763,6 +783,7 @@ function showPlaceCard(p) {
   const zh = (p.zh || '').trim(), addr = (p.addr || '').trim();
   if (!zh && !addr) { toast('Inserisci prima nome o indirizzo nella lingua locale (✏️)'); if (p.onEdit) p.onEdit(); return; }
   const q = zh || addr;
+  const btnCount = (p.tel ? 1 : 0) + 1 + (p.onEdit ? 1 : 0);
   const btns = [
     p.tel ? `<a class="btn small primary" href="tel:${esc(p.tel)}">📞 Chiama</a>` : '',
     `<button class="btn small" data-act="copy">📋 Copia</button>`,
@@ -779,7 +800,7 @@ function showPlaceCard(p) {
       <div class="req">${esc(DRIVER_PHRASES[0][0])}</div>
       <div class="py1">${esc(DRIVER_PHRASES[0][1])} · ${esc(DRIVER_PHRASES[0][2])}</div>
     </div>
-    <div class="act-row" style="justify-content:center">${btns}</div>
+    <div class="btn-grid" style="--n:${btnCount}">${btns}</div>
     ${p.en ? `<p class="py" style="text-align:center">${esc(p.en)}</p>` : ''}
     ${p.more ? `<details class="more"><summary>Info hotel</summary>${p.more}</details>` : ''}
     <details class="more"><summary>Altre frasi per il tassista</summary><div class="taxi-ph">
@@ -836,10 +857,8 @@ function hotelMoreHTML(k) {
 }
 function hotelActs(k, host) {
   const h = hotelInfo(k);
-  const row = document.createElement('div'); row.className = 'act-row';
-  row.innerHTML = `<button class="btn small taxi-btn" data-a="taxi">🚕 Indicazioni per taxi</button>${h.tel ? `<a class="btn small" href="tel:${esc(h.tel)}">📞</a>` : ''}`;
-  row.querySelector('[data-a="taxi"]').onclick = () => showPlaceCard(hotelCardData(k));
-  host.appendChild(row);
+  const g = routeRow(hotelQ(h), () => showPlaceCard(hotelCardData(k))); if (g) host.appendChild(g);
+  if (h.tel) host.appendChild(btnGrid([bLink('📞 Chiama', 'tel:' + h.tel)]));
 }
 function renderTodayHotel() {
   const box = $('todayHotel'); if (!box) return;
@@ -938,12 +957,14 @@ function transferCard(t, ctx) {
       <input class="field f-seat" placeholder="Posto" value="${esc(n.seat || '')}">
       <input class="field f-delay" placeholder="Ritardo / note (es. +40 min)" value="${esc(n.delay || '')}">
     </div>
-    <div class="act-row">
-      <a class="btn small" target="_blank" rel="noopener" href="${isFl ? 'https://www.flightradar24.com/data/flights/' + esc(code.toLowerCase()) : 'https://www.trip.com/trains/'}">${isFl ? '🛰 Stato volo' : '🚄 Stato treno (Trip.com)'}</a>
-      ${isFl ? `<a class="btn small" target="_blank" rel="noopener" href="https://www.flightaware.com/live/flight/${esc(code)}">FlightAware</a>` : ''}
-      ${zhVal ? `<button class="btn small go-taxi">🚕 Taxi per la partenza</button>` : ''}
-    </div>
+    <div data-go></div>
     `;
+  { const host = card.querySelector('[data-go]');
+    const rr = routeRow(zhVal || '', zhVal ? () => showPlaceCard({ title: '🚕 ' + depName, zh: zhVal, latName: depName }) : null);
+    if (rr) host.parentNode.insertBefore(rr, host);
+    const st = [bLink(isFl ? '🛰 Stato volo' : '🚄 Stato treno', isFl ? 'https://www.flightradar24.com/data/flights/' + code.toLowerCase() : 'https://www.trip.com/trains/', '', true)];
+    if (isFl) st.push(bLink('✈️ FlightAware', 'https://www.flightaware.com/live/flight/' + code, '', true));
+    host.parentNode.insertBefore(btnGrid(st), host); host.remove(); }
   const q = sel => card.querySelector(sel);
   const persist = () => {
     state.transferNotes[t.id] = { term: q('.f-term') ? q('.f-term').value.trim() : '', gate: q('.f-gate').value.trim(), seat: q('.f-seat').value.trim(), delay: q('.f-delay').value.trim(),};
@@ -954,7 +975,6 @@ function transferCard(t, ctx) {
     if (ctx === 'next') renderTransfers(); else renderNextTransfer(true);
   };
   card.querySelectorAll('input').forEach(i => i.addEventListener('change', persist));
-  const gt = q('.go-taxi'); if (gt) gt.addEventListener('click', () => showPlaceCard({ title: '🚕 ' + depName, zh: zhVal, latName: depName }));
   return card;
 }
 function renderTransfers() {
@@ -1015,7 +1035,7 @@ function renderWallet() {
   const hotelWrap = $('hotelGrid'), attrWrap = $('walletGrid'); hotelWrap.innerHTML = ''; attrWrap.innerHTML = '';
   const list = reservations.filter(r => !isTransportRes(r));
   /* gli hotel vengono da tutta la sezione "# Hotel" del viaggio, non solo dalle righe di "# Prenotazioni" */
-  const hotels = Object.keys(HOTELS).map(k => { const h = hotelInfo(k); return { id: 'hotel-' + k.toLowerCase(), type: '🏨 Hotel · ' + h.city, title: L(h.name.replace(/ \(.*$/, '').replace(/ = .*$/, '')), date: h.nights, ref: h.booking || '—', status: h.booking ? '✅ Prenotato' : '🟡 Da prenotare' }; });
+  const hotels = Object.keys(HOTELS).map(k => { const h = hotelInfo(k); return { hk: k, id: 'hotel-' + k.toLowerCase(), type: '🏨 Hotel · ' + h.city, title: L(h.name.replace(/ \(.*$/, '').replace(/ = .*$/, '')), date: h.nights, ref: h.booking || '—', status: h.booking ? '✅ Prenotato' : '🟡 Da prenotare' }; });
   const attrs = list.filter(r => !/hotel/i.test(r.type));
   $('secHotel').hidden = !hotels.length; $('secAttr').hidden = !attrs.length;
   $('cntHotel').textContent = hotels.length; $('cntAttr').textContent = attrs.length; $('cntTr').textContent = transfers.length;
@@ -1032,6 +1052,7 @@ function resCard(r) {
       <span class="badge ${isBooked ? 'done' : 'warn'}">${isBooked ? 'Prenotato' : 'Da Fare'}</span>
     </div><p style="margin:0; font-size: 15px;"><strong>Date:</strong> ${esc(r.date)}</p><p style="margin:4px 0 0; color:var(--muted); font-size: 13px;">Rif: ${esc(r.ref)}</p>`;
   const add = (el) => { card.appendChild(el); return el; };
+  if (r.hk) { const g = routeRow(hotelQ(hotelInfo(r.hk)), () => showPlaceCard(hotelCardData(r.hk))); if (g) { g.style.marginTop = '14px'; card.appendChild(g); } }
   const mk = (html, css) => { const d = document.createElement('div'); d.style.cssText = css || 'margin-top:12px;'; d.innerHTML = html; return d; };
   const toggle = val => { if (val) state.booked[r.id] = true; else delete state.booked[r.id]; saveState(); renderBookingAlerts(); renderWallet(); renderToday(); };
   state.resCodes = state.resCodes || {};
@@ -1168,16 +1189,12 @@ function renderCities() {
     card.innerHTML = `<div class="city-card-top"><div><div class="city-name">${esc(city.name)}</div><div class="city-dates">${esc(city.dates)}</div></div></div>
       <div class="city-dates" style="margin-top:10px">Hotel: <strong>${esc(h.name)}</strong></div>
       <div class="city-dates">${esc(h.en || '')}</div>
-      <div class="city-actions">
-        <button class="btn small primary go-it">Itinerario</button>
-        <button class="btn small taxi-btn go-taxi">🚕 Indicazioni per taxi</button>
-        ${h.tel ? `<a class="btn small" href="tel:${esc(h.tel)}">📞</a>` : ''}
-      </div>`;
-    card.querySelector('.go-it').addEventListener('click', () => {
+      `;
+    const g1 = routeRow(hotelQ(h), () => showPlaceCard(hotelCardData(city.key))); if (g1) card.appendChild(g1);
+    card.appendChild(btnGrid([bAct('🗓 Itinerario', () => {
       setView('itinerary');
       setTimeout(() => $(`day-${city.days[0]}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
-    });
-    card.querySelector('.go-taxi').addEventListener('click', () => showPlaceCard(hotelCardData(city.key)));
+    }, 'primary')].concat(h.tel ? [bLink('📞 Chiama', 'tel:' + h.tel)] : [])));
     wrap.appendChild(card);
   });
 }
@@ -1193,6 +1210,9 @@ function stopCardData(day, i) {
   return { title: `🚕 ${L(st.title)}`, zh: p.zh, addr: p.addr, tel: st.tel, latName: L(p.py || st.title), latAddr: p.pya,
     onEdit: () => editAddr(`${day.day}-${i}`, { zh: p.zh, addr: p.addr, lat: p.pya }, st.title, () => { renderItinerary(); renderToday(); }) };
 }
+function stopMapQ(day, st, p) {
+  return p.zh || st.map || (/^(volo|treno|aereo|bus|traghetto)\b/i.test(st.title) ? '' : String(day.city).includes('→') ? `${st.title}, ${meta.country}` : `${st.title}, ${day.city}, ${meta.country}`);
+}
 function detHTML(day, i) {
   const st = day.det[i], p = placeInfo(day, i);
   const sec = (label, txt) => txt ? `<div class="sec"><b>${label}</b><div>${esc(L(txt))}</div></div>` : '';
@@ -1203,16 +1223,7 @@ function detHTML(day, i) {
   h += sec('Come arrivare', st.how) + sec('Orari', st.hours) + sec('Costi', st.cost) + sec('Prenotazione', st.book);
   if (st.warn) h += `<div class="warnbox">⚠️ ${esc(L(st.warn))}</div>`;
   if (st.tips && st.tips.length) h += `<details class="more"><summary>Consigli (${st.tips.length})</summary><ul class="sec">${st.tips.map(t => `<li>${esc(L(t))}</li>`).join('')}</ul></details>`;
-  const hk = st.h || DIARY[day.day].sleep;
-  /* destinazione per le mappe: indirizzo locale, oppure «mappa:» del file, oppure titolo + città; per voli e treni nessuna mappa, salvo «mappa:» nel file; nei giorni con più città si usa titolo + paese */
-  const mapQ = p.zh || st.map || (/^(volo|treno|aereo|bus|traghetto)\b/i.test(st.title) ? '' : String(day.city).includes('→') ? `${st.title}, ${meta.country}` : `${st.title}, ${day.city}, ${meta.country}`);
-  h += `<div class="act-row">
-    ${(p.zh || p.addr) ? `<button class="btn small taxi-btn" data-a="taxi">🚕 Taxi</button>` : ''}
-    ${st.tel ? `<a class="btn small" href="tel:${esc(st.tel)}">📞 Chiama</a>` : ''}
-    ${mapQ ? `<a class="btn small" href="${appleMaps(mapQ)}">🧭 Mappa</a>
-    <a class="btn small" href="${transitApple(mapQ)}">🚇 Metro</a>` : ''}
-  </div>
-  <div class="vb">${st.v === 'ok' ? '✅ Dati letti su fonti online' : '🟡 Da verificare prima di partire'}${p.custom ? ' · ✏️ modificato da te' : ''}</div>`;
+  h += `<div class="vb">${st.v === 'ok' ? '✅ Dati letti su fonti online' : '🟡 Da verificare prima di partire'}${p.custom ? ' · ✏️ modificato da te' : ''}</div>`;
   return h;
 }
 function isCheckinDay(day, hk) {
@@ -1242,12 +1253,9 @@ function renderDay(day, target) {
     const hasPlace = !!(p.zh || p.addr);
     row.innerHTML = `<div class="time">${esc(s[0])}</div>
       <div><h5>${esc(L(s[1]))}</h5><p>${esc(L(s[2]))}</p>
-        ${st ? `<div class="stop-pills">
-          ${st.guide ? `<button class="btn small" data-a="guide">🎧 Guida</button>` : ''}
-          <button class="btn small" data-a="tg" aria-expanded="false">Dettagli ▾</button>
-          ${st.v === 'ok' ? '' : '<span class="vdot" title="da verificare">🟡</span>'}</div>` : ''}</div>
+</div>
       <div class="stop-tools"><input class="check" type="checkbox" aria-label="Completata" ${checked ? 'checked' : ''}></div>
-      ${st ? `<div class="stop-det" hidden></div>` : ''}`;
+      ${st ? `<div class="stop-acts"></div><div class="stop-det" hidden></div>` : ''}`;
     if (checked) row.classList.add('done');
     row.querySelector('.check').addEventListener('change', e => {
       state.completed[key] = e.target.checked; saveState();
@@ -1255,7 +1263,15 @@ function renderDay(day, target) {
       renderToday();
     });
     if (st) {
-      const det = row.querySelector('.stop-det'), tg = row.querySelector('[data-a="tg"]');
+      const acts = row.querySelector('.stop-acts');
+      const mq = stopMapQ(day, st, p);
+      const g1 = routeRow(mq, hasPlace ? () => showPlaceCard(stopCardData(day, i)) : null); if (g1) acts.appendChild(g1);
+      const r2 = [];
+      if (st.guide) r2.push(bAct('🎧 Guida', () => openGuideByTitle(st.guide)));
+      if (st.tel) r2.push(bLink('📞 Chiama', 'tel:' + st.tel));
+      const tg = bAct('Dettagli ▾'); tg.dataset.a = 'tg'; tg.setAttribute('aria-expanded', 'false'); r2.push(tg);
+      acts.appendChild(btnGrid(r2));
+      const det = row.querySelector('.stop-det');
       const fill = () => {
         det.innerHTML = detHTML(day, i);
         const on = (a, fn) => { const b = det.querySelector(`[data-a="${a}"]`); if (b) b.onclick = fn; };
@@ -1263,8 +1279,6 @@ function renderDay(day, target) {
       };
       const setOpen = open => { det.hidden = !open; tg.setAttribute('aria-expanded', open); tg.textContent = open ? 'Chiudi ▴' : 'Dettagli ▾'; if (open) { fill(); detOpen.add(key); } else detOpen.delete(key); };
       tg.addEventListener('click', () => setOpen(det.hidden));
-      const gd = row.querySelector('.stop-pills [data-a="guide"]');
-      if (gd) gd.addEventListener('click', () => openGuideByTitle(st.guide));
       if (detOpen.has(key)) setOpen(true);
     }
     timeline.appendChild(row);
@@ -1412,12 +1426,7 @@ function openStop(list, i) {
   const box = document.createElement('div');
   box.innerHTML = `
     <div class="note-line" style="margin-bottom:10px;">${esc(city)} · ${esc(L(stop.native).replace(/^[\s·]+/,''))} · ${esc(tagLabel(stop.tag))}</div>
-    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;">
-      <button class="btn small primary m-listen" type="button" data-label="🔊 Ascolta">🔊 Ascolta</button>
-      ${hanzi ? '<button class="btn small m-taxi" type="button">🚕 Indicazioni per taxi</button>' : ''}
-      <a class="btn small" href="${appleMaps(`${stop.title}, ${city}, ${meta.country}`)}">🧭 Mappa</a>
-      <button class="btn small m-fav" type="button">${state.favs[key] ? '★ Preferito' : '☆ Preferito'}</button>
-    </div>
+    <div data-go></div>
     <p style="font-size:16px; line-height:1.6; color:var(--text);">${esc(stop.text)}</p>
     ${section('Curiosità', stop.curiosita)}
     ${section('Tradizioni & Eventi', stop.tradizioni)}
@@ -1430,14 +1439,17 @@ function openStop(list, i) {
       <button class="btn m-prev" type="button" ${i === 0 ? 'disabled' : ''}>← Precedente</button>
       <button class="btn m-next" type="button" ${i === list.length - 1 ? 'disabled' : ''}>Successiva →</button>
     </div>`;
-  box.querySelector('.m-listen').addEventListener('click', e => speak(stop.text, meta.guideLang || 'it-IT', e.currentTarget, Number(state.ttsRate) || 0.95));
-  const taxi = box.querySelector('.m-taxi');
-  if (taxi) taxi.addEventListener('click', () => { stopSpeech(); showBig('Mostra all\'autista', hanzi, 'Mi porti qui, per favore.', '🚕'); });
-  box.querySelector('.m-fav').addEventListener('click', e => {
-    if (state.favs[key]) delete state.favs[key]; else state.favs[key] = true;
-    saveState(); e.currentTarget.textContent = state.favs[key] ? '★ Preferito' : '☆ Preferito';
-    if (!guide.favOnly) renderCompanion();
-  });
+  { const host = box.querySelector('[data-go]');
+    const g1 = routeRow(`${stop.title}, ${city}, ${meta.country}`, hanzi ? () => { stopSpeech(); showBig('Mostra all\'autista', hanzi, 'Mi porti qui, per favore.', '🚕'); } : null);
+    const listen = bAct('🔊 Ascolta', null, 'primary'); listen.dataset.label = '🔊 Ascolta';
+    listen.addEventListener('click', e => speak(stop.text, meta.guideLang || 'it-IT', e.currentTarget, Number(state.ttsRate) || 0.95));
+    const fav = bAct(state.favs[key] ? '★ Preferito' : '☆ Preferito', e => {
+      if (state.favs[key]) delete state.favs[key]; else state.favs[key] = true;
+      saveState(); e.currentTarget.textContent = state.favs[key] ? '★ Preferito' : '☆ Preferito';
+      if (!guide.favOnly) renderCompanion();
+    });
+    if (g1) host.parentNode.insertBefore(g1, host);
+    host.parentNode.insertBefore(btnGrid([listen, fav]), host); host.remove(); }
   box.querySelector('.m-prev').addEventListener('click', () => openStop(list, i - 1));
   box.querySelector('.m-next').addEventListener('click', () => openStop(list, i + 1));
   $('modalTitle').textContent = stop.title;
