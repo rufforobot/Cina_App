@@ -568,6 +568,26 @@ main { padding: 16px 16px 140px; }
 .news-item a { color: var(--accent); font-size: 13px; font-weight: 600; text-decoration: none; }
 /* le mappe Leaflet hanno livelli con z-index alti: isolarle perché non passino sopra popup e menu */
 .day-map, #dmMap, .leaflet-container { isolation: isolate; }
+
+/* widget (stile iOS 26): griglia di riquadri che aprono un popup o una schermata */
+.wgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.wsec-t { font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 22px 4px 10px; }
+.wsec-t:first-child { margin-top: 4px; }
+.wtile { text-align: left; border: 0.5px solid var(--glass-border); background: var(--glass); box-shadow: var(--shadow); border-radius: 22px; padding: 14px; color: var(--text); display: flex; flex-direction: column; gap: 10px; min-width: 0; font: inherit; transition: transform .2s; }
+.wtile:active { transform: scale(.96); }
+.wtile .wi { width: 42px; height: 42px; border-radius: 12px; background: var(--fill); display: flex; align-items: center; justify-content: center; color: var(--accent); }
+.wtile .wi svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.wtile .wt { font-size: 16px; font-weight: 600; letter-spacing: -.2px; overflow-wrap: anywhere; line-height: 1.25; }
+.wtile .ws { font-size: 13px; color: var(--muted); line-height: 1.3; margin-top: 2px; }
+.wtile .wp { display: inline-block; margin-top: 8px; font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: color-mix(in srgb, var(--ok) 20%, var(--surface)); color: var(--ok); }
+.wtile .wp.warn { background: color-mix(in srgb, var(--warn) 20%, var(--surface)); color: var(--warn); }
+.wtile.wide { grid-column: 1 / -1; }
+.wtitle { font-size: 26px; font-weight: 700; letter-spacing: -.5px; margin: 0 0 14px; }
+#utilGroups > [hidden] { display: none !important; }
+#utilGroups.single .seg { display: none; }
+.modal.sheet.open { align-items: flex-end; padding: 0; animation: sheetUp .35s cubic-bezier(.32,.72,0,1); }
+.modal.sheet .modal-card { width: 100%; max-height: 88vh; border-radius: 28px 28px 0 0; padding-bottom: env(safe-area-inset-bottom); }
+@keyframes sheetUp { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
 </style>
 </head>
 <body>
@@ -640,31 +660,7 @@ main { padding: 16px 16px 140px; }
   <!-- WALLET -->
   <section id="wallet" class="view">
     <div class="btn-grid" style="--n:1; margin-bottom:12px;"><button class="btn small" id="impBtn" type="button">Importa da email</button></div>
-    <div class="card card-no-pad" id="wsecGroup">
-    <details class="wsec" id="secTr"><summary><span>Trasferimenti</span><small id="cntTr"></small></summary>
-      <div class="wallet-grid" id="transferGrid"></div></details>
-
-    <details class="wsec" id="secHotel"><summary><span>Hotel</span><small id="cntHotel"></small></summary>
-      <div class="wallet-grid" id="hotelGrid"></div></details>
-
-    <details class="wsec" id="secAttr"><summary><span>Attrazioni</span><small id="cntAttr"></small></summary>
-      <div class="wallet-grid" id="walletGrid"></div></details>
-
-    <details class="wsec" id="secUtil"><summary><span>Utilità</span><small id="cntUtil"></small></summary>
-      <div class="wallet-grid" id="walUtilGrid"></div></details>
-
-    <details class="wsec" id="secImp" hidden><summary><span>Importate da email</span><small id="cntImp"></small></summary>
-      <div class="wallet-grid" id="impGrid"></div></details>
-
-    <details class="wsec"><summary><span>Promemoria sul calendario</span></summary>
-      <div class="utility-card">
-        <p class="note-line" style="margin:0 0 10px;">Scarica un file .ics e aprilo per aggiungere gli eventi.</p>
-        <div class="grid-2">
-          <button class="btn primary" id="icsRes">Aperture prenotazioni</button>
-          <button class="btn primary" id="icsTr">Voli e treni</button>
-        </div>
-      </div></details>
-    </div>
+    <div id="wWidgets"></div>
 
     <div id="oldCodes" hidden>
       <div class="section-title"><div><h3>Altri codici</h3><p>Salvati in precedenza. Ora i codici e le note si inseriscono dentro ogni prenotazione.</p></div></div>
@@ -680,6 +676,13 @@ main { padding: 16px 16px 140px; }
   <!-- UTILI -->
   <section id="useful" class="view">
     <div id="utilHome">
+    <div id="utilTiles">
+      <div class="wgrid" id="utilGrid"></div>
+      <div class="quick-apps" id="quickApps" style="margin-top: 16px; scroll-margin-top: 90px;" hidden></div>
+    </div>
+    <button class="ubar" type="button" id="utilBack" data-uback hidden>&lsaquo; Utili</button>
+    <h2 id="utilToolTitle" class="wtitle" hidden></h2>
+    <div id="utilGroups" hidden>
     <section class="card ugroup" id="up-money">
       <div class="seg two"><button type="button" class="on" data-pane="up-conv">Cambio</button><button type="button" data-pane="up-budget">Budget</button></div>
 <div class="upane" id="up-conv">
@@ -736,9 +739,7 @@ main { padding: 16px 16px 140px; }
         <div class="section-title" id="sec-weather"><div><h3>Meteo</h3><p id="wxStamp"></p></div><button class="btn small" id="wxRefresh" style="flex:0 0 auto;">Aggiorna</button></div>
     <div class="wx-cities" id="weatherBox"></div>
     </section>
-    <div class="quick-apps" id="quickApps" style="margin-bottom: 24px; scroll-margin-top: 90px;" hidden></div>
-    <div class="section-title"><div><h3>Altro</h3></div></div>
-      <div class="util-grid" id="utilGrid"></div>
+    </div>
     </div>
     <div class="upanel" id="up-check" hidden>
       <button class="ubar" type="button" data-uback>&lsaquo; Utili</button>
@@ -1000,7 +1001,24 @@ function updateMetrics() { updateCountdown(); }
 
 /* ====================== MODALE ====================== */
 function openModal(title, html) { $('modalTitle').textContent = title; $('modalBody').innerHTML = html; $('modal').classList.add('open'); }
-function closeModal() { stopSpeech(); $('modal').classList.remove('open'); }
+let sheetBuilder = null;
+function closeModal() { stopSpeech(); sheetBuilder = null; $('modal').classList.remove('open', 'sheet'); }
+function openSheetNode(title, builder) { sheetBuilder = builder; $('modalTitle').textContent = title; $('modalBody').replaceChildren(builder()); $('modal').classList.add('sheet', 'open'); }
+function refreshSheet() { if (sheetBuilder && $('modal').classList.contains('open')) $('modalBody').replaceChildren(sheetBuilder()); }
+const WIC = {
+  flight: '<path d="M3 13l18-8-4 15-4-6-6-1z"/>', train: '<path d="M7 3h10a2 2 0 0 1 2 2v10a3 3 0 0 1-3 3l2 3M8 18l-2 3M5 5v10a3 3 0 0 0 3 3M5 11h14M9 15h.01M15 15h.01"/>',
+  hotel: '<path d="M4 20V6l8-3 8 3v14M9 20v-5h6v5M9 9h.01M15 9h.01M9 12h.01M15 12h.01"/>', sim: '<rect x="6" y="3" width="12" height="18" rx="3"/><path d="M10 17h4"/>',
+  shield: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>', ticket: '<path d="M3 9a2 2 0 0 0 0 6v3h18v-3a2 2 0 0 1 0-6V6H3zM13 6v12"/>',
+  cash: '<circle cx="12" cy="12" r="9"/><path d="M8.5 7.5 12 12l3.5-4.5M8 12h8M8 15h8M12 12v6"/>', cloud: '<path d="M7 18h10a4 4 0 0 0 .5-8A5.5 5.5 0 0 0 7 8.5 3.8 3.8 0 0 0 7 18z"/>',
+  wallet: '<rect x="3" y="6" width="18" height="13" rx="3"/><path d="M3 10h18"/>', check: '<path d="M5 12l4 4 10-10"/>', bell: '<path d="M6 17V11a6 6 0 0 1 12 0v6l2 2H4zM10 21h4"/>',
+  info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/>', chat: '<path d="M4 5h16v11H9l-5 4z"/>', tr: '<path d="M4 6h9M8.5 4v2M6 6c1 4 4 7 7 8M12 6c-1 4-4 7-7 8M14 20l4-9 4 9M15.5 17h5"/>',
+  sos: '<circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5h.01"/>', save: '<path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19h14"/>', cal: '<rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M9 3v4M15 3v4"/>', mail: '<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 8l9 6 9-6"/>'
+};
+function wTile(o) {
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'wtile' + (o.wide ? ' wide' : '');
+  b.innerHTML = `<div class="wi"><svg viewBox="0 0 24 24">${WIC[o.ic] || WIC.info}</svg></div><div><div class="wt">${esc(o.t)}</div>${o.s ? `<div class="ws">${esc(o.s)}</div>` : ''}${o.pill ? `<span class="wp ${o.warn ? 'warn' : ''}">${esc(o.pill)}</span>` : ''}</div>`;
+  b.onclick = o.open; return b;
+}
 function showBig(title, big, sub, icon) {
   openModal(title, `
     <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:40vh; text-align:center;">
@@ -1223,10 +1241,7 @@ function transferCard(t, ctx) {
   card.querySelectorAll('input').forEach(i => i.addEventListener('change', persist));
   return card;
 }
-function renderTransfers() {
-  const wrap = $('transferGrid'); wrap.innerHTML = '';
-  transfers.forEach(t => wrap.appendChild(transferCard(t, 'list')));
-}
+function renderTransfers() { /* ora le schede dei trasferimenti stanno nei widget di Doc */ }
 /* ====================== CALENDARIO (.ics) ====================== */
 const icsStamp = d => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
 const icsEsc = s => String(s).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
@@ -1268,21 +1283,26 @@ function exportTransfersICS() {
 const isTransportRes = r => /treno|volo|aere|bus|traghetto/i.test(r.type);
 function resExtra(id) { state.resNotes = state.resNotes || {}; return state.resNotes[id] || (state.resNotes[id] = { note: '', codes: [] }); }
 function renderWallet() {
-  const hotelWrap = $('hotelGrid'), attrWrap = $('walletGrid'), utilWrap = $('walUtilGrid'); hotelWrap.innerHTML = ''; attrWrap.innerHTML = ''; utilWrap.innerHTML = '';
   const list = reservations.filter(r => !isTransportRes(r));
-  /* gli hotel vengono da tutta la sezione "# Hotel" del viaggio, non solo dalle righe di "# Prenotazioni" */
   const hotels = Object.keys(HOTELS).map(k => { const h = hotelInfo(k); return { hk: k, id: 'hotel-' + k.toLowerCase(), type: 'Hotel · ' + h.city, title: L(h.name.replace(/ \(.*$/, '').replace(/ = .*$/, '')), date: h.nights, ref: h.booking || '—', fileBooked: !!h.booking, status: h.booking ? 'Prenotato' : 'Da prenotare' }; });
   const nonHotel = list.filter(r => !/hotel/i.test(r.type));
-  /* Attrazioni = biglietti e prenotazioni di luoghi; Utilità = tutto il resto (eSIM, assicurazione, ...) */
   const isAttrRes = r => /attrazion|prenotazion|biglietto|ticket/i.test(r.type);
   const attrs = nonHotel.filter(isAttrRes), utils = nonHotel.filter(r => !isAttrRes(r));
-  $('secHotel').hidden = !hotels.length; $('secAttr').hidden = !attrs.length; $('secUtil').hidden = !utils.length;
-  $('cntHotel').textContent = hotels.length; $('cntAttr').textContent = attrs.length; $('cntUtil').textContent = utils.length; $('cntTr').textContent = transfers.length;
-  hotels.forEach(r => hotelWrap.appendChild(resCard(r)));
-  attrs.forEach(r => attrWrap.appendChild(resCard(r)));
-  utils.forEach(r => utilWrap.appendChild(resCard(r)));
+  const host = $('wWidgets'); host.innerHTML = '';
+  const group = (title, tiles) => { if (!tiles.length) return; const t = document.createElement('div'); t.className = 'wsec-t'; t.textContent = title; const g = document.createElement('div'); g.className = 'wgrid'; tiles.forEach(x => g.appendChild(x)); host.append(t, g); };
+  const short = s => String(s).replace(/\s*\(.*?\)/g, '').trim();
+  const trTile = t => { const ms = new Date(t.dep) - Date.now(); return wTile({ ic: /Volo/.test(t.type) ? 'flight' : 'train', t: short(t.title), s: fmtLocal(t.dep), pill: ms > 0 ? 'tra ' + relTime(ms) : 'partito', warn: ms > 0, open: () => openSheetNode(t.title, () => transferCard(t, 'list')) }); };
+  const resTile = (r, ic) => { const bk = r.fileBooked || state.booked[r.id]; return wTile({ ic, t: short(r.title), s: r.date, pill: bk ? 'Prenotato' : 'Da prenotare', warn: !bk, open: () => openSheetNode(r.title, () => resCard(r)) }); };
+  group('Voli', transfers.filter(t => /Volo/.test(t.type)).map(trTile));
+  group('Treni e altri trasferimenti', transfers.filter(t => !/Volo/.test(t.type)).map(trTile));
+  group('Hotel', hotels.map(r => resTile(r, 'hotel')));
+  group('Attrazioni', attrs.map(r => resTile(r, 'ticket')));
+  group('Utilità', utils.map(r => resTile(r, /sim/i.test(r.type + r.title) ? 'sim' : /assic/i.test(r.type + r.title) ? 'shield' : 'info')));
+  const imp = state.imported || [];
+  group('Importate da email', imp.map(x => wTile({ ic: 'mail', t: x.title, s: [x.date && x.date.split('-').reverse().join('/'), x.time].filter(Boolean).join(' · ') || 'Data non indicata', open: () => openSheetNode(x.title, () => importedCard(x)) })));
+  group('Altro', [wTile({ ic: 'cal', t: 'Promemoria calendario', s: 'File .ics per il telefono', open: () => openSheetNode('Promemoria sul calendario', () => { const d = document.createElement('div'); d.innerHTML = '<p class="note-line" style="margin:0 0 12px;">Scarica un file .ics e aprilo per aggiungere gli eventi.</p><div class="grid-2"><button class="btn primary" data-i="r">Aperture prenotazioni</button><button class="btn primary" data-i="t">Voli e treni</button></div>'; d.querySelector('[data-i=r]').onclick = exportReservationsICS; d.querySelector('[data-i=t]').onclick = exportTransfersICS; return d; }) })]);
   renderCodes();
-  if (typeof renderImported === 'function') renderImported();
+  refreshSheet();
 }
 function resCard(r) {
   const card = document.createElement('article'); card.className = 'wallet-card';
@@ -1334,7 +1354,7 @@ function openResEditor(r, isBooked) {
     const cv = q('[data-f="cv"]').value.trim(); if (cv) ex.codes.push({ id: Date.now(), title: q('[data-f="ct"]').value.trim() || 'Codice', value: cv });
     ex.note = q('[data-f="note"]').value.trim(); done();
   };
-  $('modalTitle').textContent = r.title; $('modalBody').replaceChildren(box); $('modal').classList.add('open');
+  sheetBuilder = null; $('modalTitle').textContent = r.title; $('modalBody').replaceChildren(box); $('modal').classList.add('sheet', 'open');
 }
 function renderCodes() {
   const sec = $('oldCodes'), box = $('codeList'); box.innerHTML = '';
@@ -2430,18 +2450,14 @@ function openImport() {
   };
   $('modalTitle').textContent = 'Importa da email'; $('modalBody').replaceChildren(box); $('modal').classList.add('open');
 }
-function renderImported() {
-  const sec = $('secImp'), wrap = $('impGrid'); if (!sec) return;
-  const list = state.imported || []; sec.hidden = !list.length; wrap.innerHTML = '';
-  $('cntImp').textContent = list.length;
-  list.forEach(x => {
-    const c = document.createElement('article'); c.className = 'wallet-card';
-    c.innerHTML = `<div class="companion-meta">Importata</div><h4 style="margin:0;font-size:18px;">${esc(x.title)}</h4><p style="margin:8px 0 0;font-size:15px;">${esc([x.date && x.date.split('-').reverse().join('/'), x.time].filter(Boolean).join(' · ') || 'Data non indicata')}</p>${x.num ? `<p class="note-line" style="margin:4px 0 0;">N° ${esc(x.num)}</p>` : ''}<div data-a></div>`;
-    const it = []; if (x.num) { it.push(bAct('Mostra QR', () => showQR(x.title, x.num))); it.push(bAct('Copia', () => copyText(x.num))); }
-    it.push(bAct('Elimina', () => { if (confirm('Eliminare "' + x.title + '"?')) { state.imported = state.imported.filter(y => y.id !== x.id); saveState(); renderImported(); renderReminders(); } }));
-    const g = btnGrid(it); g.style.marginTop = '14px'; c.querySelector('[data-a]').replaceWith(g); wrap.appendChild(c);
-  });
+function importedCard(x) {
+  const c = document.createElement('article'); c.className = 'wallet-card';
+  c.innerHTML = `<div class="companion-meta">Importata</div><h4 style="margin:0;font-size:18px;">${esc(x.title)}</h4><p style="margin:8px 0 0;font-size:15px;">${esc([x.date && x.date.split('-').reverse().join('/'), x.time].filter(Boolean).join(' · ') || 'Data non indicata')}</p>${x.num ? `<p class="note-line" style="margin:4px 0 0;">N° ${esc(x.num)}</p>` : ''}<div data-a></div>`;
+  const it = []; if (x.num) { it.push(bAct('Mostra QR', () => showQR(x.title, x.num))); it.push(bAct('Copia', () => copyText(x.num))); }
+  it.push(bAct('Elimina', () => { if (confirm('Eliminare "' + x.title + '"?')) { state.imported = state.imported.filter(y => y.id !== x.id); saveState(); closeModal(); renderWallet(); renderReminders(); } }));
+  const g = btnGrid(it); g.style.marginTop = '14px'; c.querySelector('[data-a]').replaceWith(g); return c;
 }
+function renderImported() { renderWallet(); }
 
 /* ---- Traduttore ---- */
 function renderTrans() {
@@ -2514,9 +2530,7 @@ function selPane(pid) {
 }
 function goTool(id) {
   setView('useful');
-  const inl = ['weather', 'budget', 'phrases', 'trans', 'cambio'].includes(id);
-  showUtil(inl ? '' : id);
-  if (inl) setTimeout(() => { const e = selPane(id === 'cambio' ? 'up-conv' : 'up-' + id); if (e) window.scrollTo({ top: Math.max(0, e.getBoundingClientRect().top + window.scrollY - 90), behavior: 'smooth' }); }, 450);
+  showUtil(id === 'cambio' ? 'conv' : id);
   if (id === 'cambio') setTimeout(() => { const c = $('convYuan'); if (c) c.focus({ preventScroll: true }); }, 50);
 }
 document.querySelectorAll('.tool-btn[data-go]').forEach(b => b.addEventListener('click', () => goTool(b.dataset.go)));
@@ -2525,26 +2539,32 @@ initSubTabs();
 ['gesturestart','gesturechange','gestureend'].forEach(ev => document.addEventListener(ev, e => e.preventDefault()));
 
 /* Utili: griglia di riquadri, ogni argomento in una schermata propria */
+const UTOOLS = { conv: ['up-money', 'up-conv', 'Cambio'], budget: ['up-money', 'up-budget', 'Budget'], trans: ['up-lang', 'up-trans', 'Traduttore'], phrases: ['up-lang', 'up-phrases', 'Frasi utili'], weather: ['up-weather', null, 'Meteo'] };
 function showUtil(id) {
-  $('utilHome').hidden = !!id;
+  const t = UTOOLS[id];
+  $('utilHome').hidden = !!id && !t;
+  $('utilTiles').hidden = !!t; $('utilGroups').hidden = !t; $('utilBack').hidden = !t; $('utilToolTitle').hidden = !t || id === 'weather';
   document.querySelectorAll('.upanel').forEach(pn => { pn.hidden = pn.id !== 'up-' + id; });
+  if (t) { ['up-money', 'up-lang', 'up-weather'].forEach(g => { $(g).hidden = g !== t[0]; }); if (t[1]) selPane(t[1]); $('utilGroups').classList.add('single'); $('utilToolTitle').textContent = t[2]; }
   if (!id) renderUtilHome();
   window.scrollTo({ top: 0, behavior: 'auto' });
 }
 function renderUtilHome() {
+  const cs = meta.currency && meta.currency.symbol || '';
   const tiles = [
-    ['check', 'Checklist', true, () => $('checkProgress').textContent + ' completate'],
-    ['remind', 'Promemoria', true, () => { const n = buildReminders().filter(r => !(state.remDone || {})[r.id]).length; return n + ' da fare'; }],
-    ['info', 'Info paese', hasInfo, () => INFO.length + ' argomenti'],
-    ['sos', 'Emergenze', true, () => (meta.emergency[0] ? meta.emergency[0][0] + ' · ' + meta.emergency[0][1] : 'Numeri utili')],
-    ['backup', 'Backup', true, () => state.lastBackup ? 'Ultimo: ' + new Date(state.lastBackup).toLocaleDateString('it-IT', { day: 'numeric', month: 'short' }) : 'Mai eseguito']
-  ];
+    ['cash', 'Cambio', true, 'conv', () => '1 € = ' + rate().toFixed(2).replace('.', ',') + ' ' + cs],
+    ['wallet', 'Budget', true, 'budget', () => fmtEur(sumEuro(state.expenses)) + ' spesi'],
+    ['cloud', 'Meteo', true, 'weather', () => 'Previsioni per città'],
+    ['tr', 'Traduttore', true, 'trans', () => 'Traduci al volo'],
+    ['chat', 'Frasi utili', hasPhr, 'phrases', () => phrases.length + ' frasi'],
+    ['check', 'Checklist', true, 'check', () => $('checkProgress').textContent + ' fatte'],
+    ['bell', 'Promemoria', true, 'remind', () => { const n = buildReminders().filter(r => !(state.remDone || {})[r.id]).length; return n + ' da fare'; }],
+    ['info', 'Info paese', hasInfo, 'info', () => INFO.length + ' argomenti'],
+    ['sos', 'Emergenze', true, 'sos', () => (meta.emergency[0] ? meta.emergency[0][0] + ' · ' + meta.emergency[0][1] : 'Numeri utili')],
+    ['save', 'Backup', true, 'backup', () => state.lastBackup ? 'Ultimo: ' + new Date(state.lastBackup).toLocaleDateString('it-IT', { day: 'numeric', month: 'short' }) : 'Mai eseguito']
+  ].filter(t => t[2]);
   const g = $('utilGrid'); g.innerHTML = '';
-  tiles.filter(t => t[2]).forEach(([id, title, , prev]) => {
-    const b = document.createElement('button'); b.type = 'button'; b.className = 'util-tile';
-    b.innerHTML = `<b>${esc(title)}</b><span>${esc(prev())}</span>`;
-    b.onclick = () => showUtil(id); g.appendChild(b);
-  });
+  tiles.forEach(([ic, t, , id, prev], i) => { const el = wTile({ ic, t, s: prev(), open: () => showUtil(id), wide: i === tiles.length - 1 && tiles.length % 2 }); g.appendChild(el); });
 }
 document.querySelectorAll('.ugroup .seg [data-pane]').forEach(b => b.addEventListener('click', () => selPane(b.dataset.pane)));
 document.querySelectorAll('[data-uback]').forEach(b => b.addEventListener('click', () => showUtil('')));
@@ -2552,8 +2572,6 @@ $('closeModal').addEventListener('click', closeModal);
 $('modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-$('icsRes').addEventListener('click', exportReservationsICS);
-$('icsTr').addEventListener('click', exportTransfersICS);
 $('checkAdd').addEventListener('click', () => {
   const i = $('checkNew'); const label = i.value.trim(); if (!label) return;
   state.checkCustom.push({ id: 'c' + Date.now(), label }); i.value = ''; saveState(); renderChecklist();
