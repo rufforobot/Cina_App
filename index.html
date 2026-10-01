@@ -247,9 +247,23 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
 .wx-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
 .wx-slot { background: var(--surface-2); border-radius: 12px; padding: 8px 6px; text-align: center; font-size: 13px; }
 .wx-slot b { display: block; font-size: 12px; color: var(--muted); font-weight: 600; }
-.wx-days { display: flex; gap: 8px; flex-wrap: wrap; }
-.wx-day { background: var(--surface-2); border-radius: 12px; padding: 8px 10px; font-size: 13px; text-align: center; min-width: 76px; }
-.wx-day b { display: block; font-size: 12px; color: var(--muted); font-weight: 600; }
+.wx-cities { display: grid; gap: 14px; }
+.wx-city { padding: 18px 0 14px; border-radius: var(--radius); background: var(--glass); border: 0.5px solid var(--glass-border); box-shadow: var(--shadow); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); overflow: hidden; }
+.wx-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 0 20px; }
+.wx-name { font-size: 22px; font-weight: 700; letter-spacing: -.4px; }
+.wx-sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
+.wx-now { display: flex; align-items: center; gap: 8px; }
+.wx-now .wi { font-size: 30px; line-height: 1; }
+.wx-now .wt { font-size: 40px; font-weight: 300; letter-spacing: -1.5px; line-height: 1; }
+.wx-rail { display: flex; gap: 8px; overflow-x: auto; scroll-snap-type: x proximity; padding: 14px 20px 4px; scrollbar-width: none; }
+.wx-rail::-webkit-scrollbar { display: none; }
+.wx-tile { flex: 0 0 64px; scroll-snap-align: start; text-align: center; padding: 10px 4px; border-radius: 16px; background: var(--surface-2); }
+.wx-tile .wd { font-size: 13px; font-weight: 700; text-transform: capitalize; }
+.wx-tile .wdt { font-size: 11px; color: var(--muted); }
+.wx-tile .wi { font-size: 26px; margin: 8px 0 6px; line-height: 1; }
+.wx-tile .hi { font-size: 17px; font-weight: 700; }
+.wx-tile .lo { font-size: 15px; color: var(--muted); }
+.wx-tile .rn { font-size: 11px; color: var(--accent-2); font-weight: 600; margin-top: 4px; min-height: 14px; }
 
 .code-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 0.5px solid var(--border); }
 .code-row .val { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 15px; overflow-wrap: anywhere; }
@@ -525,12 +539,8 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
       <div id="phrasesBox"></div>
     </div>
 
-    <div class="section-title" id="sec-weather"><div><h3>Meteo</h3></div></div>
-    <div class="utility-card" style="margin-bottom: 24px;">
-      <button class="btn block" id="wxRefresh">Aggiorna meteo</button>
-      <div class="note-line" id="wxStamp" style="margin:8px 0;"></div>
-      <div id="weatherBox"></div>
-    </div>
+    <div class="section-title" id="sec-weather"><div><h3>Meteo</h3><p id="wxStamp"></p></div><button class="btn small" id="wxRefresh" style="flex:0 0 auto;">Aggiorna</button></div>
+    <div class="wx-cities" id="weatherBox" style="margin-bottom: 24px;"></div>
 
     <div class="section-title" id="sec-sos"><div><h3>Emergenze</h3><p id="sosNote"></p></div></div>
     <div class="utility-card" style="margin-bottom: 24px;">
@@ -1605,7 +1615,7 @@ function renderWeather() {
   renderHomeWeather(); renderDayWeather();
   const box = $('weatherBox'), stamp = $('wxStamp');
   const cache = readWxCache();
-  if (!cache) { stamp.textContent = ''; box.innerHTML = '<p class="note-line">Nessun dato salvato. Tocca "Aggiorna meteo" con la connessione attiva.</p>'; return; }
+  if (!cache) { stamp.textContent = ''; box.innerHTML = '<p class="note-line">Nessun dato salvato. Tocca "Aggiorna" con la connessione attiva.</p>'; return; }
   stamp.textContent = 'Aggiornato: ' + new Date(cache.ts).toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'short' });
   box.innerHTML = '';
   trip.cities.forEach(city => {
@@ -1614,14 +1624,15 @@ function renderWeather() {
     let idxs = dates.map(dt => w.daily.time.indexOf(dt)).filter(i => i >= 0);
     let note = 'Giorni del soggiorno';
     if (!idxs.length) { idxs = [0, 1, 2]; note = 'Prossimi giorni: il soggiorno non è ancora coperto dalle previsioni'; }
-    const cur = w.current ? `ora ${Math.round(w.current.temperature_2m)}° ${wxIcon(w.current.weather_code)}` : '';
-    const chips = idxs.map(i => {
-      const t = w.daily.time[i];
-      const p = w.daily.precipitation_probability_max?.[i];
-      return `<div class="wx-day"><b>${esc(t.slice(8, 10))}/${esc(t.slice(5, 7))}</b>${wxIcon(w.daily.weather_code[i])} ${Math.round(w.daily.temperature_2m_min[i])}°/${Math.round(w.daily.temperature_2m_max[i])}°${p != null ? `<br>💧${p}%` : ''}</div>`;
+    const wd = t => new Date(t + 'T12:00:00').toLocaleDateString('it-IT', { weekday: 'short' }).replace('.', '');
+    const tiles = idxs.map((i, k) => {
+      const t = w.daily.time[i], p = w.daily.precipitation_probability_max?.[i];
+      return `<div class="wx-tile"><div class="wd">${esc(wd(t))}</div><div class="wdt">${esc(t.slice(8, 10))}/${esc(t.slice(5, 7))}</div><div class="wi">${wxIcon(w.daily.weather_code[i])}</div><div class="hi">${Math.round(w.daily.temperature_2m_max[i])}°</div><div class="lo">${Math.round(w.daily.temperature_2m_min[i])}°</div><div class="rn">${p != null ? p + '%' : ''}</div></div>`;
     }).join('');
-    const el = document.createElement('div'); el.className = 'weather-city';
-    el.innerHTML = `<div class="wc-head"><strong>${esc(city.name)}</strong><span>${esc(cur)}</span></div><div class="wx-days">${chips}</div><div class="note-line" style="margin-top:6px;">${esc(note)}</div>`;
+    const el = document.createElement('div'); el.className = 'wx-city';
+    el.innerHTML = `<div class="wx-top"><div><div class="wx-name">${esc(city.name)}</div><div class="wx-sub">${esc(note)}</div></div>
+      ${w.current ? `<div class="wx-now"><span class="wi">${wxIcon(w.current.weather_code)}</span><span class="wt">${Math.round(w.current.temperature_2m)}°</span></div>` : ''}</div>
+      <div class="wx-rail">${tiles}</div>`;
     box.appendChild(el);
   });
 }
@@ -1647,7 +1658,7 @@ async function refreshWeather(manual) {
   } catch (e) {
     if (manual) alert('Meteo non raggiungibile: servono connessione e accesso al servizio. Restano i dati salvati.');
   } finally {
-    btn.disabled = false; btn.textContent = 'Aggiorna meteo';
+    btn.disabled = false; btn.textContent = 'Aggiorna';
   }
 }
 
