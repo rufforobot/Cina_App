@@ -478,6 +478,7 @@ main { padding: 16px 16px 140px; }
 .wsec .wallet-card, .wsec .utility-card { background: var(--bg); box-shadow: none; border: none; }
 .wsec .wallet-card .btn, .wsec .utility-card .btn { background: var(--surface); }
 .wsec .wallet-card .btn.primary, .wsec .utility-card .btn.primary { background: var(--accent); color: #fff; }
+.wallet-card .badge { white-space: nowrap; overflow-wrap: normal; max-width: none; flex-shrink: 0; align-self: flex-start; }
 .wsec .wallet-card .field, .wsec .utility-card .field { background: var(--surface); }
 
 .stat-row .stat { display: flex; flex-direction: column; align-items: center; text-align: center; flex: 1; }
@@ -619,6 +620,9 @@ main { padding: 16px 16px 140px; }
 
     <details class="wsec" id="secAttr"><summary><span>Attrazioni</span><small id="cntAttr"></small></summary>
       <div class="wallet-grid" id="walletGrid"></div></details>
+
+    <details class="wsec" id="secUtil"><summary><span>Utilità</span><small id="cntUtil"></small></summary>
+      <div class="wallet-grid" id="utilGrid"></div></details>
 
     <details class="wsec" id="secImp" hidden><summary><span>Importate da email</span><small id="cntImp"></small></summary>
       <div class="wallet-grid" id="impGrid"></div></details>
@@ -1235,15 +1239,19 @@ function exportTransfersICS() {
 const isTransportRes = r => /treno|volo|aere|bus|traghetto/i.test(r.type);
 function resExtra(id) { state.resNotes = state.resNotes || {}; return state.resNotes[id] || (state.resNotes[id] = { note: '', codes: [] }); }
 function renderWallet() {
-  const hotelWrap = $('hotelGrid'), attrWrap = $('walletGrid'); hotelWrap.innerHTML = ''; attrWrap.innerHTML = '';
+  const hotelWrap = $('hotelGrid'), attrWrap = $('walletGrid'), utilWrap = $('utilGrid'); hotelWrap.innerHTML = ''; attrWrap.innerHTML = ''; utilWrap.innerHTML = '';
   const list = reservations.filter(r => !isTransportRes(r));
   /* gli hotel vengono da tutta la sezione "# Hotel" del viaggio, non solo dalle righe di "# Prenotazioni" */
   const hotels = Object.keys(HOTELS).map(k => { const h = hotelInfo(k); return { hk: k, id: 'hotel-' + k.toLowerCase(), type: 'Hotel · ' + h.city, title: L(h.name.replace(/ \(.*$/, '').replace(/ = .*$/, '')), date: h.nights, ref: h.booking || '—', fileBooked: !!h.booking, status: h.booking ? 'Prenotato' : 'Da prenotare' }; });
-  const attrs = list.filter(r => !/hotel/i.test(r.type));
-  $('secHotel').hidden = !hotels.length; $('secAttr').hidden = !attrs.length;
-  $('cntHotel').textContent = hotels.length; $('cntAttr').textContent = attrs.length; $('cntTr').textContent = transfers.length;
+  const nonHotel = list.filter(r => !/hotel/i.test(r.type));
+  /* Attrazioni = biglietti e prenotazioni di luoghi; Utilità = tutto il resto (eSIM, assicurazione, ...) */
+  const isAttrRes = r => /attrazion|prenotazion|biglietto|ticket/i.test(r.type);
+  const attrs = nonHotel.filter(isAttrRes), utils = nonHotel.filter(r => !isAttrRes(r));
+  $('secHotel').hidden = !hotels.length; $('secAttr').hidden = !attrs.length; $('secUtil').hidden = !utils.length;
+  $('cntHotel').textContent = hotels.length; $('cntAttr').textContent = attrs.length; $('cntUtil').textContent = utils.length; $('cntTr').textContent = transfers.length;
   hotels.forEach(r => hotelWrap.appendChild(resCard(r)));
   attrs.forEach(r => attrWrap.appendChild(resCard(r)));
+  utils.forEach(r => utilWrap.appendChild(resCard(r)));
   renderCodes();
   if (typeof renderImported === 'function') renderImported();
 }
@@ -1252,7 +1260,7 @@ function resCard(r) {
   const fileBooked = r.fileBooked, isBooked = fileBooked || state.booked[r.id];
   const ex = resExtra(r.id), save = () => { saveState(); renderWallet(); };
   card.innerHTML = `<div style="display:flex; justify-content:space-between; gap:8px; margin-bottom:12px;">
-      <div><div class="companion-meta">${esc(r.type)}</div><h4 style="margin:0; font-size:18px;">${esc(r.title)}</h4></div>
+      <div style="min-width:0;"><div class="companion-meta">${esc(r.type)}</div><h4 style="margin:0; font-size:18px;">${esc(r.title)}</h4></div>
       <span class="badge ${isBooked ? 'done' : 'warn'}">${isBooked ? 'Prenotato' : 'Da prenotare'}</span>
     </div><p style="margin:0; font-size: 15px;"><strong>Date:</strong> ${esc(r.date)}</p><p style="margin:4px 0 0; color:var(--muted); font-size: 13px;">Rif: ${esc(r.ref)}</p>`;
   const add = (el) => { card.appendChild(el); return el; };
