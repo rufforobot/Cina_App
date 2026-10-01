@@ -1501,7 +1501,7 @@ function dayPoints(day) {
     const p = placeInfo(day, i);
     if (!stopMapQ(day, st, p)) return;
     /* ogni query porta la città: il solo nome cinese (es. 新天地, 人民公园) esiste in molte città e finiva fuori zona */
-    const cands = [st.map, `${L(st.title)}, ${city}${meta.country}`, p.zh && `${p.zh}, ${city}${meta.country}`, p.addr && `${p.addr}, ${city}${meta.country}`].filter(Boolean);
+    const cands = [st.map, st.map && st.map.replace(/\s*Terminal \w+/i, '').replace(/,\s*[^,]+$/, ''), `${L(st.title)}, ${city}${meta.country}`, p.zh && `${p.zh}, ${city}${meta.country}`, p.addr && `${p.addr}, ${city}${meta.country}`].filter(Boolean);
     out.push({ i, time: s[0], title: L(s[1]), cands });
   });
   return out;
