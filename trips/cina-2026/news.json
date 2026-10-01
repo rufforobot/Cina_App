@@ -1,0 +1,24 @@
+{
+ "updated": "2026-10-01T22:50:00+02:00",
+ "items": [
+  {
+   "city": "Shanghai",
+   "cat": "Spettacoli",
+   "title": "China Shanghai International Arts Festival",
+   "text": "25ª edizione, oltre 500 spettacoli in città tra teatro, danza, musica orchestrale e sperimentale, con molta programmazione senza parole o in inglese. Controlla il cartellone del giorno.",
+   "place": "Teatri di tutta la città",
+   "src": "Shanghai Tourism",
+   "url": "https://www.shanghaitourism.org/shanghai-festivals-events-calendar/"
+  },
+  {
+   "date": "2026-10-18",
+   "city": "Shanghai",
+   "cat": "Sport",
+   "title": "Rolex Shanghai Masters, ultimo giorno",
+   "text": "Il torneo ATP Masters 1000 si chiude oggi. Sede lontana dal centro: calcola circa 75 minuti da People's Square tra metro e navetta.",
+   "place": "Qizhong Tennis Center, Minhang",
+   "src": "Shanghai Tourism",
+   "url": "https://www.shanghaitourism.org/shanghai-festivals-events-calendar/"
+  }
+ ]
+}

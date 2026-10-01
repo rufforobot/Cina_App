@@ -558,6 +558,14 @@ main { padding: 16px 16px 140px; }
 .utility-card { min-width: 0; overflow-wrap: anywhere; }
 .tl-soft { filter: saturate(.55) brightness(1.06) contrast(.92); }
 .tl-gray { filter: grayscale(1) brightness(1.08) contrast(.88); }
+
+.news-card { padding: 20px; }
+.news-item { padding: 12px 0; border-top: 0.5px solid var(--glass-border); display: flex; flex-direction: column; gap: 4px; min-width: 0; overflow-wrap: anywhere; }
+.news-item:first-of-type { border-top: 0; }
+.news-item .companion-meta { padding: 0; }
+.news-item p { margin: 0; font-size: 14px; color: var(--muted); }
+.news-item small { color: var(--muted); font-size: 13px; }
+.news-item a { color: var(--accent); font-size: 13px; font-weight: 600; text-decoration: none; }
 </style>
 </head>
 <body>
@@ -589,6 +597,8 @@ main { padding: 16px 16px 140px; }
     <section class="card" id="nowCard"></section>
 
     <div id="todayGuides"></div>
+
+    <div id="todayNews"></div>
 
 
 
@@ -1971,6 +1981,36 @@ function renderTodayGuides() {
   box.appendChild(card);
 }
 
+/* ====================== NEWS DEL GIORNO ====================== */
+/* trips/<id>/news.json, aggiornato ogni giorno da un'attività programmata: { updated, items: [{ date, city, cat, title, text, place, time, url, src }] } */
+let newsData = null;
+async function loadNews() {
+  const key = 'news-' + meta.id;
+  try {
+    const r = await fetch('trips/' + meta.id + '/news.json?t=' + Date.now(), { cache: 'no-store' });
+    if (r.ok) { newsData = await r.json(); try { localStorage.setItem(key, JSON.stringify(newsData)); } catch {} }
+  } catch {}
+  if (!newsData) { try { newsData = JSON.parse(localStorage.getItem(key) || 'null'); } catch {} }
+  renderTodayNews();
+}
+function renderTodayNews() {
+  const box = $('todayNews'); if (!box) return; box.innerHTML = '';
+  const d = trip.days[tripDayIndex()]; if (!d || !newsData || !Array.isArray(newsData.items)) return;
+  const iso = dayISO(d);
+  const items = newsData.items.filter(x => x && x.title && (x.date === iso || (!x.date && x.city && !String(d.city).includes('→') && String(d.city).includes(x.city)))).slice(0, 6);
+  if (!items.length) return;
+  const card = document.createElement('section'); card.className = 'card news-card';
+  const upd = newsData.updated ? new Date(newsData.updated) : null;
+  card.innerHTML = `<h3>${tripStarted() ? 'Da non perdere oggi' : 'Da non perdere il primo giorno'}</h3><p class="note-line" style="margin:2px 0 6px;">${esc(d.city)}${upd && !isNaN(upd) ? ' · aggiornato il ' + upd.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' }) : ''}</p>`;
+  items.forEach(x => {
+    const it = document.createElement('div'); it.className = 'news-item';
+    const meta2 = [x.place, x.time].filter(Boolean).join(' · ');
+    it.innerHTML = `${x.cat ? `<div class="companion-meta">${esc(x.cat)}</div>` : ''}<b>${esc(x.title)}</b>${x.text ? `<p>${esc(x.text)}</p>` : ''}${meta2 ? `<small>${esc(meta2)}</small>` : ''}${x.url && /^https?:/.test(x.url) ? `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.src || 'Fonte')}</a>` : (x.src ? `<small>${esc(x.src)}</small>` : '')}`;
+    card.appendChild(it);
+  });
+  box.appendChild(card);
+}
+
 /* ====================== CHECKLIST ====================== */
 function renderChecklist() {
   const box = $('checklistBox'); box.innerHTML = '';
@@ -2530,7 +2570,7 @@ $('sosGrid').innerHTML = meta.emergency.map(e => `<div style="padding:10px; back
 $('sosAssist').href = 'tel:' + meta.assistance.tel; $('sosAssist').textContent = '' + meta.assistance.label;
 $('convLabel').textContent = `${meta.currency.name} (${meta.currency.symbol})`; $('curOpt').textContent = meta.currency.symbol;
 setupConverter(); setupExpenseForm(); setupBackup(); refreshRate();
-renderCities(); renderUtilHome(); renderItinerary(); renderGuideControls(); renderCompanion(); renderTodayGuides(); renderTransfers(); renderWallet(); renderCodes();
+renderCities(); renderUtilHome(); renderItinerary(); renderGuideControls(); renderCompanion(); renderTodayGuides(); loadNews(); renderTransfers(); renderWallet(); renderCodes();
 initExtras();
 renderExpenses(); renderBookingAlerts(); renderToday();
 renderChecklist(); renderPhrases(''); renderWeather(); renderBackupInfo(); updateRateUI(); updateMetrics();
