@@ -1566,7 +1566,9 @@ function loadDay(day, onProg) {
     if (found.length) {
       say('Cerco la tua posizione…');
       const h = await getHere();
-      if (h && kmBetween(h, found[0].ll) <= 150 && kmBetween(h, found[0].ll) > 0.05) res.here = h;
+      const dk = h ? kmBetween(h, found[0].ll) : 0;
+      /* il giorno 1 parte sempre da dove sei (anche lontano); gli altri giorni solo se sei in zona */
+      if (h && dk > 0.05 && (day.day === 1 || dk <= 150)) res.here = h;
     }
     const route = (res.here ? [{ ll: res.here }] : []).concat(found);
     if (route.length > 1) {
@@ -1579,7 +1581,18 @@ function loadDay(day, onProg) {
         } catch {}
       }
       if (r) { res.geom = r.geom; res.km = r.km; res.exact = true; }
-      else for (let k = 1; k < route.length; k++) res.km += kmBetween(route[k - 1].ll, route[k].ll);
+      else {
+        /* percorso completo non calcolabile (es. tra continenti): strada vera solo per il primo tratto da te alla prima tappa */
+        let from = 1;
+        if (res.here) {
+          const k1 = route.slice(0, 2).map(p => p.ll[1].toFixed(5) + ',' + p.ll[0].toFixed(5)).join(';');
+          let r1 = routeCache[k1];
+          if (!r1) { try { const j = await (await fetch('https://router.project-osrm.org/route/v1/driving/' + k1 + '?overview=full&geometries=geojson')).json(); if (j.routes && j.routes[0]) { r1 = { geom: j.routes[0].geometry, km: j.routes[0].distance / 1000 }; routeCache[k1] = r1; saveLS(ROUTE_KEY, routeCache); } } catch {} }
+          if (r1) { res.leg1 = r1; res.km = r1.km; from = 2; }
+        }
+        for (let k = from; k < route.length; k++) res.km += kmBetween(route[k - 1].ll, route[k].ll);
+        res.exact = !!res.leg1 && route.length === 2;
+      }
     }
     return res;
   })();
@@ -1590,11 +1603,14 @@ const pinIcon = n => window.L.divIcon({ className: 'dm-pin', html: `<span>${n}</
 function drawDay(map, d, small) {
   addTiles(map);
   const line = (d.here ? [d.here] : []).concat(d.found.map(p => p.ll));
+  /* prima la vista, poi i livelli: Leaflet non disegna tracciati su una mappa senza centro */
+  if (line.length === 1) map.setView(line[0], 15); else map.fitBounds(line, small ? { paddingTopLeft: [26, 24], paddingBottomRight: [26, 56] } : { padding: [30, 30] });
   if (d.here) window.L.marker(d.here, { icon: window.L.divIcon({ className: 'dm-here', html: '<span></span>', iconSize: [18, 18], iconAnchor: [9, 9] }), interactive: false }).addTo(map);
   d.found.forEach(p => { p.mk = window.L.marker(p.ll, { icon: pinIcon(p.n), interactive: !small }).addTo(map); if (!small) p.mk.bindPopup(`<b>${esc(p.title)}</b><br>${esc(p.time)}`); });
+  if (d.leg1) window.L.geoJSON(d.leg1.geom, { style: { color: '#FF2D55', weight: 4, opacity: .8 } }).addTo(map);
   if (d.geom) window.L.geoJSON(d.geom, { style: { color: '#FF2D55', weight: 4, opacity: .8 } }).addTo(map);
-  else if (line.length > 1) window.L.polyline(line, { color: '#FF2D55', weight: 3, opacity: .8, dashArray: '6 8' }).addTo(map);
-  if (line.length === 1) map.setView(line[0], 15); else map.fitBounds(line, small ? { paddingTopLeft: [26, 24], paddingBottomRight: [26, 56] } : { padding: [30, 30] });
+  else if (d.leg1 && d.found.length > 1) window.L.polyline(d.found.map(p => p.ll), { color: '#FF2D55', weight: 3, opacity: .8, dashArray: '6 8' }).addTo(map);
+  else if (!d.leg1 && line.length > 1) window.L.polyline(line, { color: '#FF2D55', weight: 3, opacity: .8, dashArray: '6 8' }).addTo(map);
 }
 const kmLabel = d => (d.found.length > 1 || d.here) ? `${fmtKm(d.km)}${d.exact ? '' : ' in linea d\'aria'}` : '';
 function initMini(day, host) {
