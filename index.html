@@ -384,7 +384,7 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
     </div>
     <div class="city-grid" id="bookingAlertsGrid" style="margin-bottom: 24px;"></div>
 
-    <div class="section-title"><div><h3>Le Tappe</h3><p>Accedi rapidamente ai giorni del viaggio e al "Mostra al tassista".</p></div></div>
+    <div class="section-title"><div><h3>Le Tappe</h3><p>Accedi rapidamente ai giorni del viaggio e alle indicazioni per il taxi.</p></div></div>
     <div class="city-grid" id="cityGrid"></div>
   </section>
 
@@ -758,7 +758,7 @@ function showPlaceCard(p) {
   const q = zh || addr;
   const btns = [
     p.tel ? `<a class="btn small primary" href="tel:${esc(p.tel)}">📞 Chiama</a>` : '',
-    `<button class="btn small" data-act="copy">📋 Copia</button>`,
+    `<button class="btn small" data-act="copy">📋 Copia per DiDi</button>`,
     p.onEdit ? `<button class="btn small" data-act="edit">✏️ Modifica</button>` : ''
   ].join('');
   openModal(p.title || "Mostra all'autista", `
@@ -773,6 +773,7 @@ function showPlaceCard(p) {
       <div class="py1">${esc(DRIVER_PHRASES[0][1])} · ${esc(DRIVER_PHRASES[0][2])}</div>
     </div>
     <div class="act-row" style="justify-content:center">${btns}</div>
+    <p class="note-line" style="text-align:center">Con DiDi: copia, apri l'app e incolla la destinazione nel campo di ricerca.</p>
     ${p.en ? `<p class="py" style="text-align:center">${esc(p.en)}</p>` : ''}
     ${p.more ? `<details class="more"><summary>Info hotel</summary>${p.more}</details>` : ''}
     <details class="more"><summary>Altre frasi per il tassista</summary><div class="taxi-ph">
@@ -830,7 +831,7 @@ function hotelMoreHTML(k) {
 function hotelActs(k, host) {
   const h = hotelInfo(k);
   const row = document.createElement('div'); row.className = 'act-row';
-  row.innerHTML = `<button class="btn small taxi-btn" data-a="taxi">🚕 Mostra al tassista</button>${h.tel ? `<a class="btn small" href="tel:${esc(h.tel)}">📞</a>` : ''}`;
+  row.innerHTML = `<button class="btn small taxi-btn" data-a="taxi">🚕 Indicazioni per taxi</button>${h.tel ? `<a class="btn small" href="tel:${esc(h.tel)}">📞</a>` : ''}`;
   row.querySelector('[data-a="taxi"]').onclick = () => showPlaceCard(hotelCardData(k));
   host.appendChild(row);
 }
@@ -934,7 +935,7 @@ function transferCard(t, ctx) {
     <div class="act-row">
       <a class="btn small" target="_blank" rel="noopener" href="${isFl ? 'https://www.flightradar24.com/data/flights/' + esc(code.toLowerCase()) : 'https://www.trip.com/trains/'}">${isFl ? '🛰 Stato volo' : '🚄 Stato treno (Trip.com)'}</a>
       ${isFl ? `<a class="btn small" target="_blank" rel="noopener" href="https://www.flightaware.com/live/flight/${esc(code)}">FlightAware</a>` : ''}
-      ${zhVal ? `<button class="btn small go-taxi">🚕 Tassista per la partenza</button>` : ''}
+      ${zhVal ? `<button class="btn small go-taxi">🚕 Taxi / DiDi per la partenza</button>` : ''}
     </div>
     `;
   const q = sel => card.querySelector(sel);
@@ -1403,7 +1404,7 @@ function openStop(list, i) {
     <div class="note-line" style="margin-bottom:10px;">${esc(city)} · ${esc(L(stop.native).replace(/^[\s·]+/,''))} · ${esc(tagLabel(stop.tag))}</div>
     <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;">
       <button class="btn small primary m-listen" type="button" data-label="🔊 Ascolta">🔊 Ascolta</button>
-      ${hanzi ? '<button class="btn small m-taxi" type="button">🚕 Mostra al tassista</button>' : ''}
+      ${hanzi ? '<button class="btn small m-taxi" type="button">🚕 Indicazioni per taxi</button>' : ''}
       <a class="btn small" href="${appleMaps(`${stop.title}, ${city}, ${meta.country}`)}">🧭 Mappa</a>
       <button class="btn small m-fav" type="button">${state.favs[key] ? '★ Preferito' : '☆ Preferito'}</button>
     </div>
