@@ -52,7 +52,7 @@ Parti da `trips/_modello.md` (ha una nota per ogni sezione). In breve:
 
 ## Nome e icona sulla Home
 Nome, icona e indirizzo di avvio vengono dall'intestazione del viaggio (`title`, e se vuoi `shortTitle`, `themeColor`, `icon`).
-Per cambiare l'icona rimuovi e riaggiungi l'app alla Home.
+Ogni viaggio può avere la sua icona: metti i PNG (192, 512 e 180 px) in `trips/` e indicali in `icon:` (`192`, `512`, `apple`). Per cambiarla rimuovi e riaggiungi l app alla Home.
 
 ## Lingua e scrittura locale
 La frase per il tassista è la prima di `# Frasi tassista`. La scrittura locale (da togliere dalle schermate generali)
