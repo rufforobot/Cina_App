@@ -1,0 +1,1587 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=0">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f2f2f7">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Cina 2026">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Viaggio</title>
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: light-dark(#f2f2f7, #000000);
+  --surface: light-dark(#ffffff, #1c1c1e);
+  --surface-2: light-dark(#e5e5ea, #2c2c2e);
+  --text: light-dark(#000000, #ffffff);
+  --muted: light-dark(#8e8e93, #98989d);
+  --border: light-dark(#c6c6c8, #38383a);
+  --accent: light-dark(#ff3b30, #ff453a);
+  --accent-2: light-dark(#007aff, #0a84ff);
+  --warn: light-dark(#ff9500, #ff9f0a);
+  --danger: light-dark(#ff3b30, #ff453a);
+  --ok: light-dark(#34c759, #30d158);
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+  --radius: 20px;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { scroll-behavior: smooth; overflow-x: hidden; width: 100%; max-width: 100%; }
+body {
+  margin: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg); color: var(--text); padding-bottom: env(safe-area-inset-bottom);
+}
+button, input, textarea, select { font: inherit; }
+button, .btn, a.btn { cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+
+#app { min-height: 100vh; background: var(--bg); overflow-x: hidden; width: 100%; }
+
+header {
+  position: sticky; top: 0; z-index: 40;
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  border-bottom: 0.5px solid var(--border); padding-top: env(safe-area-inset-top);
+}
+.header-inner {
+  max-width: 1180px; margin: 0 auto; padding: 12px 18px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.logo {
+  width: 40px; height: 40px; flex: 0 0 40px;
+  display: grid; place-items: center; border-radius: 10px;
+  background: var(--accent); color: white; font-size: 20px; font-weight: bold;
+}
+.brand h1 { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: -0.4px; white-space: nowrap; }
+.brand small { color: var(--muted); display: block; margin-top: 2px; font-size: 13px; font-weight: 500; }
+.header-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; align-items: center; }
+.clocks { display: flex; flex-wrap: wrap; gap: 6px; font-size: 12px; font-weight: 600; color: var(--text); background: var(--surface-2); padding: 6px 10px; border-radius: 10px; justify-content: center; }
+
+.icon-btn, .btn {
+  background: var(--surface-2); color: var(--accent-2);
+  border: none; border-radius: 12px; padding: 10px 14px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  font-weight: 600; transition: transform 0.1s; text-align: center;
+}
+.btn:active { transform: scale(0.96); }
+.btn:disabled { opacity: .5; }
+.btn.primary { background: var(--accent-2); color: white; }
+.btn.ghost { background: transparent; color: var(--accent-2); }
+.btn.small { padding: 8px 12px; border-radius: 10px; font-size: 14px; }
+.btn.warn { background: var(--warn); color: white; }
+.btn.block { width: 100%; }
+
+main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
+
+.hero-card, .panel, .day-card, .city-card, .companion-card, .note-card, .wallet-card, .expense-card, .utility-card {
+  background: var(--surface); border: none; box-shadow: var(--shadow); border-radius: var(--radius);
+}
+
+.hero { display: grid; grid-template-columns: 1.5fr .9fr; gap: 18px; margin-bottom: 24px; }
+.hero-card { padding: 24px; }
+.hero-card h2 { margin: 0 0 8px; font-size: clamp(28px, 5vw, 40px); font-weight: 700; letter-spacing: -1px; }
+.hero-card p { margin: 0; color: var(--muted); max-width: 72ch; line-height: 1.5; }
+.hero-route { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; }
+.city-pill { padding: 8px 12px; background: var(--surface-2); border-radius: 20px; font-size: 14px; font-weight: 500; }
+
+.countdown { padding: 24px; display: flex; flex-direction: column; justify-content: space-between; }
+.countdown .big { font-size: clamp(48px, 9vw, 72px); font-weight: 700; line-height: 1; letter-spacing: -2px; }
+.countdown .label { color: var(--muted); margin-top: 8px; font-weight: 500; }
+.countdown-meta { margin-top: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.metric { padding: 12px; background: var(--surface-2); border-radius: 14px; text-align: center; }
+.metric strong { display: block; font-size: 20px; font-weight: 600; }
+.metric span { color: var(--muted); font-size: 12px; font-weight: 500; }
+
+.view { display: none; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+.view.active { display: block; }
+
+.section-title { display: flex; justify-content: space-between; align-items: end; gap: 10px; margin: 24px 0 16px; scroll-margin-top: 90px; }
+.section-title h3 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+.section-title p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+
+.city-grid, .companion-grid, .wallet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+.city-card, .companion-card, .wallet-card, .expense-card, .utility-card { padding: 20px; }
+.city-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.city-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+.city-name { font-size: 19px; font-weight: 700; letter-spacing: -0.3px; }
+.city-dates { color: var(--muted); font-size: 13px; margin-top: 4px; }
+
+.day-list { display: grid; gap: 16px; }
+.day-card { scroll-margin-top: 90px; }
+.day-head { padding: 18px 20px 14px; display: flex; justify-content: space-between; gap: 12px; border-bottom: 0.5px solid var(--border); }
+.day-title h4 { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.4px; }
+.day-title p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+.timeline { padding: 8px 20px; }
+.stop { display: grid; grid-template-columns: 75px 1fr auto; gap: 12px; padding: 16px 0; border-bottom: 0.5px solid var(--border); align-items: start; }
+.stop:last-child { border-bottom: none; }
+.stop-tools { display: flex; align-items: center; gap: 10px; }
+.time { font-weight: 700; font-variant-numeric: tabular-nums; font-size: 15px; color: var(--accent-2); }
+.stop h5 { margin: 0; font-size: 16px; font-weight: 600; }
+.stop p { margin: 4px 0 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
+
+.check {
+  -webkit-appearance: none; appearance: none; width: 24px; height: 24px; border: 2px solid var(--border); border-radius: 12px;
+  background: transparent; cursor: pointer; position: relative; transition: 0.2s; flex: 0 0 24px; margin: 0;
+}
+.check:checked { background: var(--accent-2); border-color: var(--accent-2); }
+.check:checked::after { content: "✓"; color: white; position: absolute; inset: 0; display: grid; place-items: center; font-size: 14px; font-weight: 900; }
+.stop.done h5 { text-decoration: line-through; opacity: .5; }
+
+.note-area { padding: 0 20px 20px; }
+.note-area label.lbl { color: var(--muted); font-size: 13px; font-weight: 600; display: block; margin-bottom: 8px; }
+.note-area textarea {
+  width: 100%; min-height: 100px; resize: vertical; border: none; background: var(--surface-2);
+  color: var(--text); border-radius: 12px; padding: 14px; font-size: 16px; outline: none;
+}
+
+.alert { padding: 14px 16px; border-radius: 14px; background: color-mix(in srgb, var(--warn) 15%, var(--surface)); color: var(--text); font-size: 14px; line-height: 1.5; margin: 0 20px 16px; font-weight: 500; }
+.companion-meta { color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.chip-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.chip { padding: 6px 10px; border-radius: 12px; background: var(--surface-2); color: var(--text); font-size: 12px; font-weight: 500; }
+.badge { padding: 6px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; background: var(--surface-2); white-space: nowrap; height: fit-content; }
+.badge.warn { background: color-mix(in srgb, var(--warn) 20%, var(--surface)); color: var(--warn); }
+.badge.done { background: color-mix(in srgb, var(--ok) 20%, var(--surface)); color: var(--ok); }
+
+.today-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+.today-card { padding: 20px; background: var(--surface); box-shadow: var(--shadow); border-radius: var(--radius); }
+.today-card h3 { margin: 0 0 6px; font-size: 20px; font-weight: 700; letter-spacing: -0.4px; }
+.today-card p { margin: 4px 0 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
+
+.bottom-nav {
+  display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+  background: color-mix(in srgb, var(--surface) 80%, transparent); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-top: 0.5px solid var(--border); padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
+  max-width: 1180px; margin: 0 auto;
+}
+.bottom-nav button { border: none; background: transparent; color: var(--muted); padding: 4px; font-size: 10px; font-weight: 500; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: 0.2s; }
+.bottom-nav button.active { color: var(--accent-2); }
+.bottom-nav button svg { width: 24px; height: 24px; fill: currentColor; }
+
+/* Campi e form */
+.field { width: 100%; border: none; background: var(--surface-2); color: var(--text); border-radius: 12px; padding: 12px; font-size: 16px; outline: none; min-width: 0; }
+.row-form { display: grid; gap: 8px; margin-top: 12px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.note-line { font-size: 13px; color: var(--muted); line-height: 1.5; }
+.del-btn { border: none; background: transparent; color: var(--danger); font-size: 18px; padding: 4px 8px; line-height: 1; }
+
+.chips-nav { display: flex; gap: 8px; overflow-x: auto; padding: 4px 0 8px; scrollbar-width: none; }
+.chips-nav::-webkit-scrollbar { display: none; }
+.chip-btn.on { background: var(--accent-2); color: #fff; }
+.chip-btn { flex: 0 0 auto; border: none; background: var(--surface); color: var(--accent-2); padding: 9px 14px; border-radius: 18px; font-weight: 600; font-size: 14px; box-shadow: var(--shadow); }
+
+/* Budget */
+.expense-total { font-size: clamp(24px, 7vw, 32px); font-weight: 800; letter-spacing: -1px; margin-top: 8px; word-break: break-word; }
+.expense-form { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; width: 100%; }
+.expense-form .full { grid-column: 1 / -1; }
+.expense-form input, .expense-form select { border: none; background: var(--surface-2); color: var(--text); border-radius: 12px; padding: 12px; outline: none; min-width: 0; font-size: 16px; }
+.expense-list { margin-top: 16px; display: grid; gap: 0; }
+.expense-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 0.5px solid var(--border); font-size: 15px; }
+.expense-row .desc { min-width: 0; overflow-wrap: anywhere; }
+.expense-row .right { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+.bar-row { display: grid; grid-template-columns: 96px 1fr auto; gap: 10px; align-items: center; font-size: 14px; margin: 8px 0; }
+.bar { height: 10px; border-radius: 5px; background: var(--surface-2); overflow: hidden; }
+.bar > span { display: block; height: 100%; background: var(--accent-2); border-radius: 5px; }
+.bar-row strong { font-variant-numeric: tabular-nums; }
+.sub-title { margin: 18px 0 4px; font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+
+.quick-apps { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+.quick-apps a { padding: 14px; border-radius: 16px; font-size: 16px; font-weight: 700; text-align: center; color: white; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.app-alipay { background: #1677FF; }
+.app-wechat { background: #07C160; }
+
+/* Checklist */
+.check-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 0.5px solid var(--border); font-size: 15px; line-height: 1.4; }
+.check-item.done span { text-decoration: line-through; opacity: .5; }
+
+/* Frasi */
+.phrase-cat { margin: 18px 0 2px; font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+.phrase { padding: 12px 0; border-bottom: 0.5px solid var(--border); display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; }
+.phrase .it { font-size: 15px; font-weight: 600; }
+.phrase .zh { font-size: 24px; font-weight: 700; margin-top: 2px; }
+.phrase .py { color: var(--muted); font-size: 14px; }
+.phrase .acts { display: flex; gap: 6px; }
+
+/* Meteo */
+.weather-city { padding: 12px 0; border-bottom: 0.5px solid var(--border); }
+.weather-city:last-child { border-bottom: none; }
+.wc-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.wx-line { margin-top: 4px; font-size: 13px; color: var(--muted); }
+.wx-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+.wx-slot { background: var(--surface-2); border-radius: 12px; padding: 8px 6px; text-align: center; font-size: 13px; }
+.wx-slot b { display: block; font-size: 12px; color: var(--muted); font-weight: 600; }
+.wx-days { display: flex; gap: 8px; flex-wrap: wrap; }
+.wx-day { background: var(--surface-2); border-radius: 12px; padding: 8px 10px; font-size: 13px; text-align: center; min-width: 76px; }
+.wx-day b { display: block; font-size: 12px; color: var(--muted); font-weight: 600; }
+
+.code-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 0.5px solid var(--border); }
+.code-row .val { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 15px; overflow-wrap: anywhere; }
+
+.toast { position: fixed; left: 50%; bottom: calc(90px + env(safe-area-inset-bottom)); transform: translateX(-50%); background: var(--text); color: var(--bg); padding: 10px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; z-index: 100; box-shadow: 0 8px 30px rgba(0,0,0,.25); max-width: 90vw; text-align: center; }
+
+@media (max-width: 640px) {
+  .hero { grid-template-columns: 1fr; }
+  .today-grid { grid-template-columns: 1fr; }
+  main { padding: 16px 16px 100px; }
+  .city-grid, .companion-grid, .wallet-grid { grid-template-columns: 1fr; }
+}
+
+.modal { position: fixed; inset: 0; z-index: 80; display: none; background: rgba(0,0,0,0.5); padding: 16px; backdrop-filter: blur(5px); }
+.modal.open { display: flex; align-items: center; justify-content: center; animation: fadeModal 0.3s; }
+@keyframes fadeModal { from { opacity: 0; } to { opacity: 1; } }
+.modal-card { width: min(860px, 100%); max-height: 85vh; overflow: auto; background: var(--bg); border-radius: 24px; display: flex; flex-direction: column; }
+.modal-head { position: sticky; top: 0; background: color-mix(in srgb, var(--surface) 90%, transparent); backdrop-filter: blur(20px); padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 10; }
+.modal-body { padding: 20px; background: var(--surface); }
+.modal-body p { line-height: 1.6; color: var(--text); font-size: 15px; }
+
+/* --- diario dettagliato --- */
+.hotel-box { margin: 14px 20px 4px; padding: 14px 16px; border-radius: 16px; background: var(--surface-2); }
+.hotel-box h5 { margin: 0 0 2px; font-size: 15px; }
+.hotel-box .zh, .pl-zh { font-size: 22px; font-weight: 800; line-height: 1.35; color: var(--text); }
+.hotel-box .ad, .pl-ad { font-size: 15px; line-height: 1.45; margin-top: 2px; }
+.py { color: var(--muted); font-size: 13px; margin-top: 2px; }
+.live-line { margin-top:8px; padding:8px 10px; border-radius:10px; background:var(--surface-2); font-weight:700; font-size:15px; }
+.act-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.act-row .btn, .act-row a.btn { text-decoration: none; }
+.act-row .btn, .stop-pills .btn { background: var(--surface); }
+.act-row .btn.primary { background: var(--accent-2); color: #fff; }
+.btn.taxi-btn, .act-row .btn.taxi-btn, .stop-pills .btn.taxi-btn { background: var(--warn); color: #fff; font-weight: 700; }
+.stop-pills .btn { background: var(--surface-2); }
+.modal-body .act-row .btn { background: var(--surface-2); }
+.modal-body .act-row .btn.primary { background: var(--accent-2); color: #fff; }
+.act-row a.btn, .act-row button.btn { display: inline-flex; align-items: center; }
+.stop-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.stop-det { grid-column: 1 / -1; background: var(--surface-2); border-radius: 14px; padding: 14px; margin-top: 4px; }
+.stop-det[hidden] { display: none; }
+.pl { padding: 12px 14px; border-radius: 12px; background: var(--surface); margin-bottom: 10px; }
+.pl-empty { color: var(--muted); font-size: 14px; }
+.sec { margin-top: 12px; }
+.sec b { display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; color: var(--muted); margin-bottom: 3px; }
+.sec div, .sec li { font-size: 14.5px; line-height: 1.55; }
+.sec ul { margin: 0; padding-left: 18px; }
+.warnbox { margin-top: 12px; padding: 10px 12px; border-radius: 12px; background: color-mix(in srgb, var(--warn) 18%, var(--surface)); font-size: 14px; line-height: 1.5; font-weight: 500; }
+.vb { font-size: 12px; font-weight: 600; margin-top: 12px; color: var(--muted); }
+.taxi-lat { text-align: center; padding: 4px 0 10px; border-bottom: 0.5px solid var(--border); margin-bottom: 10px; }
+.lat-n { font-size: 17px; font-weight: 700; line-height: 1.35; }
+.lat-a { font-size: 15px; color: var(--muted); line-height: 1.4; margin-top: 4px; }
+.taxi-big { text-align: center; padding: 6px 0 4px; }
+.taxi-big .zh1 { font-size: 40px; font-weight: 800; line-height: 1.3; word-break: break-all; }
+.taxi-big .ad1 { font-size: 24px; font-weight: 700; line-height: 1.4; margin-top: 10px; }
+.taxi-big .py1 { font-size: 15px; color: var(--muted); margin-top: 8px; }
+.taxi-big .req { margin-top: 18px; padding-top: 14px; border-top: 0.5px solid var(--border); font-size: 26px; font-weight: 700; }
+.taxi-ph { margin-top: 14px; font-size: 14px; }
+.taxi-ph div { padding: 8px 0; border-top: 0.5px solid var(--border); }
+.edit-form input { width: 100%; margin-bottom: 10px; }
+
+.hb-line { display: flex; gap: 10px; align-items: flex-start; }
+.hb-ic { font-size: 20px; line-height: 1.3; }
+.hb-name { font-size: 14px; font-weight: 600; }
+.hb-zh { font-size: 17px; font-weight: 700; line-height: 1.35; }
+.hotel-box { margin: 12px 20px 0; padding: 12px 14px; }
+.hotel-box .act-row { margin-top: 10px; }
+details.more { margin-top: 10px; }
+details.more summary { font-size: 14px; font-weight: 600; color: var(--accent-2); cursor: pointer; padding: 4px 0; }
+details.more ul { margin: 6px 0 0; padding-left: 18px; }
+.vdot { font-size: 13px; align-self: center; }
+.pl-zh { font-size: 20px; }
+.pl-lat { font-size: 16px; font-weight: 700; line-height: 1.35; }
+.stop-det { padding: 12px; }
+.sec { margin-top: 10px; }
+.sec div, .sec li { font-size: 14px; line-height: 1.5; }
+</style>
+</head>
+<body>
+<div id="app">
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <div class="logo" id="brandLogo"></div>
+      <div>
+        <h1 id="brandTitle">Viaggio</h1>
+        <small id="brandSub"></small>
+      </div>
+    </div>
+    <div class="header-actions">
+      <div class="clocks">
+        <span id="clockChina">--:--</span>
+        <span id="clockItaly">🇮🇹 --:--</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="hero-card">
+      <h2 id="heroTitle"></h2>
+      <p id="heroText"></p>
+      <div class="hero-route" id="heroRoute"></div>
+    </div>
+    <div class="hero-card countdown">
+      <div>
+        <div class="big" id="countdownValue">—</div>
+        <div class="label" id="countdownLabel">al viaggio</div>
+      </div>
+      <div class="countdown-meta">
+        <div class="metric"><strong id="cityCount">6</strong><span>città</span></div>
+        <div class="metric"><strong id="dayCount">17</strong><span>giorni</span></div>
+        <div class="metric"><strong id="progressCount">0%</strong><span>fatto</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section id="dashboard" class="view active">
+    <div class="today-grid">
+      <div class="today-card" id="todayMode"></div>
+      <div class="today-card" id="todayNext"></div>
+    </div>
+
+    <div id="todayWeather" style="margin-bottom: 24px;"></div>
+
+    <div id="todayHotel" style="margin-bottom: 24px;"></div>
+
+    <div class="section-title"><div><h3>🧳 Prossimo trasferimento</h3><p>Volo o treno in arrivo. Aggiungi posto e stazione in cinese.</p></div></div>
+    <div id="nextTransfer" style="margin-bottom: 24px;"></div>
+
+    <div class="section-title"><div><h3>🎧 Guide nella tua città</h3><p>Tocca una tappa per leggerla o ascoltarla.</p></div></div>
+    <div id="todayGuides" style="margin-bottom: 24px;"></div>
+
+    <div class="section-title" id="bookingAlertsTitle" style="display:none;">
+      <div><h3>🔔 Alert Prenotazioni</h3><p>Da prenotare, in ordine di apertura (orario italiano).</p></div>
+    </div>
+    <div class="city-grid" id="bookingAlertsGrid" style="margin-bottom: 24px;"></div>
+
+    <div class="section-title"><div><h3>Le Tappe</h3><p>Accedi rapidamente ai giorni del viaggio e alle Taxi Card.</p></div></div>
+    <div class="city-grid" id="cityGrid"></div>
+  </section>
+
+  <!-- ITINERARIO E DIARIO -->
+  <section id="itinerary" class="view">
+    <div class="section-title"><div><h3>Itinerario Completo & Diario</h3><p>Spunta le tappe e scrivi le note della giornata.</p></div></div>
+    <div class="day-list" id="fullItinerary"></div>
+  </section>
+
+  <!-- AUDIOGUIDA -->
+  <section id="companion" class="view">
+    <div class="section-title"><div><h3>Il tuo Cicerone Digitale</h3><p>Storia, curiosità e dritte per ogni tappa. La voce di sistema funziona anche offline.</p></div></div>
+    <input class="field" id="guideSearch" placeholder="Cerca una tappa (es. panda, tè, muraglia)">
+    <div class="chips-nav" id="guideCities" style="margin-top:10px;"></div>
+    <div class="chips-nav" id="guideTags"></div>
+    <div class="grid-2" style="margin:6px 0 16px; align-items:center;">
+      <span class="note-line" id="guideCount"></span>
+      <select class="field" id="ttsRate" aria-label="Velocità della voce">
+        <option value="0.8">Voce lenta</option><option value="0.95">Voce normale</option><option value="1.1">Voce veloce</option>
+      </select>
+    </div>
+    <div class="companion-grid" id="companionGrid"></div>
+  </section>
+
+  <!-- WALLET -->
+  <section id="wallet" class="view">
+    <div class="section-title"><div><h3>✈️ Trasferimenti</h3><p>Voli e treni, con posto/binario e stazione in cinese.</p></div></div>
+    <div class="wallet-grid" id="transferGrid"></div>
+
+    <div class="section-title"><div><h3>🎟️ Prenotazioni</h3><p>Hotel, attrazioni e finestre di apertura.</p></div></div>
+    <div class="wallet-grid" id="walletGrid"></div>
+
+    <div class="section-title"><div><h3>📅 Promemoria sul calendario</h3><p>Scarica un file .ics e aprilo per aggiungere gli eventi.</p></div></div>
+    <div class="utility-card">
+      <div class="grid-2">
+        <button class="btn primary" id="icsRes">Aperture prenotazioni</button>
+        <button class="btn primary" id="icsTr">Voli e treni</button>
+      </div>
+    </div>
+
+    <div class="section-title"><div><h3>🔑 Codici e note</h3><p>PIN, numeri di conferma, riferimenti. Restano solo su questo dispositivo.</p></div></div>
+    <div class="utility-card">
+      <div class="row-form" style="margin-top:0;">
+        <input class="field" id="codeTitle" placeholder="Titolo (es. Hotel Pechino)">
+        <input class="field" id="codeValue" placeholder="Codice o testo">
+        <button class="btn primary block" id="codeAdd">Aggiungi</button>
+      </div>
+      <div id="codeList" style="margin-top:12px;"></div>
+    </div>
+  </section>
+
+  <!-- UTILI -->
+  <section id="useful" class="view">
+    <div class="chips-nav" id="utilNav">
+      <button class="chip-btn" data-go="sec-pay">💳 Pagamenti</button>
+      <button class="chip-btn" data-go="sec-budget">💶 Budget</button>
+      <button class="chip-btn" data-go="sec-check">✅ Checklist</button>
+      <button class="chip-btn" data-go="sec-phrases">🗣️ Frasi</button>
+      <button class="chip-btn" data-go="sec-weather">⛅ Meteo</button>
+      <button class="chip-btn" data-go="sec-sos">🚨 Emergenze</button>
+      <button class="chip-btn" data-go="sec-backup">💾 Backup</button>
+    </div>
+
+    <div class="section-title" id="sec-pay"><div><h3>📱 Pagamenti Rapidi</h3><p>Apri le app cinesi con un tocco.</p></div></div>
+    <div class="quick-apps" style="margin-bottom: 24px;">
+      <a href="alipay://" class="app-alipay">💳 Apri Alipay</a>
+      <a href="weixin://" class="app-wechat">💬 Apri WeChat</a>
+    </div>
+
+    <div class="section-title"><div><h3>💱 Convertitore Rapido</h3><p id="rateLabel">Calcolo istantaneo offline.</p></div></div>
+    <div class="utility-card" style="margin-bottom: 24px;">
+      <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: center;">
+        <div>
+          <label for="convYuan" style="font-size: 13px; color: var(--muted); font-weight: 600; display: block; margin-bottom: 8px; text-align: center;" id="convLabel"></label>
+          <input type="text" id="convYuan" inputmode="decimal" placeholder="0" style="width: 100%; border: none; background: var(--surface-2); color: var(--text); border-radius: 14px; padding: 16px 12px; font-size: 22px; font-weight: 700; text-align: center; outline: none;">
+        </div>
+        <div style="font-size: 28px; color: var(--muted); font-weight: bold; margin-top: 24px;">⇄</div>
+        <div>
+          <label for="convEuro" style="font-size: 13px; color: var(--muted); font-weight: 600; display: block; margin-bottom: 8px; text-align: center;">Euro (€)</label>
+          <input type="text" id="convEuro" inputmode="decimal" placeholder="0" style="width: 100%; border: none; background: var(--surface-2); color: var(--text); border-radius: 14px; padding: 16px 12px; font-size: 22px; font-weight: 700; text-align: center; outline: none;">
+        </div>
+      </div>
+      <div class="row-form">
+        <label for="rateInput" class="note-line">Tasso di cambio: quanti <span id="curName">yuan</span> per 1 €</label>
+        <div class="grid-2">
+          <input class="field" id="rateInput" type="text" inputmode="decimal" placeholder="7.70">
+          <button class="btn" id="rateSave">Salva tasso</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title" id="sec-budget"><div><h3>💶 Gestione Budget</h3><p>Spese per categoria e per città.</p></div></div>
+    <div class="expense-card" style="margin-bottom: 24px;">
+      <div style="width: 100%;">
+        <div class="companion-meta">Totale Viaggio</div>
+        <div class="expense-total" id="expenseTotal">€0,00</div>
+        <div style="margin-top: 6px; font-size: 15px; font-weight: 600; color: var(--accent-2);" id="expenseToday">Oggi: €0,00</div>
+        <div class="note-line" id="expenseAvg" style="margin-top:4px;"></div>
+      </div>
+      <div class="expense-form">
+        <input id="expenseDesc" class="full" placeholder="Cos'hai comprato?"/>
+        <input id="expenseAmount" type="text" inputmode="decimal" placeholder="Importo"/>
+        <select id="expenseCurrency"><option id="curOpt">¥</option><option>€</option></select>
+        <select id="expenseCat"></select>
+        <select id="expenseCity"></select>
+        <button class="btn primary full" id="addExpense">Aggiungi spesa</button>
+      </div>
+      <div id="breakdown"></div>
+      <div class="sub-title">Elenco spese</div>
+      <div class="expense-list" id="expenseList"></div>
+    </div>
+
+    <div class="section-title" id="sec-check"><div><h3>✅ Checklist pre-partenza</h3><p>Completate: <strong id="checkProgress">0/0</strong></p></div></div>
+    <div class="utility-card" style="margin-bottom: 24px;">
+      <div id="checklistBox"></div>
+      <div class="grid-2" style="margin-top:14px;">
+        <input class="field" id="checkNew" placeholder="Aggiungi un elemento">
+        <button class="btn" id="checkAdd">Aggiungi</button>
+      </div>
+    </div>
+
+    <div class="section-title" id="sec-phrases"><div><h3>🗣️ Frasi utili</h3><p>Tocca "Mostra" per far leggere il cinese a chi hai davanti.</p></div></div>
+    <div class="utility-card" style="margin-bottom: 24px;">
+      <input class="field" id="phraseSearch" placeholder="Cerca (es. bagno, conto, allergico)">
+      <div id="phrasesBox"></div>
+    </div>
+
+    <div class="section-title" id="sec-weather"><div><h3>⛅ Meteo</h3><p>Serve internet per aggiornare; l'ultimo dato resta salvato.</p></div></div>
+    <div class="utility-card" style="margin-bottom: 24px;">
+      <button class="btn block" id="wxRefresh">🔄 Aggiorna meteo</button>
+      <div class="note-line" id="wxStamp" style="margin:8px 0;"></div>
+      <div id="weatherBox"></div>
+    </div>
+
+    <div class="section-title" id="sec-sos"><div><h3>🚨 Emergenze</h3><p id="sosNote"></p></div></div>
+    <div class="utility-card" style="margin-bottom: 24px;">
+      <h4 style="margin:0; font-size:18px;">Numeri Utili</h4>
+      <div id="sosGrid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center; margin-top: 12px;"></div>
+      <a class="btn small warn" id="sosAssist" style="width:100%; margin-top:12px;"></a>
+    </div>
+
+    <div class="section-title" id="sec-backup"><div><h3>💾 Backup e offline</h3><p>I dati stanno solo in questo browser: fai un backup ogni tanto.</p></div></div>
+    <div class="utility-card">
+      <div class="note-line" id="backupInfo"></div>
+      <div class="grid-2" style="margin-top:12px;">
+        <button class="btn primary" id="bkExport">Scarica backup</button>
+        <button class="btn" id="bkCopy">Copia negli appunti</button>
+      </div>
+      <div class="row-form">
+        <label class="btn block" for="bkFile">Ripristina da file…</label>
+        <input type="file" id="bkFile" accept="application/json,.json" hidden>
+      </div>
+      <div class="sub-title">Modalità offline</div>
+      <div class="note-line" id="offlineStatus">Verifica in corso…</div>
+    </div>
+  </section>
+</main>
+
+<nav class="bottom-nav" id="bottomNav">
+  <button class="active" data-view="dashboard"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Home</button>
+  <button data-view="itinerary"><svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>Diario</button>
+  <button data-view="companion"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>Guida</button>
+  <button data-view="wallet"><svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>Wallet</button>
+  <button data-view="useful"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>Utili</button>
+</nav>
+
+<div class="modal" id="modal">
+  <div class="modal-card">
+    <div class="modal-head"><strong id="modalTitle">Titolo</strong><button class="btn small" id="closeModal">Chiudi</button></div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+</div>
+
+<script>
+/* Il viaggio da aprire si sceglie con ?t=nome (default: cina-2026) e si carica da trips/nome.js */
+window.TRIP_ID = (new URLSearchParams(location.search).get('t') || 'cina-2026').replace(/[^a-z0-9_-]/gi, '');
+document.write('<script src="trips/' + window.TRIP_ID + '.js"><\/script>');
+</script>
+<script>
+const $ = id => document.getElementById(id);
+const SCRIPT_CLS = (window.TRIP_DATA.meta.script) || '\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af\u0e00-\u0e7f';
+const SCRIPT_RUN = new RegExp('[' + SCRIPT_CLS + '][' + SCRIPT_CLS + '·,、]*', 'g');
+const L = t => String(t ?? '').replace(SCRIPT_RUN, '').replace(/\(\s*[,·]\s*/g, '(').replace(/\(\s*\)/g, '').replace(/\s+([,.;:?!])/g, '$1').replace(/\s{2,}/g, ' ').trim();
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ====================== DATI DEL VIAGGIO (da trips/*.js) ====================== */
+const { meta, trip, companionData, HOTELS, DRIVER_PHRASES, DIARY, CITY_KEY, reservations, transfers, checklistData, phrases, CATS } = window.TRIP_DATA;
+/* collega diario e hotel ai dati base */
+trip.cities.forEach(c => { const h = HOTELS[CITY_KEY[c.name]]; c.key = CITY_KEY[c.name]; c.hotel = h.name; c.hotelZh = h.zh; });
+trip.days.forEach(day => { const x = DIARY[day.day]; if (!x) return; day.det = x.stops; day.sleep = x.sleep; day.stops = x.stops.map(st => [st.t, st.title, st.sum || '']); });
+const hotelKeyForDay = day => { const k = DIARY[day.day] && DIARY[day.day].sleep; return k || (day.day === trip.days[trip.days.length - 1].day ? trip.cities[trip.cities.length - 1].key : null); };
+const catOf = k => CATS.find(c => c[0] === k) || CATS[CATS.length - 1];
+
+/* ====================== STATO ====================== */
+const STATE_KEY = meta.stateKey;
+const defaultState = () => ({completed:{}, booked:{}, expenses:[], notes:{}, transferNotes:{}, codes:[], checklist:{}, checkCustom:[], rate:meta.currency.rate, lastBackup:null, favs:{}, ttsRate:0.95, addr:{}});
+const state = loadState();
+
+function loadState() {
+  try {
+    const s = Object.assign(defaultState(), JSON.parse(localStorage.getItem(STATE_KEY) || '{}'));
+    delete s.photos;
+    s.expenses = (s.expenses || []).map((x, i) => ({...x, id: x.id ?? (Date.now() + i)}));
+    return s;
+  } catch { return defaultState(); }
+}
+function saveState() {
+  try { localStorage.setItem(STATE_KEY, JSON.stringify(state)); }
+  catch (e) { alert('Memoria del browser piena: impossibile salvare.'); }
+  updateMetrics();
+}
+const rate = () => { const r = Number(state.rate); return r > 0 ? r : meta.currency.rate; };
+
+function toast(msg) {
+  const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t); setTimeout(() => t.remove(), 1800);
+}
+function copyText(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    return navigator.clipboard.writeText(text).then(() => toast('Copiato'), () => toast('Copia non riuscita'));
+  }
+  toast('Copia non supportata qui'); return Promise.resolve();
+}
+function downloadFile(name, text, mime) {
+  const blob = new Blob([text], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+/* ====================== ORE E DATE ====================== */
+function updateClocks() {
+  const now = new Date();
+  const opt = { hour: '2-digit', minute: '2-digit', hour12: false };
+  $('clockChina').textContent = meta.flag + ' ' + now.toLocaleTimeString('it-IT', { ...opt, timeZone: meta.tz });
+  $('clockItaly').textContent = '🇮🇹 ' + now.toLocaleTimeString('it-IT', { ...opt, timeZone: 'Europe/Rome' });
+}
+setInterval(updateClocks, 1000);
+updateClocks();
+
+function appleMaps(query){ return `https://maps.apple.com/?q=${encodeURIComponent(query)}`; }
+
+function destToday() { return new Date().toLocaleDateString('en-CA', { timeZone: meta.tz }); }
+const dayISO = d => {
+  const m = Number(d.date.slice(3, 5)), y0 = Number(trip.start.slice(0, 4)), m0 = Number(trip.start.slice(5, 7));
+  return `${m < m0 ? y0 + 1 : y0}-${d.date.slice(3, 5)}-${d.date.slice(0, 2)}`;
+};
+function tripDayIndex() {
+  const today = destToday();
+  let idx = trip.days.findIndex(d => dayISO(d) === today);
+  if (idx < 0) idx = trip.days.findIndex(d => dayISO(d) > today);
+  return idx < 0 ? trip.days.length - 1 : idx;
+}
+function relTime(ms) {
+  const m = Math.max(0, Math.floor(ms / 60000));
+  const d = Math.floor(m / 1440), h = Math.floor((m % 1440) / 60), mm = m % 60;
+  if (d >= 1) return `${d} g ${h} h`;
+  if (h >= 1) return `${h} h ${mm} min`;
+  return `${mm} min`;
+}
+const fmtLocal = iso => `${iso.slice(8, 10)}/${iso.slice(5, 7)} ${iso.slice(11, 16)}`;
+const parseOpens = s => new Date(s.length <= 10 ? `${s}T00:00:00+02:00` : s);
+const cityOfDay = n => {
+  const d = trip.days.find(x => x.day === n);
+  return d ? d.city.split('→')[0].trim() : 'In viaggio';
+};
+
+function updateCountdown() {
+  const start = new Date(meta.start), end = new Date(meta.end);
+  const now = new Date();
+  const el = $('countdownValue'), label = $('countdownLabel');
+  if (now < start) {
+    const days = Math.ceil((start - now) / 86400000);
+    el.textContent = days; label.textContent = days === 1 ? 'giorno alla partenza' : 'giorni alla partenza';
+  } else if (now <= end) {
+    el.textContent = `D${tripDayIndex() + 1}`; label.textContent = 'del viaggio';
+  } else {
+    el.textContent = '✓'; label.textContent = 'Viaggio concluso';
+  }
+}
+function updateMetrics() {
+  let total = 0, done = 0;
+  trip.days.forEach(d => d.stops.forEach((_, i) => { total++; if (state.completed[`${d.day}-${i}`]) done++; }));
+  $('progressCount').textContent = `${Math.round(done / total * 100)}%`;
+  updateCountdown();
+}
+
+/* ====================== MODALE ====================== */
+function openModal(title, html) { $('modalTitle').textContent = title; $('modalBody').innerHTML = html; $('modal').classList.add('open'); }
+function closeModal() { stopSpeech(); $('modal').classList.remove('open'); }
+function showBig(title, big, sub, icon) {
+  openModal(title, `
+    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:40vh; text-align:center;">
+      ${icon ? `<div style="font-size: 60px; margin-bottom: 20px;">${icon}</div>` : ''}
+      <div style="font-size: 38px; font-weight: 800; line-height: 1.4; color: var(--text);">${esc(big)}</div>
+      ${sub ? `<p style="margin-top: 20px; font-size: 16px; color: var(--muted);">${esc(sub)}</p>` : ''}
+    </div>`);
+}
+function transitApple(q){ return `https://maps.apple.com/?daddr=${encodeURIComponent(q)}&dirflg=r`; }
+/* Scheda da mostrare al tassista/DiDi: nome e indirizzo grandi, frase pronta, telefono, mappe, modifica */
+function showPlaceCard(p) {
+  const zh = (p.zh || '').trim(), addr = (p.addr || '').trim();
+  if (!zh && !addr) { toast('Inserisci prima nome o indirizzo in cinese (✏️)'); if (p.onEdit) p.onEdit(); return; }
+  const q = zh || addr;
+  const btns = [
+    p.tel ? `<a class="btn small primary" href="tel:${esc(p.tel)}">📞 Chiama</a>` : '',
+    `<button class="btn small" data-act="copy">📋 Copia</button>`,
+    p.onEdit ? `<button class="btn small" data-act="edit">✏️ Modifica</button>` : ''
+  ].join('');
+  openModal(p.title || "Mostra all'autista", `
+    <div class="taxi-lat">
+      ${p.latName ? `<div class="lat-n">${esc(p.latName)}</div>` : ''}
+      ${p.latAddr ? `<div class="lat-a">${esc(p.latAddr)}</div>` : ''}
+    </div>
+    <div class="taxi-big">
+      ${zh ? `<div class="zh1">${esc(zh)}</div>` : ''}
+      ${addr ? `<div class="ad1">${esc(addr)}</div>` : ''}
+      <div class="req">${esc(DRIVER_PHRASES[0][0])}</div>
+      <div class="py1">${esc(DRIVER_PHRASES[0][1])} · ${esc(DRIVER_PHRASES[0][2])}</div>
+    </div>
+    <div class="act-row" style="justify-content:center">${btns}</div>
+    ${p.en ? `<p class="py" style="text-align:center">${esc(p.en)}</p>` : ''}
+    ${p.more ? `<details class="more"><summary>Info hotel</summary>${p.more}</details>` : ''}
+    <details class="more"><summary>Altre frasi per il tassista</summary><div class="taxi-ph">
+      ${DRIVER_PHRASES.slice(1).map(f => `<div><strong style="font-size:20px">${esc(f[0])}</strong><br><span class="py">${esc(f[1])} · ${esc(f[2])}</span></div>`).join('')}</div></details>`);
+  const body = $('modalBody');
+  body.querySelector('[data-act="copy"]').onclick = () => copyText([zh, addr].filter(Boolean).join('\n'));
+  const ed = body.querySelector('[data-act="edit"]');
+  if (ed) ed.onclick = () => p.onEdit();
+}
+/* Retro-compatibilità: Taxi Card da un testo cinese libero (trasferimenti) */
+function showTaxiCard(zh) {
+  if (!zh) { alert('Inserisci prima il nome in cinese, che trovi sul biglietto.'); return; }
+  showPlaceCard({ title: "Mostra all'autista", zh });
+}
+
+/* Modifica nome/indirizzo in cinese: resta salvato sul telefono */
+function editAddr(key, cur, title, done) {
+  openModal('✏️ ' + title, `<div class="edit-form">
+    <label class="lbl">Nome in cinese (come sull'app/biglietto)</label><input class="field" id="edZh" value="${esc(cur.zh || '')}" placeholder="es. 月牙酒店">
+    <label class="lbl">Indirizzo in cinese</label><input class="field" id="edAd" value="${esc(cur.addr || '')}" placeholder="es. 青羊区顺城大街127号">
+    <label class="lbl">Indirizzo in caratteri latini (mostrato nell'app)</label><input class="field" id="edLat" value="${esc(cur.lat || '')}" placeholder="es. No. 127 Shuncheng Street, Chengdu">
+    <div class="act-row"><button class="btn primary" id="edSave">Salva</button><button class="btn" id="edReset">Ripristina originale</button></div></div>`);
+  $('edSave').onclick = () => {
+    const zh = $('edZh').value.trim(), addr = $('edAd').value.trim(), lat = $('edLat').value.trim();
+    if (zh || addr) state.addr[key] = { zh, addr, lat }; else delete state.addr[key];
+    saveState(); closeModal(); toast('Salvato'); done();
+  };
+  $('edReset').onclick = () => { delete state.addr[key]; saveState(); closeModal(); toast('Ripristinato'); done(); };
+}
+function hotelInfo(k) {
+  const h = HOTELS[k], o = state.addr['h-' + k] || {};
+  const cust = !!(o.zh || o.addr);
+  return Object.assign({}, h, { zh: o.zh || h.zh, addr: o.addr || h.addr, py: cust ? '' : h.py, en: cust ? (o.lat || '') : h.en, custom: cust });
+}
+function hotelCardData(k, after) {
+  const h = hotelInfo(k);
+  return { title: '🏨 ' + h.city, zh: h.zh, addr: h.addr, tel: h.tel, latName: L(h.name.replace(/ = .*$/, '')), latAddr: h.en, more: hotelMoreHTML(k),
+    onEdit: () => editAddr('h-' + k, { zh: h.zh, addr: h.addr, lat: h.en }, 'Hotel ' + h.city, () => { renderCities(); renderItinerary(); renderToday(); if (after) after(); }) };
+}
+function hotelBoxHTML(k, withNight) {
+  const h = hotelInfo(k);
+  return `<div class="hb-line"><span class="hb-ic">🏨</span><div><div class="hb-name">${esc(h.name.replace(/ \(.*$/, '').replace(/ = .*$/, ''))}${withNight ? ' · ' + esc(h.nights) : ''}</div>
+    <div class="py">${esc(h.en || 'Indirizzo personalizzato salvato')}</div></div></div>`;
+}
+function hotelMoreHTML(k) {
+  const h = hotelInfo(k);
+  return `<div class="sec"><b>Nome completo</b><div>${esc(L(h.name))}</div></div>
+    <div class="sec"><b>Posizione</b><div>${esc(L(h.metro))}</div></div>
+    <div class="sec"><b>Check-in / check-out</b><div>${esc(h.cin)} · ${esc(h.cout)}</div></div>
+    ${h.telShow ? `<div class="sec"><b>Telefono</b><div>${esc(h.telShow)}</div></div>` : ''}
+    ${h.booking ? `<div class="sec"><b>Prenotazione</b><div>${esc(h.booking)}</div></div>` : ''}
+    ${h.warn ? `<div class="warnbox">⚠️ ${esc(L(h.warn))}</div>` : ''}
+    <div class="vb">${h.custom ? '✏️ Dati modificati da te' : (h.v === 'ok' ? '✅ Letto su fonti online' : '🟡 Da verificare con la tua conferma')}</div>`;
+}
+function hotelActs(k, host) {
+  const h = hotelInfo(k);
+  const row = document.createElement('div'); row.className = 'act-row';
+  row.innerHTML = `<button class="btn small taxi-btn" data-a="taxi">🚕 Mostra al tassista</button>${h.tel ? `<a class="btn small" href="tel:${esc(h.tel)}">📞</a>` : ''}`;
+  row.querySelector('[data-a="taxi"]').onclick = () => showPlaceCard(hotelCardData(k));
+  host.appendChild(row);
+}
+function renderTodayHotel() {
+  const box = $('todayHotel'); if (!box) return;
+  const d = trip.days[tripDayIndex()], k = hotelKeyForDay(d);
+  box.innerHTML = '';
+  if (!k) return;
+  const card = document.createElement('div'); card.className = 'utility-card';
+  card.innerHTML = hotelBoxHTML(k, true);
+  hotelActs(k, card);
+  box.appendChild(card);
+}
+
+/* ====================== CARD OGGI ====================== */
+function pendingReservations() {
+  return reservations
+    .filter(r => r.status.includes('Da prenotare') && !state.booked[r.id])
+    .sort((a, b) => (a.opens ? +parseOpens(a.opens) : Infinity) - (b.opens ? +parseOpens(b.opens) : Infinity));
+}
+function renderToday() {
+  renderTodayHotel();
+  const modeEl = $('todayMode'), nextEl = $('todayNext');
+  const today = destToday();
+  const started = today >= dayISO(trip.days[0]);
+  const ended = today > dayISO(trip.days[trip.days.length - 1]);
+  const d = trip.days[tripDayIndex()];
+
+  if (!started) {
+    const pending = pendingReservations();
+    modeEl.innerHTML = `<div class="companion-meta">Prima della partenza</div><h3>Giorno 1 · ${esc(d.city)}</h3><p>${esc(d.date)} · ${esc(d.title)}</p>`;
+    nextEl.innerHTML = pending.length
+      ? `<div class="companion-meta">Da prenotare</div><h3>${esc(pending[0].title)}</h3><p>Per il ${esc(pending[0].date)} · ${esc(pending[0].ref)}</p>`
+      : `<div class="companion-meta">Prenotazioni</div><h3>Tutto prenotato ✅</h3><p>Nessuna prenotazione in sospeso.</p>`;
+    return;
+  }
+  if (ended) {
+    modeEl.innerHTML = `<div class="companion-meta">Viaggio</div><h3>Concluso ✓</h3><p>Rivedi le note nel Diario.</p>`;
+    nextEl.innerHTML = `<div class="companion-meta">Prossima tappa</div><h3>A presto!</h3>`;
+    return;
+  }
+  modeEl.innerHTML = `<div class="companion-meta">Oggi · Giorno ${d.day}</div><h3>${esc(d.city)}</h3><p>${esc(d.date)} · ${esc(d.title)}</p>`;
+  const nextIdx = d.stops.findIndex((_, i) => !state.completed[`${d.day}-${i}`]);
+  if (nextIdx < 0) {
+    nextEl.innerHTML = `<div class="companion-meta">Prossima tappa</div><h3>Giornata completata ✅</h3><p>Hai spuntato tutte le tappe di oggi.</p>`;
+  } else {
+    const s = d.stops[nextIdx];
+    nextEl.innerHTML = `<div class="companion-meta">Prossima tappa · ${esc(s[0])}</div><h3>${esc(L(s[1]))}</h3><p>${esc(L(s[2]))}</p>`;
+  }
+}
+
+/* ====================== ALERT PRENOTAZIONI ====================== */
+function renderBookingAlerts() {
+  const wrap = $('bookingAlertsGrid'), title = $('bookingAlertsTitle');
+  wrap.innerHTML = '';
+  const toBook = pendingReservations();
+  if (!toBook.length) { title.style.display = 'none'; return; }
+  title.style.display = 'flex';
+  toBook.forEach(r => {
+    let when = '';
+    if (r.opens) {
+      const ms = parseOpens(r.opens) - Date.now();
+      when = ms > 0 ? `Apre tra ${relTime(ms)}` : 'Già aperta: prenota ora';
+    }
+    const card = document.createElement('div'); card.className = 'utility-card'; card.style.border = '2px solid var(--warn)';
+    card.innerHTML = `<div style="display:flex; justify-content:space-between; gap:8px;"><div><div class="companion-meta">${esc(r.type)}</div><h4 style="margin:0; font-size:18px;">${esc(r.title)}</h4></div><span class="badge warn">${esc(r.ref)}</span></div>
+      <p style="margin: 8px 0 0; font-size:14px; font-weight: 500;">Per il: ${esc(r.date)}</p>
+      ${when ? `<p style="margin: 4px 0 0; font-size:14px; font-weight: 700; color: var(--warn);">⏰ ${esc(when)}</p>` : ''}
+      <button class="btn warn small" style="width:100%; margin-top: 12px;">✅ Fatto</button>`;
+    card.querySelector('button').onclick = () => { state.booked[r.id] = true; saveState(); renderBookingAlerts(); renderWallet(); renderToday(); };
+    wrap.appendChild(card);
+  });
+}
+
+/* ====================== TRASFERIMENTI ====================== */
+function liveText(t, n) {
+  const fl = /Volo/.test(t.type);
+  return [n.term && 'Terminal ' + esc(n.term), n.gate && (fl ? 'Gate ' : 'Binario ') + esc(n.gate), n.seat && 'Posto ' + esc(n.seat), n.delay && '⏱ ' + esc(n.delay)].filter(Boolean).join(' · ');
+}
+function transferCard(t, ctx) {
+  const n = state.transferNotes[t.id] || {};
+  const zhVal = t.zh || '';
+  const depName = t.title.split('→')[0].replace(/^[A-Z0-9]{2,7}\s*(\([^)]*\))?\s*·\s*/, '').trim();
+  const isFl = /Volo/.test(t.type), hasZh = !!zhVal;
+  const code = ((t.title.match(/^([A-Z0-9]{2,7})/) || [])[1]) || '';
+  const ms = new Date(t.dep) - Date.now();
+  const card = document.createElement('article'); card.className = 'wallet-card';
+  card.innerHTML = `<div style="display:flex; justify-content:space-between; gap:8px;">
+      <div><div class="companion-meta">${esc(t.type)}</div><h4 style="margin:0; font-size:18px;">${esc(t.title)}</h4>${zhVal ? `<div class="py">${esc(zhVal)}</div>` : ''}</div>
+      <span class="badge ${ms > 0 ? 'warn' : 'done'}" data-badge>${ms > 0 ? 'tra ' + esc(relTime(ms)) : 'partito'}</span>
+    </div>
+    <p style="margin:10px 0 0; font-size:15px;"><strong>Partenza:</strong> ${esc(fmtLocal(t.dep))} <span class="note-line">(ora locale)</span></p>
+    ${t.arr ? `<p class="note-line" style="margin:4px 0 0;">${esc(t.arr)}</p>` : ''}
+    <div class="live-line" data-live ${(n.term || n.gate || n.seat || n.delay) ? '' : 'hidden'}>${liveText(t, n)}</div>
+    <div class="row-form">
+      ${isFl ? `<input class="field f-term" placeholder="Terminal" value="${esc(n.term || '')}">` : ''}
+      <input class="field f-gate" placeholder="${isFl ? 'Gate' : 'Binario'}" value="${esc(n.gate || '')}">
+      <input class="field f-seat" placeholder="Posto" value="${esc(n.seat || '')}">
+      <input class="field f-delay" placeholder="Ritardo / note (es. +40 min)" value="${esc(n.delay || '')}">
+    </div>
+    <div class="act-row">
+      <a class="btn small" target="_blank" rel="noopener" href="${isFl ? 'https://www.flightradar24.com/data/flights/' + esc(code.toLowerCase()) : 'https://www.trip.com/trains/'}">${isFl ? '🛰 Stato volo' : '🚄 Stato treno (Trip.com)'}</a>
+      ${isFl ? `<a class="btn small" target="_blank" rel="noopener" href="https://www.flightaware.com/live/flight/${esc(code)}">FlightAware</a>` : ''}
+      ${zhVal ? `<button class="btn small go-taxi">🚕 Tassista per la partenza</button>` : ''}
+    </div>
+    `;
+  const q = sel => card.querySelector(sel);
+  const persist = () => {
+    state.transferNotes[t.id] = { term: q('.f-term') ? q('.f-term').value.trim() : '', gate: q('.f-gate').value.trim(), seat: q('.f-seat').value.trim(), delay: q('.f-delay').value.trim(),};
+    saveState();
+    const nn = state.transferNotes[t.id], lv = q('[data-live]');
+    lv.innerHTML = liveText(t, nn); lv.hidden = !lv.textContent.trim();
+    // aggiorna l'altra vista senza togliere il focus da questa
+    if (ctx === 'next') renderTransfers(); else renderNextTransfer(true);
+  };
+  card.querySelectorAll('input').forEach(i => i.addEventListener('change', persist));
+  const gt = q('.go-taxi'); if (gt) gt.addEventListener('click', () => showPlaceCard({ title: '🚕 ' + depName, zh: zhVal, latName: depName }));
+  return card;
+}
+function renderTransfers() {
+  const wrap = $('transferGrid'); wrap.innerHTML = '';
+  transfers.forEach(t => wrap.appendChild(transferCard(t, 'list')));
+}
+function renderNextTransfer(force) {
+  const box = $('nextTransfer');
+  if (!force && box.contains(document.activeElement) && document.activeElement !== document.body) return;
+  box.innerHTML = '';
+  const nxt = transfers.find(t => new Date(t.dep) > Date.now());
+  if (!nxt) { box.innerHTML = '<div class="utility-card">Nessun trasferimento in programma.</div>'; return; }
+  const card = transferCard(nxt, 'next');
+  card.style.maxWidth = '520px';
+  box.appendChild(card);
+}
+
+/* ====================== CALENDARIO (.ics) ====================== */
+const icsStamp = d => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+const icsEsc = s => String(s).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
+function buildICS(events) {
+  const L = ['BEGIN:VCALENDAR', 'VERSION:2.0', `PRODID:-//${meta.title}//IT`, 'CALSCALE:GREGORIAN'];
+  const stamp = icsStamp(new Date());
+  events.forEach(e => {
+    L.push('BEGIN:VEVENT', `UID:${e.uid}@${meta.id}`, `DTSTAMP:${stamp}`);
+    if (e.allDay) {
+      const next = new Date(e.date + 'T00:00:00Z'); next.setUTCDate(next.getUTCDate() + 1);
+      L.push(`DTSTART;VALUE=DATE:${e.date.replace(/-/g, '')}`, `DTEND;VALUE=DATE:${next.toISOString().slice(0, 10).replace(/-/g, '')}`);
+    } else {
+      const s = new Date(e.start), en = new Date(s.getTime() + e.mins * 60000);
+      L.push(`DTSTART:${icsStamp(s)}`, `DTEND:${icsStamp(en)}`);
+    }
+    L.push(`SUMMARY:${icsEsc(e.title)}`, `DESCRIPTION:${icsEsc(e.desc || '')}`,
+      'BEGIN:VALARM', 'ACTION:DISPLAY', `DESCRIPTION:${icsEsc(e.title)}`, `TRIGGER:${e.allDay ? 'PT9H' : '-PT1H'}`, 'END:VALARM', 'END:VEVENT');
+  });
+  L.push('END:VCALENDAR');
+  return L.join('\r\n');
+}
+function exportReservationsICS() {
+  const ev = reservations.filter(r => r.opens).map(r => {
+    const base = { uid: 'res-' + r.id, title: `Prenota: ${r.title}`, desc: `${r.ref} · per il ${r.date}` };
+    return r.opens.length <= 10 ? { ...base, allDay: true, date: r.opens } : { ...base, start: r.opens, mins: 30 };
+  });
+  downloadFile(`${meta.id}-prenotazioni.ics`, buildICS(ev), 'text/calendar');
+}
+function exportTransfersICS() {
+  const ev = transfers.map(t => {
+    const n = state.transferNotes[t.id] || {};
+    return { uid: 'tr-' + t.id, title: `${t.type} ${t.title}`, start: t.dep, mins: 60,
+      desc: [t.arr, n.seat ? `Posto/codice: ${n.seat}` : ''].filter(Boolean).join('\n') };
+  });
+  downloadFile(`${meta.id}-trasferimenti.ics`, buildICS(ev), 'text/calendar');
+}
+
+/* ====================== WALLET / CODICI ====================== */
+function renderWallet() {
+  const wrap = $('walletGrid'); wrap.innerHTML = '';
+  reservations.forEach(r => {
+    const card = document.createElement('article'); card.className = 'wallet-card';
+    const isBooked = r.status.includes('✅') || state.booked[r.id];
+    card.innerHTML = `<div style="display:flex; justify-content:space-between; gap:8px; margin-bottom:12px;">
+        <div><div class="companion-meta">${esc(r.type)}</div><h4 style="margin:0; font-size:18px;">${esc(r.title)}</h4></div>
+        <span class="badge ${isBooked ? 'done' : 'warn'}">${isBooked ? 'Prenotato' : 'Da Fare'}</span>
+      </div><p style="margin:0; font-size: 15px;"><strong>Date:</strong> ${esc(r.date)}</p><p style="margin:4px 0 0; color:var(--muted); font-size: 13px;">Rif: ${esc(r.ref)}</p>`;
+    wrap.appendChild(card);
+  });
+}
+function renderCodes() {
+  const box = $('codeList'); box.innerHTML = '';
+  if (!state.codes.length) { box.innerHTML = '<p class="note-line">Nessun codice salvato.</p>'; return; }
+  state.codes.forEach(c => {
+    const row = document.createElement('div'); row.className = 'code-row';
+    row.innerHTML = `<div style="min-width:0;"><div class="companion-meta" style="margin:0;">${esc(c.title)}</div><div class="val">${esc(c.value)}</div></div>
+      <div style="display:flex; gap:4px; align-items:center;"><button class="btn small" type="button">Copia</button><button class="del-btn" type="button" aria-label="Elimina">✕</button></div>`;
+    const [copyBtn, delBtn] = row.querySelectorAll('button');
+    copyBtn.addEventListener('click', () => copyText(c.value));
+    delBtn.addEventListener('click', () => {
+      if (!confirm(`Eliminare "${c.title}"?`)) return;
+      state.codes = state.codes.filter(x => x.id !== c.id); saveState(); renderCodes();
+    });
+    box.appendChild(row);
+  });
+}
+
+/* ====================== SPESE / BUDGET ====================== */
+const parseNum = v => parseFloat(String(v).replace(',', '.'));
+const toEuro = x => x.currency === '€' ? Number(x.amount) : Number(x.amount) / rate();
+const sumEuro = list => list.reduce((a, x) => a + toEuro(x), 0);
+const fmtEur = n => '€' + n.toFixed(2).replace('.', ',');
+
+function groupEuro(list, keyFn) {
+  const m = new Map();
+  list.forEach(x => { const k = keyFn(x); m.set(k, (m.get(k) || 0) + toEuro(x)); });
+  return [...m.entries()].sort((a, b) => b[1] - a[1]);
+}
+function barsHTML(entries) {
+  if (!entries.length) return '<p class="note-line">Ancora nessuna spesa.</p>';
+  const max = entries[0][1] || 1;
+  return entries.map(([label, v]) => `<div class="bar-row"><span>${esc(label)}</span><div class="bar"><span style="width:${Math.max(3, Math.round(v / max * 100))}%"></span></div><strong>${fmtEur(v)}</strong></div>`).join('');
+}
+
+function renderExpenses() {
+  const wrap = $('expenseList'); wrap.innerHTML = '';
+  const currentDay = trip.days[tripDayIndex()].day;
+  const all = state.expenses;
+  const total = sumEuro(all);
+  $('expenseTotal').innerHTML = `${fmtEur(total)} <span style="font-size: 14px; font-weight: 500; color: var(--muted);">(Totale)</span>`;
+  $('expenseToday').textContent = `Spese di Oggi: ${fmtEur(sumEuro(all.filter(x => x.day === currentDay)))}`;
+  const days = new Set(all.map(x => x.day)).size;
+  $('expenseAvg').textContent = days ? `Media: ${fmtEur(total / days)} al giorno (su ${days} ${days === 1 ? 'giorno' : 'giorni'} con spese)` : '';
+
+  $('breakdown').innerHTML =
+    `<div class="sub-title">Per categoria</div>${barsHTML(groupEuro(all, x => { const c = catOf(x.cat); return `${c[1]} ${c[2]}`; }))}
+     <div class="sub-title">Per città</div>${barsHTML(groupEuro(all, x => x.city || cityOfDay(x.day)))}`;
+
+  if (!all.length) wrap.innerHTML = '<p class="note-line">Nessuna spesa registrata.</p>';
+  all.slice().reverse().forEach(x => {
+    const c = catOf(x.cat);
+    const row = document.createElement('div'); row.className = 'expense-row';
+    row.innerHTML = `<span class="desc">${c[1]} ${esc(x.desc)} <span style="color:var(--muted); font-size:12px;">(Giorno ${esc(x.day)} · ${esc(x.city || cityOfDay(x.day))})</span></span>
+      <span class="right"><strong>${Number(x.amount).toFixed(2)} ${esc(x.currency)}</strong><button class="del-btn" aria-label="Elimina spesa">✕</button></span>`;
+    row.querySelector('.del-btn').addEventListener('click', () => {
+      if (!confirm(`Eliminare "${x.desc}"?`)) return;
+      state.expenses = state.expenses.filter(e => e.id !== x.id);
+      saveState(); renderExpenses();
+    });
+    wrap.appendChild(row);
+  });
+}
+
+function setupExpenseForm() {
+  $('expenseCat').innerHTML = CATS.map(c => `<option value="${c[0]}">${c[1]} ${c[2]}</option>`).join('');
+  const cities = ['In viaggio', ...trip.cities.map(c => c.name)];
+  $('expenseCity').innerHTML = cities.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+  $('expenseCity').value = cityOfDay(trip.days[tripDayIndex()].day);
+
+  $('addExpense').addEventListener('click', () => {
+    const descEl = $('expenseDesc'), amtEl = $('expenseAmount');
+    const desc = descEl.value.trim(), amount = parseNum(amtEl.value);
+    if (!desc || !Number.isFinite(amount) || amount <= 0) return;
+    state.expenses.push({ id: Date.now(), desc, amount, currency: $('expenseCurrency').value,
+      day: trip.days[tripDayIndex()].day, cat: $('expenseCat').value, city: $('expenseCity').value });
+    descEl.value = ''; amtEl.value = '';
+    saveState(); renderExpenses();
+  });
+}
+
+/* ====================== CONVERTITORE E TASSO ====================== */
+function updateRateUI() {
+  $('rateLabel').textContent = `Tasso di cambio: 1€ = ${rate().toFixed(2)}${meta.currency.symbol} (modificabile qui sotto)`;
+  $('rateInput').value = rate().toFixed(2);
+}
+function setupConverter() {
+  const y = $('convYuan'), e = $('convEuro');
+  y.addEventListener('input', ev => { const v = parseNum(ev.target.value); e.value = Number.isFinite(v) ? (v / rate()).toFixed(2) : ''; });
+  e.addEventListener('input', ev => { const v = parseNum(ev.target.value); y.value = Number.isFinite(v) ? (v * rate()).toFixed(2) : ''; });
+  $('rateSave').addEventListener('click', () => {
+    const v = parseNum($('rateInput').value);
+    if (!Number.isFinite(v) || v <= 0 || v > 100) { alert('Inserisci un tasso valido, per esempio 7.70'); return; }
+    state.rate = v; saveState(); updateRateUI(); renderExpenses();
+    y.value = ''; e.value = ''; toast('Tasso aggiornato');
+  });
+}
+
+/* ====================== CITTÀ / ITINERARIO ====================== */
+function renderCities() {
+  const wrap = $('cityGrid'); wrap.innerHTML = '';
+  trip.cities.forEach(city => {
+    const h = hotelInfo(city.key);
+    const card = document.createElement('div'); card.className = 'city-card';
+    card.innerHTML = `<div class="city-card-top"><div><div class="city-name">${esc(city.name)}</div><div class="city-dates">${esc(city.dates)}</div></div></div>
+      <div class="city-dates" style="margin-top:10px">Hotel: <strong>${esc(h.name)}</strong></div>
+      <div class="city-dates">${esc(h.en || '')}</div>
+      <div class="city-actions">
+        <button class="btn small primary go-it">Itinerario</button>
+        <button class="btn small taxi-btn go-taxi">🚕 Hotel al tassista</button>
+        ${h.tel ? `<a class="btn small" href="tel:${esc(h.tel)}">📞</a>` : ''}
+      </div>`;
+    card.querySelector('.go-it').addEventListener('click', () => {
+      setView('itinerary');
+      setTimeout(() => $(`day-${city.days[0]}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+    });
+    card.querySelector('.go-taxi').addEventListener('click', () => showPlaceCard(hotelCardData(city.key)));
+    wrap.appendChild(card);
+  });
+}
+
+const detOpen = new Set();
+function placeInfo(day, i) {
+  const st = day.det && day.det[i] ? day.det[i] : {}, o = state.addr[`${day.day}-${i}`] || {};
+  const cust = !!(o.zh || o.addr);
+  return { zh: o.zh || st.zh || '', addr: o.addr || st.addr || '', py: cust ? '' : (st.py || ''), pya: cust ? (o.lat || '') : (st.pya || ''), custom: cust };
+}
+function stopCardData(day, i) {
+  const st = day.det[i], p = placeInfo(day, i);
+  return { title: `🚕 ${L(st.title)}`, zh: p.zh, addr: p.addr, tel: st.tel, latName: L(p.py || st.title), latAddr: p.pya,
+    onEdit: () => editAddr(`${day.day}-${i}`, { zh: p.zh, addr: p.addr, lat: p.pya }, st.title, () => { renderItinerary(); renderToday(); }) };
+}
+function detHTML(day, i) {
+  const st = day.det[i], p = placeInfo(day, i);
+  const sec = (label, txt) => txt ? `<div class="sec"><b>${label}</b><div>${esc(L(txt))}</div></div>` : '';
+  let h = '';
+  if (p.zh || p.addr || st.editable) {
+    h += `<div class="pl">${(p.zh || p.addr) ? `<div class="pl-lat">${esc(L(p.py || st.title))}</div>${p.pya ? `<div class="pl-ad">${esc(p.pya)}</div>` : ''}<div class="py">I caratteri cinesi sono nel pulsante 🚕</div>` : '<div class="pl-empty">Indirizzo non ancora inserito: usa ✏️</div>'}</div>`;
+  }
+  h += sec('Come arrivare', st.how) + sec('Orari', st.hours) + sec('Costi', st.cost) + sec('Prenotazione', st.book);
+  if (st.warn) h += `<div class="warnbox">⚠️ ${esc(L(st.warn))}</div>`;
+  if (st.tips && st.tips.length) h += `<details class="more"><summary>Consigli (${st.tips.length})</summary><ul class="sec">${st.tips.map(t => `<li>${esc(L(t))}</li>`).join('')}</ul></details>`;
+  const hk = st.h || DIARY[day.day].sleep;
+  h += `<div class="act-row">
+    ${(p.zh || p.addr) ? `<button class="btn small taxi-btn" data-a="taxi">🚕 Tassista</button>` : ''}
+    ${st.tel ? `<a class="btn small" href="tel:${esc(st.tel)}">📞 Chiama</a>` : ''}
+    <a class="btn small" href="${appleMaps(p.zh || `${st.title}, ${day.city}, ${meta.country}`)}">🧭 Mappa</a>
+    <a class="btn small" href="${transitApple(p.zh || `${st.title}, ${day.city}, ${meta.country}`)}">🚇 Metro</a>
+    <button class="btn small" data-a="ed">✏️ Modifica</button>
+    ${hk ? `<button class="btn small" data-a="hotel">🏨 Hotel</button>` : ''}
+    ${st.guide ? `<button class="btn small" data-a="guide">🎧 Guida</button>` : ''}
+  </div>
+  <div class="vb">${st.v === 'ok' ? '✅ Dati letti su fonti online' : '🟡 Da verificare prima di partire'}${p.custom ? ' · ✏️ modificato da te' : ''}</div>`;
+  return h;
+}
+function isCheckinDay(day, hk) {
+  const first = trip.days.find(d => hotelKeyForDay(d) === hk);
+  return !first || first.day === day.day;
+}
+function renderDay(day, target) {
+  const hk = hotelKeyForDay(day);
+  const section = document.createElement('article'); section.className = 'day-card'; section.id = `day-${day.day}`;
+  section.innerHTML = `<div class="day-head"><div class="day-title"><h4>Giorno ${day.day} · ${esc(day.city)}</h4><p>${esc(day.date)} · ${esc(day.title)}</p><div class="wx-line" data-wxday="${day.day}"></div></div></div>
+    ${day.alert ? `<div class="alert">⚠️ ${esc(day.alert)}</div>` : ''}
+    ${hk && isCheckinDay(day, hk) ? `<div class="hotel-box" data-hotel>${hotelBoxHTML(hk, false)}</div>` : ''}
+    <div class="timeline"></div>
+    <div class="note-area">
+      <label class="lbl" for="note-${day.day}">📝 Diario della giornata</label>
+      <textarea id="note-${day.day}" placeholder="Ricordi, appunti, sensazioni..."></textarea>
+    </div>`;
+  if (hk && section.querySelector('[data-hotel]')) hotelActs(hk, section.querySelector('[data-hotel]'));
+
+  const timeline = section.querySelector('.timeline');
+  day.stops.forEach((s, i) => {
+    const row = document.createElement('div'); row.className = 'stop';
+    const key = `${day.day}-${i}`;
+    const checked = !!state.completed[key];
+    const st = day.det ? day.det[i] : null;
+    const p = st ? placeInfo(day, i) : { zh: '', addr: '' };
+    const hasPlace = !!(p.zh || p.addr);
+    row.innerHTML = `<div class="time">${esc(s[0])}</div>
+      <div><h5>${esc(L(s[1]))}</h5><p>${esc(L(s[2]))}</p>
+        ${st ? `<div class="stop-pills">
+          ${hasPlace ? `<button class="btn small taxi-btn" data-a="taxi">🚕 Tassista</button>` : ''}
+          <button class="btn small" data-a="tg" aria-expanded="false">Dettagli ▾</button>
+          ${st.v === 'ok' ? '' : '<span class="vdot" title="da verificare">🟡</span>'}</div>` : ''}</div>
+      <div class="stop-tools"><input class="check" type="checkbox" aria-label="Completata" ${checked ? 'checked' : ''}></div>
+      ${st ? `<div class="stop-det" hidden></div>` : ''}`;
+    if (checked) row.classList.add('done');
+    row.querySelector('.check').addEventListener('change', e => {
+      state.completed[key] = e.target.checked; saveState();
+      row.classList.toggle('done', e.target.checked);
+      renderToday();
+    });
+    if (st) {
+      const det = row.querySelector('.stop-det'), tg = row.querySelector('[data-a="tg"]');
+      const fill = () => {
+        det.innerHTML = detHTML(day, i);
+        const on = (a, fn) => { const b = det.querySelector(`[data-a="${a}"]`); if (b) b.onclick = fn; };
+        on('taxi', () => showPlaceCard(stopCardData(day, i)));
+        on('ed', () => stopCardData(day, i).onEdit());
+        on('hotel', () => showPlaceCard(hotelCardData(st.h || DIARY[day.day].sleep)));
+        on('guide', () => openGuideByTitle(st.guide));
+      };
+      const setOpen = open => { det.hidden = !open; tg.setAttribute('aria-expanded', open); tg.textContent = open ? 'Chiudi ▴' : 'Dettagli ▾'; if (open) { fill(); detOpen.add(key); } else detOpen.delete(key); };
+      tg.addEventListener('click', () => setOpen(det.hidden));
+      const tx = row.querySelector('.stop-pills [data-a="taxi"]');
+      if (tx) tx.addEventListener('click', () => showPlaceCard(stopCardData(day, i)));
+      if (detOpen.has(key)) setOpen(true);
+    }
+    timeline.appendChild(row);
+  });
+
+  const ta = section.querySelector('textarea');
+  ta.value = state.notes[day.day] || '';
+  let timer;
+  const flush = () => { clearTimeout(timer); state.notes[day.day] = ta.value; saveState(); };
+  ta.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(flush, 400); });
+  ta.addEventListener('blur', flush);
+  target.appendChild(section);
+}
+function renderItinerary() { const wrap = $('fullItinerary'); wrap.innerHTML = ''; trip.days.forEach(d => renderDay(d, wrap)); }
+
+/* ====================== AUDIOGUIDA ====================== */
+const guide = { city: 'all', tag: 'all', q: '', favOnly: false };
+guide.city = todayGuideCity() || 'all';
+const TAGS = { influencer: '📸 Influencer', local: '🔸 Local' };
+const tagLabel = t => (t && TAGS[t]) || '🎧 Classica';
+const stopKey = (city, stop) => `${city}|${stop.title}`;
+const hanziOf = native => (String(native).match(new RegExp('[' + SCRIPT_CLS + ']+', 'g')) || []).join(' ');
+const allStops = () => companionData.flatMap(c => c.stops.map(s => ({ city: c.name, stop: s })));
+
+/* Sintesi vocale a pezzi (le frasi lunghe si interrompono su alcuni telefoni) */
+const speech = { btn: null, token: 0 };
+function stopSpeech() {
+  speech.token++;
+  if ('speechSynthesis' in window) speechSynthesis.cancel();
+  if (speech.btn) { speech.btn.textContent = speech.btn.dataset.label || speech.btn.textContent; speech.btn = null; }
+}
+function pickVoice(lang2) {
+  const vs = speechSynthesis.getVoices().filter(v => v.lang.replace('_', '-').toLowerCase().startsWith(lang2));
+  return vs.find(v => /Siri|Premium|Migliorata|Enhanced/i.test(v.name)) || vs[0];
+}
+function speak(text, lang, btn, rate) {
+  if (!('speechSynthesis' in window)) { toast('Voce non supportata'); return; }
+  const same = !!btn && speech.btn === btn;
+  stopSpeech();
+  if (same) return; // secondo tocco = stop
+  const token = speech.token;
+  const sentences = text.match(/[^.!?。！？]+[.!?。！？]*\s*/g) || [text];
+  const parts = []; let cur = '';
+  sentences.forEach(s => { if (cur && (cur + s).length > 220) { parts.push(cur); cur = s; } else cur += s; });
+  if (cur) parts.push(cur);
+  if (btn) { btn.textContent = '⏹️ Ferma'; speech.btn = btn; }
+  const voice = pickVoice(lang.slice(0, 2).toLowerCase());
+  parts.forEach((p, i) => {
+    const u = new SpeechSynthesisUtterance(p.trim());
+    u.lang = lang; u.rate = rate; if (voice) u.voice = voice;
+    if (i === parts.length - 1) u.onend = u.onerror = () => { if (speech.token === token) stopSpeech(); };
+    speechSynthesis.speak(u);
+  });
+}
+
+function todayGuideCity() {
+  const names = companionData.map(c => c.name);
+  for (let i = tripDayIndex(); i < trip.days.length; i++) {
+    const hit = trip.days[i].city.split('→').map(s => s.trim()).find(p => names.includes(p));
+    if (hit) return hit;
+  }
+  return null;
+}
+const tripStarted = () => destToday() >= dayISO(trip.days[0]);
+
+function filteredStops() {
+  const q = guide.q.trim().toLowerCase();
+  return allStops().filter(({ city, stop }) => {
+    if (guide.city !== 'all' && city !== guide.city) return false;
+    if (guide.tag === 'classic') { if (stop.tag) return false; }
+    else if (guide.tag !== 'all' && stop.tag !== guide.tag) return false;
+    if (guide.favOnly && !state.favs[stopKey(city, stop)]) return false;
+    if (q && !`${stop.title} ${stop.native} ${city} ${stop.text}`.toLowerCase().includes(q)) return false;
+    return true;
+  });
+}
+
+function renderGuideControls() {
+  const mk = (label, on, fn) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'chip-btn' + (on ? ' on' : ''); b.textContent = label;
+    b.addEventListener('click', fn); return b;
+  };
+  const rowC = $('guideCities'); rowC.innerHTML = '';
+  rowC.appendChild(mk('Tutte', guide.city === 'all', () => { guide.city = 'all'; refreshGuide(); }));
+  const today = todayGuideCity();
+  if (today) rowC.appendChild(mk(tripStarted() ? '📍 Oggi' : '📍 Prima tappa', guide.city === today, () => { guide.city = today; refreshGuide(); }));
+  companionData.forEach(c => rowC.appendChild(mk(`${c.name} (${c.stops.length})`, guide.city === c.name, () => { guide.city = c.name; refreshGuide(); })));
+  const rowT = $('guideTags'); rowT.innerHTML = '';
+  [['all', 'Tutti i tipi'], ['influencer', TAGS.influencer], ['local', TAGS.local], ['classic', '🎧 Classiche']]
+    .forEach(([k, l]) => rowT.appendChild(mk(l, guide.tag === k, () => { guide.tag = k; refreshGuide(); })));
+  rowT.appendChild(mk('⭐ Preferiti', guide.favOnly, () => { guide.favOnly = !guide.favOnly; refreshGuide(); }));
+}
+function refreshGuide() { stopSpeech(); renderGuideControls(); renderCompanion(); }
+
+function renderCompanion() {
+  const wrap = $('companionGrid'); wrap.innerHTML = '';
+  const list = filteredStops();
+  $('guideCount').textContent = `${list.length} ${list.length === 1 ? 'tappa' : 'tappe'} su ${allStops().length}`;
+  if (!list.length) { wrap.innerHTML = '<div class="utility-card note-line">Nessuna tappa con questi filtri.</div>'; return; }
+
+  list.forEach(({ city, stop }, i) => {
+    const key = stopKey(city, stop);
+    let intro = stop.text.split('. ')[0] + '.';
+    if (intro.length > 130) intro = intro.slice(0, 127) + '...';
+    const card = document.createElement('div'); card.className = 'companion-card';
+    card.innerHTML = `<div style="display:flex; justify-content:space-between; gap:8px;">
+        <div style="min-width:0;"><div class="city-name">${esc(stop.title)}</div>
+        <div class="companion-meta" style="margin-top:6px;">${esc(city)} · ${esc(L(stop.native).replace(/^[\s·]+/,''))}</div></div>
+        <button class="del-btn fav" type="button" style="color:var(--warn); font-size:22px;" aria-label="Preferito">${state.favs[key] ? '★' : '☆'}</button>
+      </div>
+      <div class="chip-row"><span class="chip">${esc(tagLabel(stop.tag))}</span></div>
+      <p style="font-size:14px; color:var(--muted); line-height:1.5; margin-top:12px;">${esc(intro)}</p>
+      <div style="display:flex; gap:10px; margin-top:16px;">
+        <button class="btn small primary read-btn" type="button">📖 Leggi tutto</button>
+        <button class="btn small ghost listen-btn" type="button" data-label="🔊 Ascolta">🔊 Ascolta</button>
+      </div>`;
+    card.querySelector('.read-btn').addEventListener('click', () => openStop(list, i));
+    card.querySelector('.listen-btn').addEventListener('click', e => speak(stop.text, 'it-IT', e.currentTarget, Number(state.ttsRate) || 0.95));
+    card.querySelector('.fav').addEventListener('click', e => {
+      if (state.favs[key]) delete state.favs[key]; else state.favs[key] = true;
+      saveState();
+      if (guide.favOnly) refreshGuide(); else e.currentTarget.textContent = state.favs[key] ? '★' : '☆';
+    });
+    wrap.appendChild(card);
+  });
+}
+
+function openGuideByTitle(title) {
+  const list = allStops(), i = list.findIndex(x => x.stop.title === title);
+  if (i < 0) { toast('Guida non trovata'); return; }
+  openStop(list, i);
+}
+function openStop(list, i) {
+  stopSpeech();
+  const { city, stop } = list[i];
+  const key = stopKey(city, stop);
+  const hanzi = hanziOf(stop.native);
+  const section = (title, content) => {
+    if (!content || (Array.isArray(content) && !content.length)) return '';
+    const body = Array.isArray(content)
+      ? `<ul style="padding-left:20px; color:var(--muted); line-height:1.5;">${content.map(li => `<li style="margin-bottom:6px;">${esc(li)}</li>`).join('')}</ul>`
+      : `<p style="color:var(--muted); line-height:1.5; font-size:15px;">${esc(content)}</p>`;
+    return `<h4 style="margin-top:24px; font-size:16px; color:var(--accent-2);">${esc(title)}</h4>${body}`;
+  };
+  const box = document.createElement('div');
+  box.innerHTML = `
+    <div class="note-line" style="margin-bottom:10px;">${esc(city)} · ${esc(L(stop.native).replace(/^[\s·]+/,''))} · ${esc(tagLabel(stop.tag))}</div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;">
+      <button class="btn small primary m-listen" type="button" data-label="🔊 Ascolta">🔊 Ascolta</button>
+      ${hanzi ? '<button class="btn small m-taxi" type="button">🚕 Mostra al tassista</button>' : ''}
+      <a class="btn small" href="${appleMaps(`${stop.title}, ${city}, ${meta.country}`)}">🧭 Mappa</a>
+      <button class="btn small m-fav" type="button">${state.favs[key] ? '★ Preferito' : '☆ Preferito'}</button>
+    </div>
+    <p style="font-size:16px; line-height:1.6; color:var(--text);">${esc(stop.text)}</p>
+    ${section('Curiosità', stop.curiosita)}
+    ${section('Tradizioni & Eventi', stop.tradizioni)}
+    ${section('Oggi', stop.oggi)}
+    ${section('Particolarità', stop.particolarita)}
+    ${section('📷 Cosa osservare sul posto', stop.osservare)}
+    ${section('📸 La foto perfetta', stop.foto)}
+    ${section('🗣 Una parola cinese', stop.parola)}
+    <div class="grid-2" style="margin-top:28px;">
+      <button class="btn m-prev" type="button" ${i === 0 ? 'disabled' : ''}>← Precedente</button>
+      <button class="btn m-next" type="button" ${i === list.length - 1 ? 'disabled' : ''}>Successiva →</button>
+    </div>`;
+  box.querySelector('.m-listen').addEventListener('click', e => speak(stop.text, 'it-IT', e.currentTarget, Number(state.ttsRate) || 0.95));
+  const taxi = box.querySelector('.m-taxi');
+  if (taxi) taxi.addEventListener('click', () => { stopSpeech(); showBig('Mostra all\'autista', hanzi, 'Mi porti qui, per favore.', '🚕'); });
+  box.querySelector('.m-fav').addEventListener('click', e => {
+    if (state.favs[key]) delete state.favs[key]; else state.favs[key] = true;
+    saveState(); e.currentTarget.textContent = state.favs[key] ? '★ Preferito' : '☆ Preferito';
+    if (!guide.favOnly) renderCompanion();
+  });
+  box.querySelector('.m-prev').addEventListener('click', () => openStop(list, i - 1));
+  box.querySelector('.m-next').addEventListener('click', () => openStop(list, i + 1));
+  $('modalTitle').textContent = stop.title;
+  $('modalBody').replaceChildren(box);
+  $('modal').classList.add('open');
+  const card = document.querySelector('.modal-card'); if (card) card.scrollTop = 0;
+}
+
+function renderTodayGuides() {
+  const box = $('todayGuides'); box.innerHTML = '';
+  const city = todayGuideCity(); if (!city) return;
+  const list = allStops().filter(x => x.city === city);
+  const card = document.createElement('div'); card.className = 'utility-card';
+  card.innerHTML = `<div class="companion-meta">${tripStarted() ? 'Oggi' : 'Prima tappa'} · ${esc(city)}</div><div class="chip-row" style="margin-top:6px;"></div>`;
+  const row = card.querySelector('.chip-row');
+  list.forEach((x, i) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'chip-btn'; b.textContent = x.stop.title;
+    b.addEventListener('click', () => openStop(list, i)); row.appendChild(b);
+  });
+  box.appendChild(card);
+}
+
+/* ====================== CHECKLIST ====================== */
+function renderChecklist() {
+  const box = $('checklistBox'); box.innerHTML = '';
+  let total = 0, done = 0;
+  const groups = checklistData.map(g => ({ group: g.group, items: g.items.map(([id, label]) => ({ id, label, custom: false })) }));
+  if (state.checkCustom.length) groups.push({ group: 'I miei elementi', items: state.checkCustom.map(c => ({ id: c.id, label: c.label, custom: true })) });
+
+  groups.forEach(g => {
+    const h = document.createElement('div'); h.className = 'sub-title'; h.textContent = g.group; box.appendChild(h);
+    g.items.forEach(it => {
+      total++;
+      const on = !!state.checklist[it.id]; if (on) done++;
+      const row = document.createElement('label'); row.className = 'check-item' + (on ? ' done' : '');
+      row.innerHTML = `<input type="checkbox" class="check" ${on ? 'checked' : ''}><span style="flex:1">${esc(it.label)}</span>${it.custom ? '<button class="del-btn" type="button" aria-label="Elimina">✕</button>' : ''}`;
+      row.querySelector('input').addEventListener('change', e => { state.checklist[it.id] = e.target.checked; saveState(); renderChecklist(); });
+      const del = row.querySelector('.del-btn');
+      if (del) del.addEventListener('click', e => {
+        e.preventDefault(); e.stopPropagation();
+        state.checkCustom = state.checkCustom.filter(c => c.id !== it.id); delete state.checklist[it.id];
+        saveState(); renderChecklist();
+      });
+      box.appendChild(row);
+    });
+  });
+  $('checkProgress').textContent = `${done}/${total}`;
+}
+
+/* ====================== FRASI ====================== */
+function speakZh(text) { speak(text.replace(/…/g, ''), meta.tts, null, 0.85); }
+function renderPhrases(filter) {
+  const box = $('phrasesBox'); box.innerHTML = '';
+  const q = (filter || '').trim().toLowerCase();
+  const list = phrases.filter(p => !q || p[1].toLowerCase().includes(q) || p[3].toLowerCase().includes(q) || p[2].includes(q) || p[0].toLowerCase().includes(q));
+  if (!list.length) { box.innerHTML = '<p class="note-line" style="margin-top:12px;">Nessuna frase trovata.</p>'; return; }
+  let last = '';
+  list.forEach(p => {
+    if (p[0] !== last) { last = p[0]; const h = document.createElement('div'); h.className = 'phrase-cat'; h.textContent = p[0]; box.appendChild(h); }
+    const row = document.createElement('div'); row.className = 'phrase';
+    row.innerHTML = `<div><div class="it">${esc(p[1])}</div><div class="zh">${esc(p[2])}</div><div class="py">${esc(p[3])}</div></div>
+      <div class="acts"><button class="btn small" type="button">Mostra</button><button class="btn small ghost" type="button" aria-label="Ascolta">🔊</button></div>`;
+    const [show, say] = row.querySelectorAll('button');
+    show.addEventListener('click', () => showBig(p[1], p[2], p[3]));
+    say.addEventListener('click', () => speakZh(p[2]));
+    box.appendChild(row);
+  });
+}
+
+/* ====================== METEO ====================== */
+const WX_KEY = meta.wxKey;
+const wxCities = meta.weather;
+const wxIcon = c => c === 0 ? '☀️' : c <= 2 ? '🌤️' : c === 3 ? '☁️' : c <= 48 ? '🌫️' : c <= 57 ? '🌦️' : c <= 67 ? '🌧️' : c <= 77 ? '❄️' : c <= 82 ? '🌧️' : c <= 86 ? '❄️' : '⛈️';
+
+const wxHistRange = () => { const sh = d => { const x = new Date(d); x.setUTCFullYear(x.getUTCFullYear() - 1); return x.toISOString().slice(0, 10); }; const a = new Date(trip.start + 'T00:00:00Z'), b = new Date(trip.end + 'T00:00:00Z'); a.setUTCDate(a.getUTCDate() - 2); b.setUTCDate(b.getUTCDate() + 1); return [sh(a), sh(b)]; };
+const wxCityOf = day => (day.city.split('→').map(x => x.trim()).filter(x => wxCities[x]).pop()) || null;
+/* previsione (o clima tipico) di una città in una data ISO */
+function wxFor(city, iso) {
+  const c = readWxCache(), w = c && c.data && c.data[city]; if (!w) return null;
+  const i = w.daily ? w.daily.time.indexOf(iso) : -1;
+  if (i >= 0) return { kind: 'fc', code: w.daily.weather_code[i], min: w.daily.temperature_2m_min[i], max: w.daily.temperature_2m_max[i], pop: w.daily.precipitation_probability_max?.[i], w };
+  const h = w.hist && w.hist[iso.slice(5)];
+  if (h) return { kind: 'hist', code: h.code, min: h.min, max: h.max, rain: h.rain, w };
+  return null;
+}
+const wxText = f => `${wxIcon(f.code)} ${Math.round(f.min)}°–${Math.round(f.max)}°${f.kind === 'fc' ? (f.pop != null ? ' · 💧' + f.pop + '%' : '') + ' · previsione' : ' · tipico (anno scorso)'}`;
+function renderDayWeather() {
+  document.querySelectorAll('[data-wxday]').forEach(el => {
+    const day = trip.days.find(d => d.day === Number(el.dataset.wxday)); if (!day) return;
+    const city = wxCityOf(day), f = city && wxFor(city, dayISO(day));
+    el.textContent = f ? wxText(f) : '';
+  });
+}
+function renderHomeWeather() {
+  const box = $('todayWeather'); if (!box) return;
+  const today = destToday();
+  let day = trip.days.find(d => dayISO(d) === today && wxCityOf(d));
+  let note = 'oggi';
+  if (!day) { day = trip.days.find(d => dayISO(d) > today && wxCityOf(d)); note = day ? 'primo giorno in ' + meta.countryIt + ' · ' + day.date : ''; }
+  if (!day) { box.innerHTML = ''; return; }
+  const city = wxCityOf(day), f = wxFor(city, dayISO(day));
+  if (!f) { box.innerHTML = `<div class="utility-card"><b>⛅ Meteo · ${esc(city)}</b><p class="note-line" style="margin:6px 0 0;">Nessun dato salvato: si aggiorna da solo quando c'è connessione.</p></div>`; return; }
+  let slots = '';
+  if (f.kind === 'fc' && f.w.hourly) {
+    const iso = dayISO(day), H = f.w.hourly;
+    slots = '<div class="wx-slots">' + [[6, 12, 'Mattina'], [12, 18, 'Pomeriggio'], [18, 24, 'Sera']].map(([a, b, l]) => {
+      const ix = []; H.time.forEach((t, i) => { if (t.startsWith(iso)) { const hh = Number(t.slice(11, 13)); if (hh >= a && hh < b) ix.push(i); } });
+      if (!ix.length) return '';
+      const temps = ix.map(i => H.temperature_2m[i]), pop = Math.max(...ix.map(i => H.precipitation_probability[i] || 0));
+      const code = H.weather_code[ix[Math.floor(ix.length / 2)]];
+      return `<div class="wx-slot"><b>${l}</b>${wxIcon(code)} ${Math.round(Math.min(...temps))}°–${Math.round(Math.max(...temps))}°<br>💧${pop}%</div>`;
+    }).join('') + '</div>';
+  }
+  box.innerHTML = `<div class="utility-card"><div class="wc-head" style="margin-bottom:0"><strong>⛅ ${esc(city)} · ${esc(note)}</strong><span>${esc(wxText(f))}</span></div>${slots}</div>`;
+}
+function readWxCache() { try { return JSON.parse(localStorage.getItem(WX_KEY)); } catch { return null; } }
+function renderWeather() {
+  renderHomeWeather(); renderDayWeather();
+  const box = $('weatherBox'), stamp = $('wxStamp');
+  const cache = readWxCache();
+  if (!cache) { stamp.textContent = ''; box.innerHTML = '<p class="note-line">Nessun dato salvato. Tocca "Aggiorna meteo" con la connessione attiva.</p>'; return; }
+  stamp.textContent = 'Aggiornato: ' + new Date(cache.ts).toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'short' });
+  box.innerHTML = '';
+  trip.cities.forEach(city => {
+    const w = cache.data[city.name]; if (!w || !w.daily) return;
+    const dates = city.days.map(n => dayISO(trip.days.find(d => d.day === n)));
+    let idxs = dates.map(dt => w.daily.time.indexOf(dt)).filter(i => i >= 0);
+    let note = 'Giorni del soggiorno';
+    if (!idxs.length) { idxs = [0, 1, 2]; note = 'Prossimi giorni: il soggiorno non è ancora coperto dalle previsioni'; }
+    const cur = w.current ? `ora ${Math.round(w.current.temperature_2m)}° ${wxIcon(w.current.weather_code)}` : '';
+    const chips = idxs.map(i => {
+      const t = w.daily.time[i];
+      const p = w.daily.precipitation_probability_max?.[i];
+      return `<div class="wx-day"><b>${esc(t.slice(8, 10))}/${esc(t.slice(5, 7))}</b>${wxIcon(w.daily.weather_code[i])} ${Math.round(w.daily.temperature_2m_min[i])}°/${Math.round(w.daily.temperature_2m_max[i])}°${p != null ? `<br>💧${p}%` : ''}</div>`;
+    }).join('');
+    const el = document.createElement('div'); el.className = 'weather-city';
+    el.innerHTML = `<div class="wc-head"><strong>${esc(city.name)}</strong><span>${esc(cur)}</span></div><div class="wx-days">${chips}</div><div class="note-line" style="margin-top:6px;">${esc(note)}</div>`;
+    box.appendChild(el);
+  });
+}
+async function refreshWeather(manual) {
+  const btn = $('wxRefresh'); btn.disabled = true; btn.textContent = 'Aggiorno…';
+  try {
+    const entries = await Promise.all(Object.entries(wxCities).map(async ([name, [la, lo]]) => {
+      const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${la}&longitude=${lo}&current=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&hourly=temperature_2m,weather_code,precipitation_probability&timezone=auto&forecast_days=16`);
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const j = await r.json();
+      // clima tipico: stesse date dell'anno scorso (serve solo per i giorni oltre l'orizzonte delle previsioni)
+      let hist = (readWxCache()?.data?.[name] || {}).hist || null;
+      if (!hist) {
+        try {
+          const h = await (await fetch(`https://archive-api.open-meteo.com/v1/archive?latitude=${la}&longitude=${lo}&start_date=${wxHistRange()[0]}&end_date=${wxHistRange()[1]}&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto`)).json();
+          hist = {}; h.daily.time.forEach((t, i) => { hist[t.slice(5)] = { code: h.daily.weather_code[i], max: h.daily.temperature_2m_max[i], min: h.daily.temperature_2m_min[i], rain: h.daily.precipitation_sum[i] }; });
+        } catch { hist = null; }
+      }
+      return [name, { current: j.current, daily: j.daily, hourly: j.hourly, hist }];
+    }));
+    localStorage.setItem(WX_KEY, JSON.stringify({ v: 2, ts: Date.now(), data: Object.fromEntries(entries) }));
+    renderWeather();
+  } catch (e) {
+    if (manual) alert('Meteo non raggiungibile: servono connessione e accesso al servizio. Restano i dati salvati.');
+  } finally {
+    btn.disabled = false; btn.textContent = '🔄 Aggiorna meteo';
+  }
+}
+
+/* ====================== BACKUP / OFFLINE ====================== */
+function renderBackupInfo() {
+  const el = $('backupInfo');
+  const hasData = state.expenses.length || Object.values(state.notes).some(Boolean) || state.codes.length;
+  if (!state.lastBackup) { el.textContent = hasData ? 'Nessun backup ancora: scaricane uno.' : 'Nessun backup ancora.'; return; }
+  const days = Math.floor((Date.now() - state.lastBackup) / 86400000);
+  el.textContent = `Ultimo backup: ${new Date(state.lastBackup).toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'short' })}` + (days >= 7 && hasData ? ' (più di una settimana fa)' : '');
+}
+function backupPayload() { return JSON.stringify({ app: meta.id, version: 1, exportedAt: new Date().toISOString(), state }, null, 2); }
+function setupBackup() {
+  $('bkExport').addEventListener('click', () => {
+    downloadFile(`${meta.id}-backup-${new Date().toISOString().slice(0, 10)}.json`, backupPayload(), 'application/json');
+    state.lastBackup = Date.now(); saveState(); renderBackupInfo();
+  });
+  $('bkCopy').addEventListener('click', () => { copyText(backupPayload()); state.lastBackup = Date.now(); saveState(); renderBackupInfo(); });
+  $('bkFile').addEventListener('change', e => {
+    const f = e.target.files && e.target.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try {
+        const j = JSON.parse(r.result);
+        const s = j.state || j;
+        if (typeof s !== 'object' || s === null || (s.expenses && !Array.isArray(s.expenses))) throw new Error('formato');
+        if (!confirm('Sostituire i dati attuali con quelli del backup?')) return;
+        localStorage.setItem(STATE_KEY, JSON.stringify(Object.assign(defaultState(), s)));
+        location.reload();
+      } catch { alert('File di backup non valido.'); }
+    };
+    r.readAsText(f); e.target.value = '';
+  });
+}
+function setupOffline() {
+  const el = $('offlineStatus');
+  if (!('serviceWorker' in navigator)) { el.textContent = 'Non supportata da questo browser.'; return; }
+  if (!/^https?:$/.test(location.protocol)) {
+    el.textContent = 'Non attiva: la pagina è aperta come file locale. Pubblica la cartella su un indirizzo https, aprila da lì e aggiungila alla schermata Home: da quel momento funziona anche senza rete.';
+    return;
+  }
+  navigator.serviceWorker.register('sw.js').catch(() => { el.textContent = 'Non attiva: registrazione non riuscita.'; });
+  navigator.serviceWorker.ready.then(() => { el.textContent = 'Attiva: l\'app si apre anche senza rete (dopo il primo caricamento online).'; });
+  if (navigator.storage && navigator.storage.persist) navigator.storage.persist();
+}
+
+/* ====================== NAVIGAZIONE / INIT ====================== */
+function setView(view) {
+  document.querySelectorAll('.bottom-nav button').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll(`.bottom-nav [data-view="${view}"]`).forEach(b => b.classList.add('active'));
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  $(view).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.querySelectorAll('.bottom-nav [data-view]').forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
+document.querySelectorAll('#utilNav [data-go]').forEach(b => b.addEventListener('click', () => $(b.dataset.go).scrollIntoView({ behavior: 'smooth', block: 'start' })));
+$('heroRoute').innerHTML = trip.cities.map(c => `<span class="city-pill">${esc(c.name)}</span>`).join(' → ');
+$('cityCount').textContent = trip.cities.length;
+$('dayCount').textContent = trip.days.length;
+$('closeModal').addEventListener('click', closeModal);
+$('modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+$('icsRes').addEventListener('click', exportReservationsICS);
+$('icsTr').addEventListener('click', exportTransfersICS);
+$('codeAdd').addEventListener('click', () => {
+  const t = $('codeTitle'), v = $('codeValue');
+  if (!t.value.trim() || !v.value.trim()) return;
+  state.codes.push({ id: Date.now(), title: t.value.trim(), value: v.value.trim() });
+  t.value = ''; v.value = ''; saveState(); renderCodes();
+});
+$('checkAdd').addEventListener('click', () => {
+  const i = $('checkNew'); const label = i.value.trim(); if (!label) return;
+  state.checkCustom.push({ id: 'c' + Date.now(), label }); i.value = ''; saveState(); renderChecklist();
+});
+$('guideSearch').addEventListener('input', e => { guide.q = e.target.value; stopSpeech(); renderCompanion(); });
+$('ttsRate').value = String(state.ttsRate);
+$('ttsRate').addEventListener('change', e => { state.ttsRate = Number(e.target.value); saveState(); });
+$('phraseSearch').addEventListener('input', e => renderPhrases(e.target.value));
+$('wxRefresh').addEventListener('click', () => refreshWeather(true));
+
+/* personalizzazione dal file del viaggio */
+(function () { try {
+  const base = location.origin + location.pathname.replace(/[^/]*$/, '');
+  const ic = meta.icon || {};
+  const icon192 = base + (ic['192'] || 'icon-192.png'), icon512 = base + (ic['512'] || 'icon-512.png');
+  const manifest = {
+    name: meta.title, short_name: meta.shortTitle || meta.title, description: meta.subtitle || meta.title,
+    start_url: base + 'index.html?t=' + window.TRIP_ID, scope: base, display: 'standalone', orientation: 'portrait',
+    background_color: '#000000', theme_color: meta.themeColor || '#ff3b30', lang: 'it',
+    icons: [{ src: icon192, sizes: '192x192', type: 'image/png', purpose: 'any' }, { src: icon512, sizes: '512x512', type: 'image/png', purpose: 'any' }, { src: icon512, sizes: '512x512', type: 'image/png', purpose: 'maskable' }]
+  };
+  const mf = document.querySelector('link[rel="manifest"]');
+  if (mf) mf.href = URL.createObjectURL(new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' }));
+  const ti = document.querySelector('link[rel="apple-touch-icon"]');
+  if (ti && ic.apple) ti.href = base + ic.apple;
+} catch (e) { /* manifest statico di riserva */ } })();
+document.title = meta.title;
+const _am = document.querySelector('meta[name="apple-mobile-web-app-title"]'); if (_am) _am.content = meta.title;
+$('brandLogo').textContent = meta.logo; $('brandTitle').textContent = meta.title; $('brandSub').textContent = meta.subtitle;
+$('heroTitle').innerHTML = meta.heroTitle; $('heroText').textContent = meta.heroText;
+$('sosNote').textContent = meta.emergencyNote;
+$('sosGrid').innerHTML = meta.emergency.map(e => `<div style="padding:10px; background:var(--surface-2); border-radius:12px;"><strong>${esc(e[0])}</strong><br><small>${esc(e[1])}</small></div>`).join('');
+$('sosAssist').href = 'tel:' + meta.assistance.tel; $('sosAssist').textContent = '☎ ' + meta.assistance.label;
+$('convLabel').textContent = `${meta.currency.name} (${meta.currency.symbol})`; $('curName').textContent = meta.currency.name.toLowerCase(); $('curOpt').textContent = meta.currency.symbol;
+$('rateInput').placeholder = String(meta.currency.rate);
+setupConverter(); setupExpenseForm(); setupBackup();
+renderCities(); renderItinerary(); renderGuideControls(); renderCompanion(); renderTodayGuides(); renderTransfers(); renderWallet(); renderCodes();
+renderExpenses(); renderBookingAlerts(); renderToday(); renderNextTransfer(true);
+renderChecklist(); renderPhrases(''); renderWeather(); renderBackupInfo(); updateRateUI(); updateMetrics();
+setupOffline();
+
+const wxCache = readWxCache();
+if (navigator.onLine && (!wxCache || wxCache.v !== 2 || Date.now() - wxCache.ts > 3 * 3600 * 1000)) refreshWeather(false);
+setInterval(() => { renderNextTransfer(false); renderBookingAlerts(); updateCountdown(); }, 60000);
+</script>
+</body>
+</html>
