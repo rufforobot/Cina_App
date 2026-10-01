@@ -414,7 +414,10 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
     <div class="section-title"><div><h3>✈️ Trasferimenti</h3><p>Voli e treni, con posto, binario o gate.</p></div></div>
     <div class="wallet-grid" id="transferGrid"></div>
 
-    <div class="section-title"><div><h3>🎟️ Prenotazioni</h3><p>Hotel, attrazioni e finestre di apertura.</p></div></div>
+    <div class="section-title" id="secHotel"><div><h3>🏨 Hotel</h3></div></div>
+    <div class="wallet-grid" id="hotelGrid"></div>
+
+    <div class="section-title" id="secAttr"><div><h3>🎟️ Attrazioni</h3><p>Prenotazioni e finestre di apertura.</p></div></div>
     <div class="wallet-grid" id="walletGrid"></div>
 
     <div class="section-title"><div><h3>📅 Promemoria sul calendario</h3><p>Scarica un file .ics e aprilo per aggiungere gli eventi.</p></div></div>
@@ -425,14 +428,9 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
       </div>
     </div>
 
-    <div class="section-title"><div><h3>🔑 Codici e note</h3><p>PIN, numeri di conferma, riferimenti. Restano solo su questo dispositivo.</p></div></div>
-    <div class="utility-card">
-      <div class="row-form" style="margin-top:0;">
-        <input class="field" id="codeTitle" placeholder="Titolo (es. Hotel, PIN, codice)">
-        <input class="field" id="codeValue" placeholder="Codice o testo">
-        <button class="btn primary block" id="codeAdd">Aggiungi</button>
-      </div>
-      <div id="codeList" style="margin-top:12px;"></div>
+    <div id="oldCodes" hidden>
+      <div class="section-title"><div><h3>🔑 Altri codici</h3><p>Salvati in precedenza. Ora i codici e le note si inseriscono dentro ogni prenotazione.</p></div></div>
+      <div class="utility-card"><div id="codeList"></div></div>
     </div>
   </section>
 
@@ -1004,43 +1002,66 @@ function exportTransfersICS() {
 }
 
 /* ====================== WALLET / CODICI ====================== */
+const isTransportRes = r => /treno|volo|aere|bus|traghetto/i.test(r.type);
+function resExtra(id) { state.resNotes = state.resNotes || {}; return state.resNotes[id] || (state.resNotes[id] = { note: '', codes: [] }); }
 function renderWallet() {
-  const wrap = $('walletGrid'); wrap.innerHTML = '';
-  reservations.forEach(r => {
-    const card = document.createElement('article'); card.className = 'wallet-card';
-    const isBooked = r.status.includes('✅') || state.booked[r.id];
-    card.innerHTML = `<div style="display:flex; justify-content:space-between; gap:8px; margin-bottom:12px;">
-        <div><div class="companion-meta">${esc(r.type)}</div><h4 style="margin:0; font-size:18px;">${esc(r.title)}</h4></div>
-        <span class="badge ${isBooked ? 'done' : 'warn'}">${isBooked ? 'Prenotato' : 'Da Fare'}</span>
-      </div><p style="margin:0; font-size: 15px;"><strong>Date:</strong> ${esc(r.date)}</p><p style="margin:4px 0 0; color:var(--muted); font-size: 13px;">Rif: ${esc(r.ref)}</p>`;
-    const toggle = (val) => { if (val) state.booked[r.id] = true; else delete state.booked[r.id]; saveState(); renderBookingAlerts(); renderWallet(); renderToday(); };
-    if (state.booked[r.id]) {
-      state.resCodes = state.resCodes || {};
-      const code = state.resCodes[r.id];
-      const box = document.createElement('div'); box.style.marginTop = '12px';
-      if (code) {
-        box.innerHTML = `<div class="companion-meta" style="margin:0;">N° prenotazione</div><div class="val" style="font-weight:700; word-break:break-all; margin:2px 0 8px;">${esc(code)}</div>
-          <div class="city-actions" style="margin-top:0;"><button class="btn small primary" data-q="qr">📱 Mostra QR</button><button class="btn small" data-q="ed">Modifica</button></div>`;
-        box.querySelector('[data-q="qr"]').onclick = () => showQR(r.title, code);
-        box.querySelector('[data-q="ed"]').onclick = () => { const v = prompt('Numero di prenotazione (vuoto per rimuoverlo):', code); if (v === null) return; if (v.trim()) state.resCodes[r.id] = v.trim(); else delete state.resCodes[r.id]; saveState(); renderWallet(); };
-      } else {
-        box.innerHTML = `<div class="grid-2" style="grid-template-columns:1fr auto;"><input class="field" placeholder="N° prenotazione (se c'è il QR)" aria-label="Numero prenotazione"><button class="btn">Salva</button></div>`;
-        const inp = box.querySelector('input');
-        box.querySelector('button').onclick = () => { const v = inp.value.trim(); if (!v) return; state.resCodes[r.id] = v; saveState(); renderWallet(); };
-      }
-      card.appendChild(box);
-      const b = document.createElement('button'); b.className = 'btn small'; b.style.marginTop = '12px'; b.textContent = '↩️ Non ancora prenotato';
-      b.onclick = () => toggle(false); card.appendChild(b);
-    } else if (r.status.includes('Da prenotare')) {
-      const b = document.createElement('button'); b.className = 'btn small'; b.style.marginTop = '12px'; b.textContent = '✅ Segna come prenotato';
-      b.onclick = () => toggle(true); card.appendChild(b);
-    }
-    wrap.appendChild(card);
+  const hotelWrap = $('hotelGrid'), attrWrap = $('walletGrid'); hotelWrap.innerHTML = ''; attrWrap.innerHTML = '';
+  const list = reservations.filter(r => !isTransportRes(r));
+  const hotels = list.filter(r => /hotel/i.test(r.type)), attrs = list.filter(r => !/hotel/i.test(r.type));
+  $('secHotel').hidden = hotelWrap.hidden = !hotels.length;
+  $('secAttr').hidden = attrWrap.hidden = !attrs.length;
+  hotels.forEach(r => hotelWrap.appendChild(resCard(r)));
+  attrs.forEach(r => attrWrap.appendChild(resCard(r)));
+  renderCodes();
+}
+function resCard(r) {
+  const card = document.createElement('article'); card.className = 'wallet-card';
+  const fileBooked = r.status.includes('✅'), isBooked = fileBooked || state.booked[r.id];
+  const ex = resExtra(r.id), save = () => { saveState(); renderWallet(); };
+  card.innerHTML = `<div style="display:flex; justify-content:space-between; gap:8px; margin-bottom:12px;">
+      <div><div class="companion-meta">${esc(r.type)}</div><h4 style="margin:0; font-size:18px;">${esc(r.title)}</h4></div>
+      <span class="badge ${isBooked ? 'done' : 'warn'}">${isBooked ? 'Prenotato' : 'Da Fare'}</span>
+    </div><p style="margin:0; font-size: 15px;"><strong>Date:</strong> ${esc(r.date)}</p><p style="margin:4px 0 0; color:var(--muted); font-size: 13px;">Rif: ${esc(r.ref)}</p>`;
+  const add = (el) => { card.appendChild(el); return el; };
+  const mk = (html, css) => { const d = document.createElement('div'); d.style.cssText = css || 'margin-top:12px;'; d.innerHTML = html; return d; };
+  const toggle = val => { if (val) state.booked[r.id] = true; else delete state.booked[r.id]; saveState(); renderBookingAlerts(); renderWallet(); renderToday(); };
+  state.resCodes = state.resCodes || {};
+  const num = state.resCodes[r.id];
+  /* contenuto compilato: sempre visibile fuori dalla parte espandibile */
+  if (num) {
+    const d = add(mk(`<div class="companion-meta" style="margin:0;">N° prenotazione</div><div class="val" style="font-weight:700; word-break:break-all; margin:2px 0 8px;">${esc(num)}</div><div class="city-actions" style="margin-top:0;"><button class="btn small primary" data-q="qr">📱 Mostra QR</button></div>`));
+    d.querySelector('[data-q="qr"]').onclick = () => showQR(r.title, num);
+  }
+  ex.codes.forEach(c => {
+    const d = add(mk(`<div style="min-width:0;"><div class="companion-meta" style="margin:0;">${esc(c.title)}</div><div class="val" style="word-break:break-all;">${esc(c.value)}</div></div><button class="btn small" type="button">Copia</button>`, 'margin-top:10px; display:flex; justify-content:space-between; align-items:center; gap:8px;'));
+    d.querySelector('button').onclick = () => copyText(c.value);
   });
+  if (ex.note) add(mk(`<div class="companion-meta" style="margin:0;">Note</div><div style="white-space:pre-wrap; font-size:14px;">${esc(ex.note)}</div>`));
+  /* parte espandibile per inserire / modificare */
+  const det = document.createElement('details'); det.className = 'more'; det.style.marginTop = '12px';
+  const filled = !!(num || ex.note || ex.codes.length);
+  det.innerHTML = `<summary>🔑 Codici e note${filled ? ' · modifica' : ''}</summary>
+    <div class="row-form" style="margin-top:10px;">
+      ${isBooked ? `<div class="grid-2" style="grid-template-columns:1fr auto;"><input class="field" data-f="num" placeholder="N° prenotazione (se c'è il QR)" value="${esc(num || '')}"><button class="btn" data-b="num">Salva</button></div>` : ''}
+      <div class="grid-2"><input class="field" data-f="ct" placeholder="Titolo (es. PIN)"><input class="field" data-f="cv" placeholder="Codice o testo"></div>
+      <button class="btn" data-b="code">Aggiungi codice</button>
+      <textarea class="field" data-f="note" rows="3" placeholder="Note">${esc(ex.note)}</textarea>
+      <button class="btn" data-b="note">Salva note</button>
+      ${ex.codes.length ? `<div class="chip-row">${ex.codes.map(c => `<button class="btn small" data-del="${c.id}">✕ ${esc(c.title)}</button>`).join('')}</div>` : ''}
+    </div>`;
+  const q = sel => det.querySelector(sel);
+  const nb = q('[data-b="num"]'); if (nb) nb.onclick = () => { const v = q('[data-f="num"]').value.trim(); if (v) state.resCodes[r.id] = v; else delete state.resCodes[r.id]; save(); };
+  q('[data-b="code"]').onclick = () => { const t = q('[data-f="ct"]').value.trim(), v = q('[data-f="cv"]').value.trim(); if (!v) return; ex.codes.push({ id: Date.now(), title: t || 'Codice', value: v }); save(); };
+  q('[data-b="note"]').onclick = () => { ex.note = q('[data-f="note"]').value.trim(); save(); };
+  det.querySelectorAll('[data-del]').forEach(b => b.onclick = () => { ex.codes = ex.codes.filter(c => String(c.id) !== b.dataset.del); state.resNotes[r.id].codes = ex.codes; save(); });
+  add(det);
+  if (state.booked[r.id]) { const b = add(document.createElement('button')); b.className = 'btn small'; b.style.marginTop = '12px'; b.textContent = '↩️ Non ancora prenotato'; b.onclick = () => toggle(false); }
+  else if (r.status.includes('Da prenotare')) { const b = add(document.createElement('button')); b.className = 'btn small'; b.style.marginTop = '12px'; b.textContent = '✅ Segna come prenotato'; b.onclick = () => toggle(true); }
+  return card;
 }
 function renderCodes() {
-  const box = $('codeList'); box.innerHTML = '';
-  if (!state.codes.length) { box.innerHTML = '<p class="note-line">Nessun codice salvato.</p>'; return; }
+  const sec = $('oldCodes'), box = $('codeList'); box.innerHTML = '';
+  sec.hidden = !state.codes.length;
   state.codes.forEach(c => {
     const row = document.createElement('div'); row.className = 'code-row';
     row.innerHTML = `<div style="min-width:0;"><div class="companion-meta" style="margin:0;">${esc(c.title)}</div><div class="val">${esc(c.value)}</div></div>
@@ -1575,7 +1596,7 @@ async function refreshWeather(manual) {
 /* ====================== BACKUP / OFFLINE ====================== */
 function renderBackupInfo() {
   const el = $('backupInfo');
-  const hasData = state.expenses.length || Object.values(state.notes).some(Boolean) || state.codes.length;
+  const hasData = state.expenses.length || Object.values(state.notes).some(Boolean) || state.codes.length || Object.keys(state.resNotes || {}).length;
   if (!state.lastBackup) { el.textContent = hasData ? 'Nessun backup ancora: scaricane uno.' : 'Nessun backup ancora.'; return; }
   const days = Math.floor((Date.now() - state.lastBackup) / 86400000);
   el.textContent = `Ultimo backup: ${new Date(state.lastBackup).toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'short' })}` + (days >= 7 && hasData ? ' (più di una settimana fa)' : '');
@@ -1635,12 +1656,6 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
 
 $('icsRes').addEventListener('click', exportReservationsICS);
 $('icsTr').addEventListener('click', exportTransfersICS);
-$('codeAdd').addEventListener('click', () => {
-  const t = $('codeTitle'), v = $('codeValue');
-  if (!t.value.trim() || !v.value.trim()) return;
-  state.codes.push({ id: Date.now(), title: t.value.trim(), value: v.value.trim() });
-  t.value = ''; v.value = ''; saveState(); renderCodes();
-});
 $('checkAdd').addEventListener('click', () => {
   const i = $('checkNew'); const label = i.value.trim(); if (!label) return;
   state.checkCustom.push({ id: 'c' + Date.now(), label }); i.value = ''; saveState(); renderChecklist();
