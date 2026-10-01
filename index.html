@@ -1007,7 +1007,9 @@ function resExtra(id) { state.resNotes = state.resNotes || {}; return state.resN
 function renderWallet() {
   const hotelWrap = $('hotelGrid'), attrWrap = $('walletGrid'); hotelWrap.innerHTML = ''; attrWrap.innerHTML = '';
   const list = reservations.filter(r => !isTransportRes(r));
-  const hotels = list.filter(r => /hotel/i.test(r.type)), attrs = list.filter(r => !/hotel/i.test(r.type));
+  /* gli hotel vengono da tutta la sezione "# Hotel" del viaggio, non solo dalle righe di "# Prenotazioni" */
+  const hotels = Object.keys(HOTELS).map(k => { const h = hotelInfo(k); return { id: 'hotel-' + k.toLowerCase(), type: '🏨 Hotel · ' + h.city, title: L(h.name.replace(/ \(.*$/, '').replace(/ = .*$/, '')), date: h.nights, ref: h.booking || '—', status: h.booking ? '✅ Prenotato' : '🟡 Da prenotare' }; });
+  const attrs = list.filter(r => !/hotel/i.test(r.type));
   $('secHotel').hidden = hotelWrap.hidden = !hotels.length;
   $('secAttr').hidden = attrWrap.hidden = !attrs.length;
   hotels.forEach(r => hotelWrap.appendChild(resCard(r)));
