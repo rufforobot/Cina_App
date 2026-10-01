@@ -1522,21 +1522,51 @@ function getHere() {
   });
 }
 const MAP_STYLES = {
-  chiara: { name: 'Soft', url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', att: '&copy; OpenStreetMap', max: 19, cls: 'tl-soft' },
-  minimal: { name: 'Grigia', url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', att: '&copy; OpenStreetMap', max: 19, cls: 'tl-gray' },
+  chiara: { name: 'Chiara', vec: 'https://tiles.openfreemap.org/styles/positron', mini: 'minimal' },
+  colori: { name: 'Colori', vec: 'https://tiles.openfreemap.org/styles/liberty', mini: 'soft' },
   satellite: { name: 'Satellite', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', att: 'Esri, Maxar', max: 17 },
-  osm: { name: 'Classica', url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', att: '&copy; OpenStreetMap', max: 19 }
+  osm: { name: 'Classica', url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', att: '&copy; OpenStreetMap', max: 19 },
+  soft: { url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', att: '&copy; OpenStreetMap', max: 19, cls: 'tl-soft' },
+  minimal: { url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', att: '&copy; OpenStreetMap', max: 19, cls: 'tl-gray' }
 };
+const STYLE_BTNS = ['chiara', 'colori', 'satellite', 'osm'];
+let vecP = null;
+function ensureVector() {
+  if (window.maplibregl && window.L && window.L.maplibreGL) return Promise.resolve();
+  if (vecP) return vecP;
+  const load = src => new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
+  vecP = ensureLeaflet().then(() => { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'app/maplibre/maplibre-gl.css'; document.head.appendChild(l); return load('app/maplibre/maplibre-gl.js'); })
+    .then(() => load('app/maplibre/leaflet-maplibre-gl.js')).catch(e => { vecP = null; throw e; });
+  return vecP;
+}
 const getMapStyle = () => { try { const k = localStorage.getItem('map-style'); if (MAP_STYLES[k]) return k; } catch {} return 'chiara'; };
 const setMapStyle = k => { try { localStorage.setItem('map-style', k); } catch {} };
-function addTiles(map, key) {
-  const k = key || getMapStyle(), st = MAP_STYLES[k];
-  if (map._tiles) map.removeLayer(map._tiles);
+function addTiles(map, key, small) {
+  let k = key || getMapStyle(), st = MAP_STYLES[k];
+  /* le mappe piccole (una per giorno) restano raster: troppi contesti WebGL su iPhone */
+  if (st.vec && small) { k = st.mini; st = MAP_STYLES[k]; }
+  if (map._tiles) { try { map.removeLayer(map._tiles); } catch {} map._tiles = null; }
+  if (st.vec) {
+    const token = map._tok = {};
+    let tries = 0;
+    const start = () => {
+      if (map._tok !== token) return;
+      try { map.invalidateSize(); } catch {}
+      let c = null; try { c = map.getCenter(); } catch {}
+      /* il riquadro deve avere dimensioni e centro validi (nel popup si apre con un attimo di ritardo) */
+      if (!c || !isFinite(c.lat) || !isFinite(c.lng) || !map.getSize().x) { if (++tries < 40) { setTimeout(start, 150); return; } addTiles(map, 'osm', small); return; }
+      const lay = window.L.maplibreGL({ style: st.vec, attribution: '&copy; <a href="https://openfreemap.org">OpenFreeMap</a> &copy; OpenMapTiles &copy; OpenStreetMap' });
+      map._tiles = lay; lay.addTo(map);
+      try { lay.getMaplibreMap().on('error', e => { if (e && e.error && !map._vecErr) { map._vecErr = 1; if (map._tiles === lay) addTiles(map, 'osm', small); } }); } catch {}
+    };
+    ensureVector().then(start).catch(() => { if (map._tok === token) addTiles(map, 'osm', small); });
+    return;
+  }
+  map._tok = null;
   const lay = map._tiles = window.L.tileLayer(st.url, { maxZoom: 19, maxNativeZoom: st.max, attribution: st.att, className: st.cls || '' }).addTo(map);
   lay.bringToBack();
   let errs = 0;
-  /* se lo stile non carica (blocco, chiave richiesta) si torna alla mappa classica */
-  if (k === 'satellite') lay.on('tileerror', () => { if (++errs === 4 && map._tiles === lay) addTiles(map, 'osm'); });
+  if (k === 'satellite') lay.on('tileerror', () => { if (++errs === 4 && map._tiles === lay) addTiles(map, 'osm', small); });
 }
 function loadDay(day, onProg) {
   const job = dayJobs[day.day] || (dayJobs[day.day] = { cbs: [], prom: null });
@@ -1601,10 +1631,10 @@ function loadDay(day, onProg) {
 }
 const pinIcon = n => window.L.divIcon({ className: 'dm-pin', html: `<span>${n}</span>`, iconSize: [30, 30], iconAnchor: [15, 15] });
 function drawDay(map, d, small) {
-  addTiles(map);
+  addTiles(map, null, small);
   const line = (d.here ? [d.here] : []).concat(d.found.map(p => p.ll));
   /* prima la vista, poi i livelli: Leaflet non disegna tracciati su una mappa senza centro */
-  if (line.length === 1) map.setView(line[0], 15); else map.fitBounds(line, small ? { paddingTopLeft: [26, 24], paddingBottomRight: [26, 56] } : { padding: [30, 30] });
+  if (line.length === 1 || line.every(q => Math.abs(q[0] - line[0][0]) < 1e-5 && Math.abs(q[1] - line[0][1]) < 1e-5)) map.setView(line[0], 15); else map.fitBounds(line, small ? { paddingTopLeft: [26, 24], paddingBottomRight: [26, 56] } : { padding: [30, 30] });
   if (d.here) window.L.marker(d.here, { icon: window.L.divIcon({ className: 'dm-here', html: '<span></span>', iconSize: [18, 18], iconAnchor: [9, 9] }), interactive: false }).addTo(map);
   d.found.forEach(p => { p.mk = window.L.marker(p.ll, { icon: pinIcon(p.n), interactive: !small }).addTo(map); if (!small) p.mk.bindPopup(`<b>${esc(p.title)}</b><br>${esc(p.time)}`); });
   if (d.leg1) window.L.geoJSON(d.leg1.geom, { style: { color: '#FF2D55', weight: 4, opacity: .8 } }).addTo(map);
@@ -1648,7 +1678,7 @@ async function showDayMap(day) {
   status.textContent = (d.found.length < d.pts.length ? `${d.found.length} tappe su ${d.pts.length} sulla mappa. ` : '') + ((d.found.length > 1 || d.here) ? `Percorso ${kmLabel(d)}${d.here ? ', dalla tua posizione (punto blu)' : ''}, in ordine di visita.` : '');
   const list = $('dmList'); list.innerHTML = '';
   const sw = document.createElement('div'); sw.className = 'dm-styles';
-  Object.entries(MAP_STYLES).forEach(([k, v]) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = v.name; b.className = k === getMapStyle() ? 'on' : ''; b.onclick = () => { setMapStyle(k); addTiles(map); sw.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); }; sw.appendChild(b); });
+  STYLE_BTNS.map(k => [k, MAP_STYLES[k]]).forEach(([k, v]) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = v.name; b.className = k === getMapStyle() ? 'on' : ''; b.onclick = () => { setMapStyle(k); map._vecErr = 0; addTiles(map, k); sw.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); }; sw.appendChild(b); });
   list.appendChild(sw);
   d.pts.forEach(p => {
     const row = document.createElement('button'); row.type = 'button'; row.className = 'dm-row';
