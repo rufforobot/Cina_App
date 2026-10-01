@@ -312,8 +312,12 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
 .modal-body { padding: 20px; background: transparent; }
 .modal-body p { line-height: 1.6; color: var(--text); font-size: 15px; }
 
-.day-map { margin: 14px 20px 0; }
-.day-map .btn-grid { margin-top: 0; }
+.day-map { position: relative; margin: 14px 0 0; height: 170px; border-top: 0.5px solid var(--glass-border); border-bottom: 0.5px solid var(--glass-border); background: var(--glass); overflow: hidden; cursor: pointer; }
+.dm-mini { position: absolute; inset: 0; }
+.dm-chip { position: absolute; left: 12px; bottom: 12px; z-index: 500; padding: 6px 12px; border-radius: 999px; font-size: 13px; font-weight: 600; background: var(--glass-strong); border: 0.5px solid var(--glass-border); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: var(--shadow); }
+.day-map:not(.ready) { display: flex; align-items: center; justify-content: center; }
+.day-map:not(.ready) .dm-chip { position: static; }
+.day-map .leaflet-control-attribution { font-size: 9px; opacity: .8; }
 #dmMap { height: 46vh; min-height: 280px; border-radius: 18px; overflow: hidden; border: 0.5px solid var(--glass-border); }
 #dmList { margin-top: 12px; }
 .dm-row { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; border: none; background: none; color: var(--text); padding: 10px 0; border-top: 0.5px solid var(--glass-border); font: inherit; }
@@ -1324,9 +1328,10 @@ function isCheckinDay(day, hk) {
   return !first || first.day === day.day;
 }
 /* ====================== MAPPA DEL GIORNO ====================== */
-const GEO_KEY = (meta.id || 'trip') + '-geo';
-const geoCache = (() => { try { return JSON.parse(localStorage.getItem(GEO_KEY)) || {}; } catch { return {}; } })();
-const saveGeo = () => { try { localStorage.setItem(GEO_KEY, JSON.stringify(geoCache)); } catch {} };
+const GEO_KEY = (meta.id || 'trip') + '-geo', ROUTE_KEY = (meta.id || 'trip') + '-route';
+const readLS = k => { try { return JSON.parse(localStorage.getItem(k)) || {}; } catch { return {}; } };
+const geoCache = readLS(GEO_KEY), routeCache = readLS(ROUTE_KEY);
+const saveLS = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
 let leafletP = null, dayMap = null;
 function ensureLeaflet() {
   if (window.L && window.L.map) return Promise.resolve();
@@ -1338,12 +1343,19 @@ function ensureLeaflet() {
   return leafletP;
 }
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-async function geocodeOne(q) {
-  if (q in geoCache) return geoCache[q];
-  const r = await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=' + encodeURIComponent(q), { headers: { 'Accept-Language': 'en' } });
-  const j = await r.json();
-  geoCache[q] = j && j[0] ? [+j[0].lat, +j[0].lon] : null; saveGeo();
-  return geoCache[q];
+let geoQueue = Promise.resolve();
+function geocodeOne(q) {
+  if (q in geoCache) return Promise.resolve(geoCache[q]);
+  const job = geoQueue.then(async () => {
+    if (q in geoCache) return geoCache[q];
+    const r = await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=' + encodeURIComponent(q), { headers: { 'Accept-Language': 'en' } });
+    const j = await r.json();
+    geoCache[q] = j && j[0] ? [+j[0].lat, +j[0].lon] : null; saveLS(GEO_KEY, geoCache);
+    await sleep(1100);
+    return geoCache[q];
+  });
+  geoQueue = job.catch(() => {});
+  return job;
 }
 function dayPoints(day) {
   const city = String(day.city).includes('→') ? '' : day.city + ', ';
@@ -1352,68 +1364,103 @@ function dayPoints(day) {
     const st = day.det && day.det[i]; if (!st) return;
     const p = placeInfo(day, i);
     if (!stopMapQ(day, st, p)) return;
-    const title = L(s[1]);
     const cands = [st.map, `${L(st.title)}, ${city}${meta.country}`, p.zh, p.addr].filter(Boolean);
-    out.push({ i, time: s[0], title, cands });
+    out.push({ i, time: s[0], title: L(s[1]), cands });
   });
   return out;
 }
 const kmBetween = (a, b) => { const R = 6371, d = Math.PI / 180, dl = (b[0] - a[0]) * d, dn = (b[1] - a[1]) * d, x = Math.sin(dl / 2) ** 2 + Math.cos(a[0] * d) * Math.cos(b[0] * d) * Math.sin(dn / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(x)); };
-async function showDayMap(day) {
-  const pts = dayPoints(day);
-  openModal(`Giorno ${day.day} · ${day.city}`, `<div id="dmWrap"><p class="note-line" id="dmStatus" style="margin:0 0 10px;">Carico la mappa…</p><div id="dmMap"></div><div id="dmList"></div></div>`);
-  const status = $('dmStatus');
-  try { await ensureLeaflet(); } catch { status.textContent = 'Mappa non disponibile: serve internet la prima volta.'; return; }
-  if (dayMap) { try { dayMap.remove(); } catch {} dayMap = null; }
-  const map = dayMap = window.L.map('dmMap', { zoomControl: true, attributionControl: true });
-  window.L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }).addTo(map);
-  map.setView([30, 110], 4);
-  const done = [];
-  for (let k = 0; k < pts.length; k++) {
-    if (dayMap !== map) return;
-    status.textContent = `Cerco le posizioni ${k + 1}/${pts.length}…`;
-    let ll = null;
-    for (const q of pts[k].cands) {
-      const cached = q in geoCache;
-      try { ll = await geocodeOne(q); } catch { ll = null; }
-      if (!cached) await sleep(1100);
-      if (ll) break;
+const fmtKm = km => (km < 10 ? km.toFixed(1) : String(Math.round(km))).replace('.', ',') + ' km';
+/* posizioni + percorso di un giorno, calcolati una volta sola e poi riusati */
+const dayJobs = {};
+function loadDay(day, onProg) {
+  const job = dayJobs[day.day] || (dayJobs[day.day] = { cbs: [], prom: null });
+  if (onProg) job.cbs.push(onProg);
+  if (job.prom) return job.prom;
+  const say = t => job.cbs.forEach(f => f(t));
+  job.prom = (async () => {
+    const pts = dayPoints(day);
+    for (let k = 0; k < pts.length; k++) {
+      say(`Cerco le posizioni ${k + 1}/${pts.length}…`);
+      let ll = null;
+      for (const q of pts[k].cands) {
+        const cached = q in geoCache;
+        try { ll = await geocodeOne(q); } catch { ll = null; if (!cached) throw new Error('rete'); }
+        if (ll) break;
+      }
+      pts[k].ll = ll;
     }
-    pts[k].ll = ll;
-  }
-  /* scarta i risultati lontani dagli altri (omonimi in altre città) */
-  const ok = pts.filter(p => p.ll);
-  if (ok.length > 2) {
-    const lat = ok.map(p => p.ll[0]).sort((a, b) => a - b)[ok.length >> 1], lon = ok.map(p => p.ll[1]).sort((a, b) => a - b)[ok.length >> 1];
-    ok.forEach(p => { if (kmBetween([lat, lon], p.ll) > 80) p.ll = null; });
-  }
-  const found = pts.filter(p => p.ll);
-  const list = $('dmList'); if (!list) return;
-  if (!found.length) { status.textContent = 'Non riesco a trovare le posizioni: controlla la connessione.'; return; }
-  const bounds = [];
-  found.forEach((p, n) => {
-    p.n = n + 1; bounds.push(p.ll);
-    p.mk = window.L.marker(p.ll, { icon: window.L.divIcon({ className: 'dm-pin', html: `<span>${p.n}</span>`, iconSize: [30, 30], iconAnchor: [15, 15] }) }).addTo(map).bindPopup(`<b>${esc(p.title)}</b><br>${esc(p.time)}`);
-  });
-  if (found.length === 1) map.setView(found[0].ll, 15); else map.fitBounds(bounds, { padding: [30, 30] });
-  setTimeout(() => map.invalidateSize(), 50);
-  status.textContent = found.length < pts.length ? `${found.length} tappe su ${pts.length} sulla mappa. Percorso indicativo.` : 'Percorso indicativo, in ordine di visita.';
-  /* percorso: OSRM se disponibile, altrimenti linea tratteggiata */
-  const line = found.map(p => p.ll);
-  let drawn = false;
-  if (found.length > 1) {
+    const ok = pts.filter(p => p.ll);
+    if (ok.length > 2) {
+      const lat = ok.map(p => p.ll[0]).sort((a, b) => a - b)[ok.length >> 1], lon = ok.map(p => p.ll[1]).sort((a, b) => a - b)[ok.length >> 1];
+      ok.forEach(p => { if (kmBetween([lat, lon], p.ll) > 80) p.ll = null; });
+    }
+    const found = pts.filter(p => p.ll); found.forEach((p, n) => p.n = n + 1);
+    const res = { pts, found, geom: null, km: 0, exact: false };
+    if (found.length > 1) {
+      const key = found.map(p => p.ll[1].toFixed(5) + ',' + p.ll[0].toFixed(5)).join(';');
+      let r = routeCache[key];
+      if (!r) {
+        try {
+          const j = await (await fetch('https://router.project-osrm.org/route/v1/driving/' + key + '?overview=full&geometries=geojson')).json();
+          if (j.routes && j.routes[0]) { r = { geom: j.routes[0].geometry, km: j.routes[0].distance / 1000 }; routeCache[key] = r; saveLS(ROUTE_KEY, routeCache); }
+        } catch {}
+      }
+      if (r) { res.geom = r.geom; res.km = r.km; res.exact = true; }
+      else for (let k = 1; k < found.length; k++) res.km += kmBetween(found[k - 1].ll, found[k].ll);
+    }
+    return res;
+  })();
+  job.prom.catch(() => { job.prom = null; });
+  return job.prom;
+}
+const pinIcon = n => window.L.divIcon({ className: 'dm-pin', html: `<span>${n}</span>`, iconSize: [30, 30], iconAnchor: [15, 15] });
+function drawDay(map, d, small) {
+  window.L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }).addTo(map);
+  d.found.forEach(p => { p.mk = window.L.marker(p.ll, { icon: pinIcon(p.n), interactive: !small }).addTo(map); if (!small) p.mk.bindPopup(`<b>${esc(p.title)}</b><br>${esc(p.time)}`); });
+  if (d.geom) window.L.geoJSON(d.geom, { style: { color: '#007aff', weight: 4, opacity: .8 } }).addTo(map);
+  else if (d.found.length > 1) window.L.polyline(d.found.map(p => p.ll), { color: '#007aff', weight: 3, opacity: .8, dashArray: '6 8' }).addTo(map);
+  if (d.found.length === 1) map.setView(d.found[0].ll, 15); else map.fitBounds(d.found.map(p => p.ll), { padding: [small ? 22 : 30, small ? 22 : 30] });
+}
+const kmLabel = d => d.found.length > 1 ? `${fmtKm(d.km)}${d.exact ? '' : ' in linea d\'aria'}` : '';
+function initMini(day, host) {
+  const box = host.querySelector('.dm-mini'), chip = host.querySelector('.dm-chip');
+  const load = async () => {
+    chip.textContent = 'Carico la mappa…';
     try {
-      const r = await fetch('https://router.project-osrm.org/route/v1/driving/' + found.map(p => p.ll[1] + ',' + p.ll[0]).join(';') + '?overview=full&geometries=geojson');
-      const j = await r.json();
-      if (j.routes && j.routes[0] && dayMap === map) { window.L.geoJSON(j.routes[0].geometry, { style: { color: '#007aff', weight: 4, opacity: .8 } }).addTo(map); drawn = true; }
-    } catch {}
-    if (!drawn && dayMap === map) window.L.polyline(line, { color: '#007aff', weight: 3, opacity: .8, dashArray: '6 8' }).addTo(map);
-  }
-  list.innerHTML = '';
-  pts.forEach(p => {
+      await ensureLeaflet();
+      const d = await loadDay(day);
+      if (!d.found.length) throw new Error('vuota');
+      box.innerHTML = '';
+      const map = window.L.map(box, { zoomControl: false, dragging: false, touchZoom: false, scrollWheelZoom: false, doubleClickZoom: false, boxZoom: false, keyboard: false, tap: false, attributionControl: true });
+      map.attributionControl.setPrefix('');
+      drawDay(map, d, true);
+      chip.textContent = `${d.found.length} tappe${d.found.length > 1 ? ' · ' + kmLabel(d) : ''}`;
+      host.classList.add('ready');
+    } catch { chip.textContent = 'Mappa disponibile con internet · tocca per riprovare'; host.classList.remove('ready'); host._failed = true; }
+  };
+  host._load = load;
+  const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); load(); } }, { rootMargin: '300px' });
+  io.observe(host);
+  host.addEventListener('click', () => { if (host._failed) { host._failed = false; load(); } else showDayMap(day); });
+}
+async function showDayMap(day) {
+  openModal(`Giorno ${day.day} · ${day.city}`, `<div><p class="note-line" id="dmStatus" style="margin:0 0 10px;">Carico la mappa…</p><div id="dmMap"></div><div id="dmList"></div></div>`);
+  const status = $('dmStatus');
+  let d;
+  try { await ensureLeaflet(); d = await loadDay(day, t => { if ($('dmStatus')) $('dmStatus').textContent = t; }); } catch { status.textContent = 'Mappa non disponibile: serve internet.'; return; }
+  if (!$('dmMap')) return;
+  if (!d.found.length) { status.textContent = 'Non riesco a trovare le posizioni.'; return; }
+  if (dayMap) { try { dayMap.remove(); } catch {} }
+  const map = dayMap = window.L.map('dmMap', { zoomControl: true, attributionControl: true });
+  drawDay(map, d, false);
+  setTimeout(() => map.invalidateSize(), 60);
+  status.textContent = (d.found.length < d.pts.length ? `${d.found.length} tappe su ${d.pts.length} sulla mappa. ` : '') + (d.found.length > 1 ? `Percorso ${kmLabel(d)}, in ordine di visita.` : '');
+  const list = $('dmList'); list.innerHTML = '';
+  d.pts.forEach(p => {
     const row = document.createElement('button'); row.type = 'button'; row.className = 'dm-row';
     row.innerHTML = `<span class="dm-n${p.n ? '' : ' off'}">${p.n || '–'}</span><span style="min-width:0;flex:1;"><b>${esc(p.title)}</b><small>${esc(p.time)}${p.n ? '' : ' · posizione non trovata'}</small></span>`;
-    if (p.n) row.onclick = () => { map.flyTo(p.ll, Math.max(map.getZoom(), 15)); p.mk.openPopup(); $('dmMap').scrollIntoView({ block: 'nearest' }); };
+    if (p.n) row.onclick = () => { map.flyTo(p.ll, Math.max(map.getZoom(), 15)); p.mk.openPopup(); };
     list.appendChild(row);
   });
 }
@@ -1424,7 +1471,7 @@ function renderDay(day, target) {
   section.innerHTML = `<div class="day-head"><div class="day-title"><h4>Giorno ${day.day} · ${esc(day.city)}</h4><p>${esc(day.date)} · ${esc(day.title)}</p></div><div class="wx-line" data-wxday="${day.day}"></div></div>
     ${day.alert ? `<div class="alert"><b>Attenzione</b> ${esc(day.alert)}</div>` : ''}
     ${hk && isCheckinDay(day, hk) ? `<div class="hotel-box" data-hotel>${hotelBoxHTML(hk, false)}</div>` : ''}
-    <div class="day-map" data-daymap></div>
+    <div class="day-map" data-daymap><div class="dm-mini"></div><div class="dm-chip"></div></div>
     <div class="timeline"></div>
     <div class="note-area">
       <label class="lbl" for="note-${day.day}">Diario della giornata</label>
@@ -1432,7 +1479,7 @@ function renderDay(day, target) {
     </div>`;
   if (hk && section.querySelector('[data-hotel]')) hotelActs(hk, section.querySelector('[data-hotel]'));
 
-  { const dm = section.querySelector('[data-daymap]'); if (dayPoints(day).length > 1) dm.appendChild(btnGrid([bAct('Mappa del giorno', () => showDayMap(day))])); else dm.remove(); }
+  { const dm = section.querySelector('[data-daymap]'); if (dayPoints(day).length > 0) initMini(day, dm); else dm.remove(); }
   const timeline = section.querySelector('.timeline');
   day.stops.forEach((s, i) => {
     const row = document.createElement('div'); row.className = 'stop';
