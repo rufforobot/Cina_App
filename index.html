@@ -517,6 +517,11 @@ main { padding: 16px 16px 140px; }
 .day-card .timeline { }
 
 #ptr { position: fixed; top: calc(env(safe-area-inset-top) + 8px); left: 50%; transform: translate(-50%,0); opacity: 0; z-index: 9999; pointer-events: none; padding: 8px 16px; border-radius: 999px; background: rgba(255,255,255,.85); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); box-shadow: 0 2px 12px rgba(0,0,0,.12); font: 600 13px/1 -apple-system, system-ui, sans-serif; color: #000; transition: opacity .15s; }
+
+.dm-here span { display: block; width: 18px; height: 18px; border-radius: 50%; background: #0A84FF; border: 3px solid #fff; box-shadow: 0 0 0 6px rgba(10,132,255,.25), 0 1px 4px rgba(0,0,0,.3); box-sizing: border-box; }
+.dm-styles { display: flex; gap: 6px; margin: 0 0 12px; padding: 3px; background: var(--fill, rgba(120,120,128,.12)); border-radius: 12px; }
+.dm-styles button { flex: 1; border: 0; background: transparent; border-radius: 9px; padding: 8px 4px; font: 600 13px/1 -apple-system, system-ui, sans-serif; color: inherit; }
+.dm-styles button.on { background: var(--surface, #fff); box-shadow: 0 1px 3px rgba(0,0,0,.12); }
 </style>
 </head>
 <body>
@@ -1501,6 +1506,31 @@ const kmBetween = (a, b) => { const R = 6371, d = Math.PI / 180, dl = (b[0] - a[
 const fmtKm = km => (km < 10 ? km.toFixed(1) : String(Math.round(km))).replace('.', ',') + ' km';
 /* posizioni + percorso di un giorno, calcolati una volta sola e poi riusati */
 const dayJobs = {};
+/* posizione attuale (se concessa): serve come punto di partenza verso la prima tappa */
+let hereCache = null;
+function getHere() {
+  if (hereCache && Date.now() - hereCache.t < 300000) return Promise.resolve(hereCache.ll);
+  return new Promise(res => {
+    if (!navigator.geolocation) return res(null);
+    const to = setTimeout(() => res(null), 5000);
+    try { navigator.geolocation.getCurrentPosition(p => { clearTimeout(to); hereCache = { t: Date.now(), ll: [p.coords.latitude, p.coords.longitude] }; res(hereCache.ll); }, () => { clearTimeout(to); res(null); }, { timeout: 4500, maximumAge: 120000 }); }
+    catch { clearTimeout(to); res(null); }
+  });
+}
+const MAP_STYLES = {
+  chiara: { name: 'Chiara', url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', att: '&copy; OpenStreetMap &copy; CARTO', sub: 'abcd' },
+  minimal: { name: 'Minimal', url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', att: '&copy; OpenStreetMap &copy; CARTO', sub: 'abcd' },
+  satellite: { name: 'Satellite', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', att: 'Esri, Maxar' },
+  osm: { name: 'Classica', url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', att: '&copy; OpenStreetMap' }
+};
+const getMapStyle = () => { try { const k = localStorage.getItem('map-style'); if (MAP_STYLES[k]) return k; } catch {} return 'chiara'; };
+const setMapStyle = k => { try { localStorage.setItem('map-style', k); } catch {} };
+function addTiles(map) {
+  const st = MAP_STYLES[getMapStyle()];
+  if (map._tiles) map.removeLayer(map._tiles);
+  map._tiles = window.L.tileLayer(st.url, { maxZoom: 19, attribution: st.att, subdomains: st.sub || 'abc' }).addTo(map);
+  map._tiles.bringToBack();
+}
 function loadDay(day, onProg) {
   const job = dayJobs[day.day] || (dayJobs[day.day] = { cbs: [], prom: null });
   if (onProg) job.cbs.push(onProg);
@@ -1525,9 +1555,15 @@ function loadDay(day, onProg) {
       ok.forEach(p => { if (kmBetween([lat, lon], p.ll) > 80) p.ll = null; });
     }
     const found = pts.filter(p => p.ll); found.forEach((p, n) => p.n = n + 1);
-    const res = { pts, found, geom: null, km: 0, exact: false };
-    if (found.length > 1) {
-      const key = found.map(p => p.ll[1].toFixed(5) + ',' + p.ll[0].toFixed(5)).join(';');
+    const res = { pts, found, geom: null, km: 0, exact: false, here: null };
+    if (found.length) {
+      say('Cerco la tua posizione…');
+      const h = await getHere();
+      if (h && kmBetween(h, found[0].ll) <= 150 && kmBetween(h, found[0].ll) > 0.05) res.here = h;
+    }
+    const route = (res.here ? [{ ll: res.here }] : []).concat(found);
+    if (route.length > 1) {
+      const key = route.map(p => p.ll[1].toFixed(5) + ',' + p.ll[0].toFixed(5)).join(';');
       let r = routeCache[key];
       if (!r) {
         try {
@@ -1536,7 +1572,7 @@ function loadDay(day, onProg) {
         } catch {}
       }
       if (r) { res.geom = r.geom; res.km = r.km; res.exact = true; }
-      else for (let k = 1; k < found.length; k++) res.km += kmBetween(found[k - 1].ll, found[k].ll);
+      else for (let k = 1; k < route.length; k++) res.km += kmBetween(route[k - 1].ll, route[k].ll);
     }
     return res;
   })();
@@ -1545,13 +1581,15 @@ function loadDay(day, onProg) {
 }
 const pinIcon = n => window.L.divIcon({ className: 'dm-pin', html: `<span>${n}</span>`, iconSize: [30, 30], iconAnchor: [15, 15] });
 function drawDay(map, d, small) {
-  window.L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }).addTo(map);
+  addTiles(map);
+  const line = (d.here ? [d.here] : []).concat(d.found.map(p => p.ll));
+  if (d.here) window.L.marker(d.here, { icon: window.L.divIcon({ className: 'dm-here', html: '<span></span>', iconSize: [18, 18], iconAnchor: [9, 9] }), interactive: false }).addTo(map);
   d.found.forEach(p => { p.mk = window.L.marker(p.ll, { icon: pinIcon(p.n), interactive: !small }).addTo(map); if (!small) p.mk.bindPopup(`<b>${esc(p.title)}</b><br>${esc(p.time)}`); });
   if (d.geom) window.L.geoJSON(d.geom, { style: { color: '#FF2D55', weight: 4, opacity: .8 } }).addTo(map);
-  else if (d.found.length > 1) window.L.polyline(d.found.map(p => p.ll), { color: '#FF2D55', weight: 3, opacity: .8, dashArray: '6 8' }).addTo(map);
-  if (d.found.length === 1) map.setView(d.found[0].ll, 15); else map.fitBounds(d.found.map(p => p.ll), { padding: [small ? 22 : 30, small ? 22 : 30] });
+  else if (line.length > 1) window.L.polyline(line, { color: '#FF2D55', weight: 3, opacity: .8, dashArray: '6 8' }).addTo(map);
+  if (line.length === 1) map.setView(line[0], 15); else map.fitBounds(line, small ? { paddingTopLeft: [26, 24], paddingBottomRight: [26, 56] } : { padding: [30, 30] });
 }
-const kmLabel = d => d.found.length > 1 ? `${fmtKm(d.km)}${d.exact ? '' : ' in linea d\'aria'}` : '';
+const kmLabel = d => (d.found.length > 1 || d.here) ? `${fmtKm(d.km)}${d.exact ? '' : ' in linea d\'aria'}` : '';
 function initMini(day, host) {
   const box = host.querySelector('.dm-mini'), chip = host.querySelector('.dm-chip');
   const load = async () => {
@@ -1564,7 +1602,7 @@ function initMini(day, host) {
       const map = window.L.map(box, { zoomControl: false, dragging: false, touchZoom: false, scrollWheelZoom: false, doubleClickZoom: false, boxZoom: false, keyboard: false, tap: false, attributionControl: true });
       map.attributionControl.setPrefix('');
       drawDay(map, d, true);
-      chip.textContent = `${d.found.length} tappe${d.found.length > 1 ? ' · ' + kmLabel(d) : ''}`;
+      chip.textContent = `${d.found.length} tappe${(d.found.length > 1 || d.here) ? ' · ' + kmLabel(d) : ''}${d.here ? ' da qui' : ''}`;
       host.classList.add('ready');
     } catch { chip.textContent = 'Mappa non caricata · tocca per riprovare'; host.classList.remove('ready'); host._failed = true; }
   };
@@ -1584,8 +1622,11 @@ async function showDayMap(day) {
   const map = dayMap = window.L.map('dmMap', { zoomControl: true, attributionControl: true });
   drawDay(map, d, false);
   setTimeout(() => map.invalidateSize(), 60);
-  status.textContent = (d.found.length < d.pts.length ? `${d.found.length} tappe su ${d.pts.length} sulla mappa. ` : '') + (d.found.length > 1 ? `Percorso ${kmLabel(d)}, in ordine di visita.` : '');
+  status.textContent = (d.found.length < d.pts.length ? `${d.found.length} tappe su ${d.pts.length} sulla mappa. ` : '') + ((d.found.length > 1 || d.here) ? `Percorso ${kmLabel(d)}${d.here ? ', dalla tua posizione (punto blu)' : ''}, in ordine di visita.` : '');
   const list = $('dmList'); list.innerHTML = '';
+  const sw = document.createElement('div'); sw.className = 'dm-styles';
+  Object.entries(MAP_STYLES).forEach(([k, v]) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = v.name; b.className = k === getMapStyle() ? 'on' : ''; b.onclick = () => { setMapStyle(k); addTiles(map); sw.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); }; sw.appendChild(b); });
+  list.appendChild(sw);
   d.pts.forEach(p => {
     const row = document.createElement('button'); row.type = 'button'; row.className = 'dm-row';
     row.innerHTML = `<span class="dm-n${p.n ? '' : ' off'}">${p.n || '–'}</span><span style="min-width:0;flex:1;"><b>${esc(p.title)}</b><small>${esc(p.time)}${p.n ? '' : ' · posizione non trovata'}</small></span>`;
