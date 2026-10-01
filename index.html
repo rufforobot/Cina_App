@@ -522,6 +522,8 @@ main { padding: 16px 16px 140px; }
 .dm-styles { display: flex; gap: 6px; margin: 0 0 12px; padding: 3px; background: var(--fill, rgba(120,120,128,.12)); border-radius: 12px; }
 .dm-styles button { flex: 1; border: 0; background: transparent; border-radius: 9px; padding: 8px 4px; font: 600 13px/1 -apple-system, system-ui, sans-serif; color: inherit; }
 .dm-styles button.on { background: var(--surface, #fff); box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+.badge { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+.utility-card { min-width: 0; overflow-wrap: anywhere; }
 </style>
 </head>
 <body>
@@ -1130,7 +1132,7 @@ function renderBookingAlerts() {
       when = ms > 0 ? `Apre tra ${relTime(ms)}` : 'Già aperta: prenota ora';
     }
     const card = document.createElement('div'); card.className = 'utility-card';
-    card.innerHTML = `<div style="display:flex; justify-content:space-between; gap:8px;"><div><div class="companion-meta">${esc(r.type)}</div><h4 style="margin:0; font-size:18px;">${esc(r.title)}</h4></div><span class="badge">${esc(r.ref)}</span></div>
+    card.innerHTML = `<div class="companion-meta">${esc(r.type)}</div><h4 style="margin:0; font-size:18px;">${esc(r.title)}</h4>${r.ref ? `<p style="margin:6px 0 0; font-size:13px; color:var(--muted); overflow-wrap:anywhere;">${esc(r.ref)}</p>` : ''}
       <p style="margin: 8px 0 0; font-size:14px; font-weight: 500;">Per il: ${esc(r.date)}</p>
       ${when ? `<p style="margin: 4px 0 0; font-size:14px; font-weight: 600; color: var(--accent-2);">${esc(when)}</p>` : ''}
       <button class="btn small" style="width:100%; margin-top: 12px;">Fatto</button>`;
