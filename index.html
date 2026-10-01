@@ -450,7 +450,7 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
       <button class="chip-btn" data-go="sec-backup">💾 Backup</button>
     </div>
 
-    <div class="section-title" id="sec-pay" hidden><div><h3>📱 App utili</h3><p>Apri le app del posto con un tocco.</p></div></div>
+    <div class="section-title" id="sec-pay" hidden><div><h3>📱 App utili</h3></div></div>
     <div class="quick-apps" id="quickApps" style="margin-bottom: 24px;" hidden></div>
 
     <div class="section-title" id="sec-conv"><div><h3>💱 Convertitore Rapido</h3><p id="rateLabel">Calcolo istantaneo offline.</p></div></div>
@@ -466,16 +466,9 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
           <input type="text" id="convEuro" inputmode="decimal" placeholder="0" style="width: 100%; border: none; background: var(--surface-2); color: var(--text); border-radius: 14px; padding: 16px 12px; font-size: 22px; font-weight: 700; text-align: center; outline: none;">
         </div>
       </div>
-      <div class="row-form">
-        <label for="rateInput" class="note-line">Tasso di cambio: quanti <span id="curName">yuan</span> per 1 €</label>
-        <div class="grid-2">
-          <input class="field" id="rateInput" type="text" inputmode="decimal" placeholder="7.70">
-          <button class="btn" id="rateSave">Salva tasso</button>
-        </div>
-      </div>
     </div>
 
-    <div class="section-title" id="sec-budget"><div><h3>💶 Gestione Budget</h3><p>Spese per categoria e per città.</p></div></div>
+    <div class="section-title" id="sec-budget"><div><h3>💶 Gestione Budget</h3></div></div>
     <div class="expense-card" style="margin-bottom: 24px;">
       <div style="width: 100%;">
         <div class="companion-meta">Totale Viaggio</div>
@@ -505,16 +498,16 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
       </div>
     </div>
 
-    <div class="section-title" id="sec-info" hidden><div><h3>ℹ️ Info paese</h3><p>Cose pratiche da sapere. Tocca per aprire.</p></div></div>
+    <div class="section-title" id="sec-info" hidden><div><h3>ℹ️ Info paese</h3></div></div>
     <div class="utility-card" id="infoBox" style="margin-bottom: 24px;" hidden></div>
 
-    <div class="section-title" id="sec-phrases"><div><h3>🗣️ Frasi utili</h3><p>Tocca "Mostra" per far leggere la frase a chi hai davanti.</p></div></div>
+    <div class="section-title" id="sec-phrases"><div><h3>🗣️ Frasi utili</h3></div></div>
     <div class="utility-card" id="phrasesCard" style="margin-bottom: 24px;">
       <input class="field" id="phraseSearch" placeholder="Cerca (es. bagno, conto, allergico)">
       <div id="phrasesBox"></div>
     </div>
 
-    <div class="section-title" id="sec-weather"><div><h3>⛅ Meteo</h3><p>Serve internet per aggiornare; l'ultimo dato resta salvato.</p></div></div>
+    <div class="section-title" id="sec-weather"><div><h3>⛅ Meteo</h3></div></div>
     <div class="utility-card" style="margin-bottom: 24px;">
       <button class="btn block" id="wxRefresh">🔄 Aggiorna meteo</button>
       <div class="note-line" id="wxStamp" style="margin:8px 0;"></div>
@@ -637,7 +630,21 @@ function saveState() {
   catch (e) { alert('Memoria del browser piena: impossibile salvare.'); }
   updateMetrics();
 }
-const rate = () => { const r = Number(state.rate); return r > 0 ? r : meta.currency.rate; };
+const FX_KEY = (meta.stateKey || 'trip') + '-fx';
+const CUR_CODES = { '¥': 'CNY', '$': 'USD', '£': 'GBP', '฿': 'THB', '₩': 'KRW', 'Kč': 'CZK', 'zł': 'PLN', 'Ft': 'HUF', 'kr': 'SEK', 'Fr': 'CHF', 'CHF': 'CHF', 'Rp': 'IDR', '₫': 'VND', '₹': 'INR', 'MAD': 'MAD', 'AED': 'AED' };
+const curCode = () => (meta.currency.code || CUR_CODES[meta.currency.symbol] || '').toUpperCase();
+let fx = (() => { try { return JSON.parse(localStorage.getItem(FX_KEY)) || null; } catch { return null; } })();
+const rate = () => (fx && fx.rate > 0) ? fx.rate : meta.currency.rate;
+async function refreshRate() {
+  const code = curCode(); if (!code || !foreignCur) return;
+  const today = new Date().toISOString().slice(0, 10);
+  if (fx && fx.date === today && fx.code === code) return;
+  try {
+    const res = await fetch(`https://api.frankfurter.dev/v1/latest?base=EUR&symbols=${code}`, { cache: 'no-store' });
+    const j = await res.json(); const v = j && j.rates && j.rates[code];
+    if (v > 0) { fx = { rate: v, date: today, code, src: j.date }; try { localStorage.setItem(FX_KEY, JSON.stringify(fx)); } catch {} updateRateUI(); renderExpenses(); }
+  } catch { /* offline: resta l'ultimo tasso salvato */ }
+}
 
 function toast(msg) {
   const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
@@ -1082,19 +1089,13 @@ function setupExpenseForm() {
 
 /* ====================== CONVERTITORE E TASSO ====================== */
 function updateRateUI() {
-  $('rateLabel').textContent = `Tasso di cambio: 1€ = ${rate().toFixed(2)}${meta.currency.symbol} (modificabile qui sotto)`;
-  $('rateInput').value = rate().toFixed(2);
+  const d = fx && fx.src ? fx.src.split('-').reverse().join('/') : '';
+  $('rateLabel').textContent = `1 € = ${rate().toFixed(2)} ${meta.currency.symbol} · ${d ? 'cambio del ' + d : 'cambio indicativo, si aggiorna da solo online'}`;
 }
 function setupConverter() {
   const y = $('convYuan'), e = $('convEuro');
   y.addEventListener('input', ev => { const v = parseNum(ev.target.value); e.value = Number.isFinite(v) ? (v / rate()).toFixed(2) : ''; });
   e.addEventListener('input', ev => { const v = parseNum(ev.target.value); y.value = Number.isFinite(v) ? (v * rate()).toFixed(2) : ''; });
-  $('rateSave').addEventListener('click', () => {
-    const v = parseNum($('rateInput').value);
-    if (!Number.isFinite(v) || v <= 0 || v > 100) { alert('Inserisci un tasso valido, per esempio 7.70'); return; }
-    state.rate = v; saveState(); updateRateUI(); renderExpenses();
-    y.value = ''; e.value = ''; toast('Tasso aggiornato');
-  });
 }
 
 /* ====================== CITTÀ / ITINERARIO ====================== */
@@ -1435,7 +1436,7 @@ function renderPhrases(filter) {
     if (p[0] !== last) { last = p[0]; const h = document.createElement('div'); h.className = 'phrase-cat'; h.textContent = p[0]; box.appendChild(h); }
     const row = document.createElement('div'); row.className = 'phrase';
     row.innerHTML = `<div><div class="it">${esc(p[1])}</div><div class="zh">${esc(p[2])}</div><div class="py">${esc(p[3])}</div></div>
-      <div class="acts"><button class="btn small" type="button">Mostra</button><button class="btn small ghost" type="button" aria-label="Ascolta">🔊</button></div>`;
+      <div class="acts"><button class="btn small" type="button">Ingrandisci</button><button class="btn small ghost" type="button" aria-label="Ascolta">🔊</button></div>`;
     const [show, say] = row.querySelectorAll('button');
     show.addEventListener('click', () => showBig(p[1], p[2], p[3]));
     say.addEventListener('click', () => speakZh(p[2]));
@@ -1654,9 +1655,8 @@ $('heroTitle').textContent = meta.countryIt || meta.title;
 $('sosNote').textContent = meta.emergencyNote;
 $('sosGrid').innerHTML = meta.emergency.map(e => `<div style="padding:10px; background:var(--surface-2); border-radius:12px;"><strong>${esc(e[0])}</strong><br><small>${esc(e[1])}</small></div>`).join('');
 $('sosAssist').href = 'tel:' + meta.assistance.tel; $('sosAssist').textContent = '☎ ' + meta.assistance.label;
-$('convLabel').textContent = `${meta.currency.name} (${meta.currency.symbol})`; $('curName').textContent = meta.currency.name.toLowerCase(); $('curOpt').textContent = meta.currency.symbol;
-$('rateInput').placeholder = String(meta.currency.rate);
-setupConverter(); setupExpenseForm(); setupBackup();
+$('convLabel').textContent = `${meta.currency.name} (${meta.currency.symbol})`; $('curOpt').textContent = meta.currency.symbol;
+setupConverter(); setupExpenseForm(); setupBackup(); refreshRate();
 renderCities(); renderItinerary(); renderGuideControls(); renderCompanion(); renderTodayGuides(); renderTransfers(); renderWallet(); renderCodes();
 renderExpenses(); renderBookingAlerts(); renderToday(); renderNextTransfer(true);
 renderChecklist(); renderPhrases(''); renderWeather(); renderBackupInfo(); updateRateUI(); updateMetrics();

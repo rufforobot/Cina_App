@@ -15,10 +15,9 @@ end: 2027-04-17T23:00:00+09:00
 stateKey: giappone-2027-state-v1
 wxKey: giappone-2027-weather
 currency:
-  symbol: ¥
-  code: JPY
-  name: Yen
-  rate: 160
+  symbol: €
+  name: Euro
+  rate: 1
 emergency:
   - 110 | Polizia
   - 119 | Ambulanza / Fuoco
@@ -27,8 +26,6 @@ emergencyNote: Numeri locali in Giappone.
 assistance:
   label: Assistenza assicurazione
   tel: +390000000000
-maps: google
-guideLang: it-IT
 apps:
   - 💳 Apri PayPay | paypay://
 weather:
@@ -37,7 +34,7 @@ weather:
 
 > MODELLO DI UN NUOVO VIAGGIO. Le righe che iniziano con ">" sono note e vengono ignorate.
 > 1. Copia questo file come trips/nome-viaggio.md  2. Compila  3. Apri l'app con ?t=nome-viaggio
-> Facoltativi nell'intestazione: maps (apple, google o amap: l'app di mappe dei pulsanti 🧭 e 🚇), guideLang (lingua di lettura delle guide, es. it-IT), apps (pulsanti per aprire app del posto, formato "  - Etichetta | schema://"), shortTitle (nome sotto l'icona), themeColor (es. #ff3b30),
+> Facoltativi nell'intestazione: apps (pulsanti per aprire app del posto, formato "  - Etichetta | schema://"), shortTitle (nome sotto l'icona), themeColor (es. #ff3b30),
 > icon: con righe "  192: trips/x-192.png", "  512: trips/x-512.png", "  apple: trips/x-180.png"
 > Regole: ogni riga di dato è "- chiave: valore". Gli elenchi sono righe "  - voce" sotto la chiave.
 > I nomi delle città nei giorni e in "Città" devono coincidere con quelli di "weather".
@@ -163,12 +160,3 @@ weather:
 - shopping | 🛍️ | Shopping
 - alloggio | 🏨 | Alloggio
 - altro | 📦 | Altro
-
-# Info paese
-
-> Una sezione per argomento (## titolo con emoji), poi un elenco "- testo". Se la sezione è vuota la scheda non compare.
-## 🔌 Elettricità
-- Tensione 100 V, prese di tipo A e B: serve un adattatore.
-
-## 💰 Mance
-- Non si usa lasciare mance.
