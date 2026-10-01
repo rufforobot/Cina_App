@@ -751,14 +751,14 @@ function transitApple(q) {
   if (m === 'amap') return `https://uri.amap.com/navigation?to=,,${e}&mode=bus&src=${meta.id}&callnative=0`;
   return `https://maps.apple.com/?daddr=${e}&dirflg=r`;
 }
-/* Scheda da mostrare al tassista/DiDi: nome e indirizzo grandi, frase pronta, telefono, mappe, modifica */
+/* Scheda da mostrare al tassista: nome e indirizzo grandi, frase pronta, telefono, mappe, modifica */
 function showPlaceCard(p) {
   const zh = (p.zh || '').trim(), addr = (p.addr || '').trim();
   if (!zh && !addr) { toast('Inserisci prima nome o indirizzo nella lingua locale (✏️)'); if (p.onEdit) p.onEdit(); return; }
   const q = zh || addr;
   const btns = [
     p.tel ? `<a class="btn small primary" href="tel:${esc(p.tel)}">📞 Chiama</a>` : '',
-    `<button class="btn small" data-act="copy">📋 Copia per DiDi</button>`,
+    `<button class="btn small" data-act="copy">📋 Copia</button>`,
     p.onEdit ? `<button class="btn small" data-act="edit">✏️ Modifica</button>` : ''
   ].join('');
   openModal(p.title || "Mostra all'autista", `
@@ -773,7 +773,6 @@ function showPlaceCard(p) {
       <div class="py1">${esc(DRIVER_PHRASES[0][1])} · ${esc(DRIVER_PHRASES[0][2])}</div>
     </div>
     <div class="act-row" style="justify-content:center">${btns}</div>
-    <p class="note-line" style="text-align:center">Con DiDi: copia, apri l'app e incolla la destinazione nel campo di ricerca.</p>
     ${p.en ? `<p class="py" style="text-align:center">${esc(p.en)}</p>` : ''}
     ${p.more ? `<details class="more"><summary>Info hotel</summary>${p.more}</details>` : ''}
     <details class="more"><summary>Altre frasi per il tassista</summary><div class="taxi-ph">
@@ -935,7 +934,7 @@ function transferCard(t, ctx) {
     <div class="act-row">
       <a class="btn small" target="_blank" rel="noopener" href="${isFl ? 'https://www.flightradar24.com/data/flights/' + esc(code.toLowerCase()) : 'https://www.trip.com/trains/'}">${isFl ? '🛰 Stato volo' : '🚄 Stato treno (Trip.com)'}</a>
       ${isFl ? `<a class="btn small" target="_blank" rel="noopener" href="https://www.flightaware.com/live/flight/${esc(code)}">FlightAware</a>` : ''}
-      ${zhVal ? `<button class="btn small go-taxi">🚕 Taxi / DiDi per la partenza</button>` : ''}
+      ${zhVal ? `<button class="btn small go-taxi">🚕 Taxi per la partenza</button>` : ''}
     </div>
     `;
   const q = sel => card.querySelector(sel);
