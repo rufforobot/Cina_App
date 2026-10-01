@@ -1,43 +1,59 @@
 # App di viaggio (web app installabile)
 
-Un'unica app (`index.html`) che legge i contenuti di ogni viaggio da un file separato in `trips/`.
+Un'unica app (`index.html`) che legge i contenuti di ogni viaggio da un file **markdown** in `trips/`.
+Per cambiare viaggio non si tocca il codice: si cambia solo il file `.md`.
 
 ## File da pubblicare
 ```
-index.html          ← l'app (uguale per tutti i viaggi)
-sw.js               ← funzionamento offline
-manifest.json       ← nome e icona quando la installi sul telefono
-icon-192.png  icon-512.png  apple-touch-icon.png
-trips/cina-2026.js  ← i dati del viaggio in Cina
-trips/_modello.js   ← modello vuoto per un nuovo viaggio
+index.html            ← l'app (uguale per tutti i viaggi)
+trip-md.js            ← legge i file markdown dei viaggi
+sw.js                 ← funzionamento offline
+manifest.json  icon-192.png  icon-512.png  apple-touch-icon.png
+trips/cina-2026.md    ← i dati del viaggio in Cina
+trips/_modello.md     ← modello vuoto per un nuovo viaggio
 ```
 
 ## Pubblicare su GitHub Pages
-1. Su github.com: **New repository** → nome (es. `viaggi`) → **Public** → Create.
-2. **Add file → Upload files**: trascina tutti i file sopra, **mantenendo la cartella `trips/`**
-   (trascina la cartella intera, oppure crea il file con *Add file → Create new file* scrivendo `trips/cina-2026.js` come nome).
-3. **Commit changes**.
-4. **Settings → Pages → Build and deployment → Source: Deploy from a branch → Branch: `main` / `(root)` → Save**.
-5. Dopo 1–2 minuti l'indirizzo è `https://TUOUTENTE.github.io/viaggi/`.
-6. Sul telefono: apri l'indirizzo in Safari → Condividi → **Aggiungi a Home**.
+1. github.com → **New repository** → nome (es. `viaggi`) → **Public** → Create.
+2. **Add file → Upload files**: carica `index.html`, `trip-md.js`, `sw.js`, `manifest.json` e le tre icone nella radice.
+3. Crea la cartella `trips`: **Add file → Create new file**, nome `trips/cina-2026.md`, incolla il contenuto del file, Commit.
+   Ripeti per `trips/_modello.md` (facoltativo).
+4. **Settings → Pages → Build and deployment → Deploy from a branch → `main` / `(root)` → Save**.
+5. Dopo 1–2 minuti l'app è su `https://TUOUTENTE.github.io/viaggi/`.
+6. Sul telefono apri l'indirizzo in Safari → Condividi → **Aggiungi a Home**.
+
+> L'app non si apre facendo doppio clic sul file `index.html` dal computer: i viaggi si leggono via web (GitHub Pages va bene).
 
 ## Aprire un viaggio
-- `https://TUOUTENTE.github.io/viaggi/` apre la Cina (viaggio predefinito).
-- `https://TUOUTENTE.github.io/viaggi/?t=giappone-2027` apre `trips/giappone-2027.js`.
+- `https://TUOUTENTE.github.io/viaggi/` apre la Cina (predefinito).
+- `https://TUOUTENTE.github.io/viaggi/?t=giappone-2027` apre `trips/giappone-2027.md`.
+Ogni viaggio ha i propri dati salvati sul telefono (spunte, spese, note), separati dagli altri.
 
-## Aggiornare i contenuti
-Modifica il file in `trips/` su GitHub (matita ✏️ → Commit). Per far arrivare subito l'aggiornamento sul telefono,
-cambia anche il numero in `sw.js` (`viaggio-v18` → `viaggio-v19`).
+## Modificare un viaggio
+Su GitHub apri il file in `trips/`, matita ✏️, modifica, **Commit**. Per far arrivare subito la modifica sul telefono
+cambia anche il numero in `sw.js` (`viaggio-v19` → `viaggio-v20`); altrimenti compare alla seconda apertura.
 
-## Nuovo viaggio
-Copia `trips/_modello.js`, rinominalo, compila i dati e caricalo in `trips/`.
-I dati salvati sul telefono (spunte, spese, note) sono separati per viaggio.
+## Come è scritto un file di viaggio
+Parti da `trips/_modello.md` (ha una nota per ogni sezione). In breve:
+- **Intestazione** tra `---`: titolo, fuso orario, valuta, numeri di emergenza, coordinate delle città per il meteo.
+- **Sezioni** con `# Città`, `# Hotel`, `# Itinerario`, `# Trasferimenti`, `# Prenotazioni`, `# Checklist`, `# Guide`, `# Frasi`, `# Frasi tassista`.
+- Ogni dato è una riga `- chiave: valore`; gli elenchi sono righe `  - voce` sotto la chiave.
+- Le righe che iniziano con `>` sono note e vengono ignorate.
+- Una tappa all'hotel si scrive `- luogo: hotel` + `- hotel: SH`: nome, indirizzo e telefono si prendono dalla sezione Hotel.
+- Per andare a capo dentro un valore usa `\n`.
 
-## Nome e icona sulla Home del telefono
-Nome, icona e indirizzo di avvio vengono generati dal file del viaggio (`title`, e se vuoi `shortTitle`, `themeColor`, `icon`).
-Per un'icona diversa per viaggio metti le immagini in `trips/` e indicale in `meta.icon` (vedi `_modello.js`).
-Se non le indichi si usano le icone standard. Per un'icona nuova, rimuovi e riaggiungi l'app alla Home.
+## Nome e icona sulla Home
+Nome, icona e indirizzo di avvio vengono dall'intestazione del viaggio (`title`, e se vuoi `shortTitle`, `themeColor`, `icon`).
+Per cambiare l'icona rimuovi e riaggiungi l'app alla Home.
 
 ## Lingua e scrittura locale
-La frase per il tassista è la prima di `DRIVER_PHRASES` nel file del viaggio; la scrittura locale
-(per togliere i caratteri locali dalle schermate generali) si riconosce da sola per cinese, giapponese, coreano e thai.
+La frase per il tassista è la prima di `# Frasi tassista`. La scrittura locale (da togliere dalle schermate generali)
+si riconosce da sola per cinese, giapponese, coreano e thai.
+
+## Impostazioni per paese (nell'intestazione del viaggio)
+- `maps: apple | google | amap` — app di mappe usata dai pulsanti 🧭 Mappa e 🚇 Metro (predefinita: apple).
+- `guideLang: it-IT` — lingua di lettura delle guide; `tts` — lingua di lettura delle frasi locali.
+- `currency` — se non è l'euro compaiono convertitore e scelta valuta nelle spese.
+- `apps` — pulsanti per aprire le app del posto (Alipay, PayPay…); senza `apps` la sezione sparisce.
+- `# Info paese` — schede pratiche (elettricità, mance, orari, pagamenti…); senza questa sezione la scheda sparisce.
+- `# Frasi` — se vuota, la sezione Frasi utili sparisce.

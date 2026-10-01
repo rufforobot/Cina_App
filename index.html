@@ -7,7 +7,7 @@
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Cina 2026">
+<meta name="apple-mobile-web-app-title" content="Viaggio">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -192,8 +192,8 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
 
 .quick-apps { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
 .quick-apps a { padding: 14px; border-radius: 16px; font-size: 16px; font-weight: 700; text-align: center; color: white; display: flex; align-items: center; justify-content: center; gap: 8px; }
-.app-alipay { background: #1677FF; }
-.app-wechat { background: #07C160; }
+.quick-apps a { background: var(--accent-2); }
+[hidden] { display: none !important; }
 
 /* Checklist */
 .check-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 0.5px solid var(--border); font-size: 15px; line-height: 1.4; }
@@ -328,8 +328,8 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
         <div class="label" id="countdownLabel">al viaggio</div>
       </div>
       <div class="countdown-meta">
-        <div class="metric"><strong id="cityCount">6</strong><span>città</span></div>
-        <div class="metric"><strong id="dayCount">17</strong><span>giorni</span></div>
+        <div class="metric"><strong id="cityCount">–</strong><span>città</span></div>
+        <div class="metric"><strong id="dayCount">–</strong><span>giorni</span></div>
         <div class="metric"><strong id="progressCount">0%</strong><span>fatto</span></div>
       </div>
     </div>
@@ -346,7 +346,7 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
 
     <div id="todayHotel" style="margin-bottom: 24px;"></div>
 
-    <div class="section-title"><div><h3>🧳 Prossimo trasferimento</h3><p>Volo o treno in arrivo. Aggiungi posto e stazione in cinese.</p></div></div>
+    <div class="section-title"><div><h3>🧳 Prossimo trasferimento</h3><p>Volo o treno in arrivo. Aggiungi posto, binario o gate.</p></div></div>
     <div id="nextTransfer" style="margin-bottom: 24px;"></div>
 
     <div class="section-title"><div><h3>🎧 Guide nella tua città</h3><p>Tocca una tappa per leggerla o ascoltarla.</p></div></div>
@@ -357,7 +357,7 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
     </div>
     <div class="city-grid" id="bookingAlertsGrid" style="margin-bottom: 24px;"></div>
 
-    <div class="section-title"><div><h3>Le Tappe</h3><p>Accedi rapidamente ai giorni del viaggio e alle Taxi Card.</p></div></div>
+    <div class="section-title"><div><h3>Le Tappe</h3><p>Accedi rapidamente ai giorni del viaggio e al "Mostra al tassista".</p></div></div>
     <div class="city-grid" id="cityGrid"></div>
   </section>
 
@@ -384,7 +384,7 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
 
   <!-- WALLET -->
   <section id="wallet" class="view">
-    <div class="section-title"><div><h3>✈️ Trasferimenti</h3><p>Voli e treni, con posto/binario e stazione in cinese.</p></div></div>
+    <div class="section-title"><div><h3>✈️ Trasferimenti</h3><p>Voli e treni, con posto, binario o gate.</p></div></div>
     <div class="wallet-grid" id="transferGrid"></div>
 
     <div class="section-title"><div><h3>🎟️ Prenotazioni</h3><p>Hotel, attrazioni e finestre di apertura.</p></div></div>
@@ -401,7 +401,7 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
     <div class="section-title"><div><h3>🔑 Codici e note</h3><p>PIN, numeri di conferma, riferimenti. Restano solo su questo dispositivo.</p></div></div>
     <div class="utility-card">
       <div class="row-form" style="margin-top:0;">
-        <input class="field" id="codeTitle" placeholder="Titolo (es. Hotel Pechino)">
+        <input class="field" id="codeTitle" placeholder="Titolo (es. Hotel, PIN, codice)">
         <input class="field" id="codeValue" placeholder="Codice o testo">
         <button class="btn primary block" id="codeAdd">Aggiungi</button>
       </div>
@@ -412,23 +412,22 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
   <!-- UTILI -->
   <section id="useful" class="view">
     <div class="chips-nav" id="utilNav">
-      <button class="chip-btn" data-go="sec-pay">💳 Pagamenti</button>
+      <button class="chip-btn" id="navPay" data-go="sec-pay">💳 Pagamenti</button>
+      <button class="chip-btn" id="navConv" data-go="sec-conv">💱 Cambio</button>
       <button class="chip-btn" data-go="sec-budget">💶 Budget</button>
       <button class="chip-btn" data-go="sec-check">✅ Checklist</button>
-      <button class="chip-btn" data-go="sec-phrases">🗣️ Frasi</button>
+      <button class="chip-btn" id="navInfo" data-go="sec-info">ℹ️ Info paese</button>
+      <button class="chip-btn" id="navPhr" data-go="sec-phrases">🗣️ Frasi</button>
       <button class="chip-btn" data-go="sec-weather">⛅ Meteo</button>
       <button class="chip-btn" data-go="sec-sos">🚨 Emergenze</button>
       <button class="chip-btn" data-go="sec-backup">💾 Backup</button>
     </div>
 
-    <div class="section-title" id="sec-pay"><div><h3>📱 Pagamenti Rapidi</h3><p>Apri le app cinesi con un tocco.</p></div></div>
-    <div class="quick-apps" style="margin-bottom: 24px;">
-      <a href="alipay://" class="app-alipay">💳 Apri Alipay</a>
-      <a href="weixin://" class="app-wechat">💬 Apri WeChat</a>
-    </div>
+    <div class="section-title" id="sec-pay" hidden><div><h3>📱 App utili</h3><p>Apri le app del posto con un tocco.</p></div></div>
+    <div class="quick-apps" id="quickApps" style="margin-bottom: 24px;" hidden></div>
 
-    <div class="section-title"><div><h3>💱 Convertitore Rapido</h3><p id="rateLabel">Calcolo istantaneo offline.</p></div></div>
-    <div class="utility-card" style="margin-bottom: 24px;">
+    <div class="section-title" id="sec-conv"><div><h3>💱 Convertitore Rapido</h3><p id="rateLabel">Calcolo istantaneo offline.</p></div></div>
+    <div class="utility-card" id="convCard" style="margin-bottom: 24px;">
       <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: center;">
         <div>
           <label for="convYuan" style="font-size: 13px; color: var(--muted); font-weight: 600; display: block; margin-bottom: 8px; text-align: center;" id="convLabel"></label>
@@ -479,8 +478,11 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
       </div>
     </div>
 
-    <div class="section-title" id="sec-phrases"><div><h3>🗣️ Frasi utili</h3><p>Tocca "Mostra" per far leggere il cinese a chi hai davanti.</p></div></div>
-    <div class="utility-card" style="margin-bottom: 24px;">
+    <div class="section-title" id="sec-info" hidden><div><h3>ℹ️ Info paese</h3><p>Cose pratiche da sapere. Tocca per aprire.</p></div></div>
+    <div class="utility-card" id="infoBox" style="margin-bottom: 24px;" hidden></div>
+
+    <div class="section-title" id="sec-phrases"><div><h3>🗣️ Frasi utili</h3><p>Tocca "Mostra" per far leggere la frase a chi hai davanti.</p></div></div>
+    <div class="utility-card" id="phrasesCard" style="margin-bottom: 24px;">
       <input class="field" id="phraseSearch" placeholder="Cerca (es. bagno, conto, allergico)">
       <div id="phrasesBox"></div>
     </div>
@@ -532,12 +534,29 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
 </div>
 </div>
 
+<script src="trip-md.js"></script>
 <script>
-/* Il viaggio da aprire si sceglie con ?t=nome (default: cina-2026) e si carica da trips/nome.js */
+/* Il viaggio da aprire si sceglie con ?t=nome (default: cina-2026): si legge trips/nome.md (o, in alternativa, trips/nome.js) */
 window.TRIP_ID = (new URLSearchParams(location.search).get('t') || 'cina-2026').replace(/[^a-z0-9_-]/gi, '');
-document.write('<script src="trips/' + window.TRIP_ID + '.js"><\/script>');
+(async function () {
+  const fail = msg => { document.body.innerHTML = '<div style="padding:32px 20px;font:16px -apple-system,sans-serif;line-height:1.5"><h2>Viaggio non trovato</h2><p>' + msg + '</p><p><a href="?t=cina-2026">Apri il viaggio predefinito</a></p></div>'; };
+  try {
+    let ok = false;
+    try {
+      const r = await fetch('trips/' + window.TRIP_ID + '.md');
+      if (r.ok) { window.TRIP_DATA = TripMd.parse(await r.text()); ok = true; }
+    } catch (e) { console.error(e); }
+    if (!ok) {
+      await new Promise(res => { const sc = document.createElement('script'); sc.src = 'trips/' + window.TRIP_ID + '.js'; sc.onload = res; sc.onerror = res; document.head.appendChild(sc); });
+      ok = !!window.TRIP_DATA;
+    }
+    if (!ok && location.protocol === 'file:') return fail('Questa app legge i viaggi via web: aprila dall\'indirizzo GitHub Pages (https://…github.io/…), non facendo doppio clic sul file.');
+    if (!ok) return fail('Non trovo <b>trips/' + window.TRIP_ID + '.md</b>. Controlla il nome nell\'indirizzo (?t=...) e che il file sia stato caricato.');
+    const sc = document.createElement('script'); sc.textContent = document.getElementById('appcode').textContent; document.body.appendChild(sc);
+  } catch (e) { fail('Errore nella lettura del viaggio: ' + String(e.message || e)); }
+})();
 </script>
-<script>
+<script type="text/plain" id="appcode">
 const $ = id => document.getElementById(id);
 const SCRIPT_CLS = (window.TRIP_DATA.meta.script) || '\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af\u0e00-\u0e7f';
 const SCRIPT_RUN = new RegExp('[' + SCRIPT_CLS + '][' + SCRIPT_CLS + '·,、]*', 'g');
@@ -546,6 +565,7 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt
 
 /* ====================== DATI DEL VIAGGIO (da trips/*.js) ====================== */
 const { meta, trip, companionData, HOTELS, DRIVER_PHRASES, DIARY, CITY_KEY, reservations, transfers, checklistData, phrases, CATS } = window.TRIP_DATA;
+const INFO = window.TRIP_DATA.INFO || [];
 /* collega diario e hotel ai dati base */
 trip.cities.forEach(c => { const h = HOTELS[CITY_KEY[c.name]]; c.key = CITY_KEY[c.name]; c.hotel = h.name; c.hotelZh = h.zh; });
 trip.days.forEach(day => { const x = DIARY[day.day]; if (!x) return; day.det = x.stops; day.sleep = x.sleep; day.stops = x.stops.map(st => [st.t, st.title, st.sum || '']); });
@@ -600,7 +620,13 @@ function updateClocks() {
 setInterval(updateClocks, 1000);
 updateClocks();
 
-function appleMaps(query){ return `https://maps.apple.com/?q=${encodeURIComponent(query)}`; }
+/* Mappe: si sceglie per viaggio con "maps:" nell'intestazione (apple, google o amap) */
+function appleMaps(q) {
+  const e = encodeURIComponent(q), m = String(meta.maps || 'apple').toLowerCase();
+  if (m === 'google') return `https://www.google.com/maps/search/?api=1&query=${e}`;
+  if (m === 'amap') return `https://uri.amap.com/search?keyword=${e}&src=${meta.id}`;
+  return `https://maps.apple.com/?q=${e}`;
+}
 
 function destToday() { return new Date().toLocaleDateString('en-CA', { timeZone: meta.tz }); }
 const dayISO = d => {
@@ -658,11 +684,16 @@ function showBig(title, big, sub, icon) {
       ${sub ? `<p style="margin-top: 20px; font-size: 16px; color: var(--muted);">${esc(sub)}</p>` : ''}
     </div>`);
 }
-function transitApple(q){ return `https://maps.apple.com/?daddr=${encodeURIComponent(q)}&dirflg=r`; }
+function transitApple(q) {
+  const e = encodeURIComponent(q), m = String(meta.maps || 'apple').toLowerCase();
+  if (m === 'google') return `https://www.google.com/maps/dir/?api=1&destination=${e}&travelmode=transit`;
+  if (m === 'amap') return `https://uri.amap.com/navigation?to=,,${e}&mode=bus&src=${meta.id}&callnative=0`;
+  return `https://maps.apple.com/?daddr=${e}&dirflg=r`;
+}
 /* Scheda da mostrare al tassista/DiDi: nome e indirizzo grandi, frase pronta, telefono, mappe, modifica */
 function showPlaceCard(p) {
   const zh = (p.zh || '').trim(), addr = (p.addr || '').trim();
-  if (!zh && !addr) { toast('Inserisci prima nome o indirizzo in cinese (✏️)'); if (p.onEdit) p.onEdit(); return; }
+  if (!zh && !addr) { toast('Inserisci prima nome o indirizzo nella lingua locale (✏️)'); if (p.onEdit) p.onEdit(); return; }
   const q = zh || addr;
   const btns = [
     p.tel ? `<a class="btn small primary" href="tel:${esc(p.tel)}">📞 Chiama</a>` : '',
@@ -692,16 +723,16 @@ function showPlaceCard(p) {
 }
 /* Retro-compatibilità: Taxi Card da un testo cinese libero (trasferimenti) */
 function showTaxiCard(zh) {
-  if (!zh) { alert('Inserisci prima il nome in cinese, che trovi sul biglietto.'); return; }
+  if (!zh) { alert('Inserisci prima il nome nella lingua locale, che trovi sul biglietto.'); return; }
   showPlaceCard({ title: "Mostra all'autista", zh });
 }
 
 /* Modifica nome/indirizzo in cinese: resta salvato sul telefono */
 function editAddr(key, cur, title, done) {
   openModal('✏️ ' + title, `<div class="edit-form">
-    <label class="lbl">Nome in cinese (come sull'app/biglietto)</label><input class="field" id="edZh" value="${esc(cur.zh || '')}" placeholder="es. 月牙酒店">
-    <label class="lbl">Indirizzo in cinese</label><input class="field" id="edAd" value="${esc(cur.addr || '')}" placeholder="es. 青羊区顺城大街127号">
-    <label class="lbl">Indirizzo in caratteri latini (mostrato nell'app)</label><input class="field" id="edLat" value="${esc(cur.lat || '')}" placeholder="es. No. 127 Shuncheng Street, Chengdu">
+    <label class="lbl">Nome nella lingua locale (come sull'app/biglietto)</label><input class="field" id="edZh" value="${esc(cur.zh || '')}" placeholder="nome nella scrittura locale">
+    <label class="lbl">Indirizzo nella lingua locale</label><input class="field" id="edAd" value="${esc(cur.addr || '')}" placeholder="indirizzo nella scrittura locale">
+    <label class="lbl">Indirizzo in caratteri latini (mostrato nell'app)</label><input class="field" id="edLat" value="${esc(cur.lat || '')}" placeholder="indirizzo in caratteri latini">
     <div class="act-row"><button class="btn primary" id="edSave">Salva</button><button class="btn" id="edReset">Ripristina originale</button></div></div>`);
   $('edSave').onclick = () => {
     const zh = $('edZh').value.trim(), addr = $('edAd').value.trim(), lat = $('edLat').value.trim();
@@ -1059,7 +1090,7 @@ function detHTML(day, i) {
   const sec = (label, txt) => txt ? `<div class="sec"><b>${label}</b><div>${esc(L(txt))}</div></div>` : '';
   let h = '';
   if (p.zh || p.addr || st.editable) {
-    h += `<div class="pl">${(p.zh || p.addr) ? `<div class="pl-lat">${esc(L(p.py || st.title))}</div>${p.pya ? `<div class="pl-ad">${esc(p.pya)}</div>` : ''}<div class="py">I caratteri cinesi sono nel pulsante 🚕</div>` : '<div class="pl-empty">Indirizzo non ancora inserito: usa ✏️</div>'}</div>`;
+    h += `<div class="pl">${(p.zh || p.addr) ? `<div class="pl-lat">${esc(L(p.py || st.title))}</div>${p.pya ? `<div class="pl-ad">${esc(p.pya)}</div>` : ''}<div class="py">I caratteri locali sono nel pulsante 🚕</div>` : '<div class="pl-empty">Indirizzo non ancora inserito: usa ✏️</div>'}</div>`;
   }
   h += sec('Come arrivare', st.how) + sec('Orari', st.hours) + sec('Costi', st.cost) + sec('Prenotazione', st.book);
   if (st.warn) h += `<div class="warnbox">⚠️ ${esc(L(st.warn))}</div>`;
@@ -1247,7 +1278,7 @@ function renderCompanion() {
         <button class="btn small ghost listen-btn" type="button" data-label="🔊 Ascolta">🔊 Ascolta</button>
       </div>`;
     card.querySelector('.read-btn').addEventListener('click', () => openStop(list, i));
-    card.querySelector('.listen-btn').addEventListener('click', e => speak(stop.text, 'it-IT', e.currentTarget, Number(state.ttsRate) || 0.95));
+    card.querySelector('.listen-btn').addEventListener('click', e => speak(stop.text, meta.guideLang || 'it-IT', e.currentTarget, Number(state.ttsRate) || 0.95));
     card.querySelector('.fav').addEventListener('click', e => {
       if (state.favs[key]) delete state.favs[key]; else state.favs[key] = true;
       saveState();
@@ -1290,12 +1321,12 @@ function openStop(list, i) {
     ${section('Particolarità', stop.particolarita)}
     ${section('📷 Cosa osservare sul posto', stop.osservare)}
     ${section('📸 La foto perfetta', stop.foto)}
-    ${section('🗣 Una parola cinese', stop.parola)}
+    ${section('🗣 Una parola locale', stop.parola)}
     <div class="grid-2" style="margin-top:28px;">
       <button class="btn m-prev" type="button" ${i === 0 ? 'disabled' : ''}>← Precedente</button>
       <button class="btn m-next" type="button" ${i === list.length - 1 ? 'disabled' : ''}>Successiva →</button>
     </div>`;
-  box.querySelector('.m-listen').addEventListener('click', e => speak(stop.text, 'it-IT', e.currentTarget, Number(state.ttsRate) || 0.95));
+  box.querySelector('.m-listen').addEventListener('click', e => speak(stop.text, meta.guideLang || 'it-IT', e.currentTarget, Number(state.ttsRate) || 0.95));
   const taxi = box.querySelector('.m-taxi');
   if (taxi) taxi.addEventListener('click', () => { stopSpeech(); showBig('Mostra all\'autista', hanzi, 'Mi porti qui, per favore.', '🚕'); });
   box.querySelector('.m-fav').addEventListener('click', e => {
@@ -1549,6 +1580,18 @@ $('phraseSearch').addEventListener('input', e => renderPhrases(e.target.value));
 $('wxRefresh').addEventListener('click', () => refreshWeather(true));
 
 /* personalizzazione dal file del viaggio */
+const hasInfo = INFO.length > 0, hasPhr = phrases.length > 0;
+['sec-info', 'infoBox', 'navInfo'].forEach(id => { $(id).hidden = !hasInfo; });
+['sec-phrases', 'phrasesCard', 'navPhr'].forEach(id => { $(id).hidden = !hasPhr; });
+if (hasInfo) $('infoBox').innerHTML = INFO.map(g => `<details class="more" style="margin-top:8px"><summary><b>${esc(g.title)}</b></summary><ul class="sec" style="margin-top:8px">${g.items.map(i => `<li>${esc(i)}</li>`).join('')}</ul></details>`).join('');
+const foreignCur = !!(meta.currency && meta.currency.symbol && meta.currency.symbol !== '€');
+['sec-conv', 'convCard', 'navConv'].forEach(id => { $(id).hidden = !foreignCur; });
+$('navPay').hidden = !(meta.apps && meta.apps.length);
+if (!foreignCur) { const ec = $('expenseCurrency'); ec.value = '€'; ec.hidden = true; }
+if (meta.apps && meta.apps.length) {
+  $('sec-pay').hidden = false; const qa = $('quickApps'); qa.hidden = false;
+  qa.innerHTML = meta.apps.map(a => { const [label, url] = String(a).split(' | '); return `<a href="${esc((url || '').trim())}">${esc((label || '').trim())}</a>`; }).join('');
+}
 (function () { try {
   const base = location.origin + location.pathname.replace(/[^/]*$/, '');
   const ic = meta.icon || {};
