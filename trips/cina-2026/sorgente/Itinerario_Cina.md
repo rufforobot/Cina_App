@@ -178,14 +178,14 @@ Sera libera per riposare con calma — il giorno dopo (mercato locale, Nanjing R
 
 | Orario | Destinazione | Trasporto | Note |
 |---|---|---|---|
-| **09:00** | Mercato locale (zona Xintiandi) | 🚇 L10, diretta | Nessun orario fisso — di lunedì è più autentico che nel weekend |
-| **10:30** | Nanjing Road (pedonale) | 🚇 L10, poche fermate | 30-45 min, solo un passaggio veloce |
+| **08:00** | Mercato locale (zona Xintiandi) | 🚇 L10, diretta | Nessun orario fisso — i mercati di quartiere danno il meglio presto, circa 6:30-9:00 |
+| **10:00** | Nanjing Road (pedonale) | 🚇 L10, poche fermate | 30-45 min, solo un passaggio veloce |
 | **11:30** | Pranzo | 🚶 | |
 | **13:00** | Wukang Mansion | 🚇 L10/11, Jiao Tong University (uscita 7) | inizio passeggiata |
 | **13:00-17:00** | Wukang Rd → Wuyuan Rd → Anfu Rd → lilong → Fuxing Park | 🚶 | 2,5km, 4h — luce migliore su Wukang Mansion tra le 16:00-17:30 |
 | **19:00** | Cena in zona | 🚶 | Concessione Francese, molte opzioni |
 
-⚠️ **Lunedì lo Yu Garden è chiuso** (l'abbiamo spostato al Giorno 3, domenica). La mattina è quindi per la vita locale: **passeggiata libera in un mercato di quartiere** vicino a Xintiandi/Concessione Francese (senza orari fissi: banchi di verdura, pesce vivo nelle vasche, la contrattazione quotidiana — di lunedì è la vita di tutti i giorni, non il weekend). Poi un passaggio veloce su **Nanjing Road** pedonale, e pranzo.
+⚠️ **Lunedì lo Yu Garden è chiuso** (l'abbiamo spostato al Giorno 3, domenica). La mattina è quindi per la vita locale: **passeggiata libera in un mercato di quartiere** vicino a Xintiandi/Concessione Francese (senza orari fissi: banchi di verdura, pesce vivo nelle vasche, la contrattazione quotidiana; andateci presto, verso le 8:00, perché il momento migliore dei mercati di quartiere è la prima mattina). Poi un passaggio veloce su **Nanjing Road** pedonale, e pranzo.
 
 **Pomeriggio: Concessione Francese, sul serio** — non una passeggiata serale di un'ora, ma il quartiere vissuto per quello che è: **Wukang Mansion** (il palazzo Normandie del 1924, il più fotografato della città), poi **Wukang Road** (oltre 50 edifici storici anni '20-'30, stili francese/spagnolo/inglese/Art Déco mescolati), **Wuyuan Road** (caffè indipendenti), **Anfu Road** (boutique, moda giovane), i piccoli **lilong** residenziali lungo il percorso, fino a **Fuxing Park** — 2,5 km, 3-4 ore con calma, il modo in cui i viaggiatori aggiornati al 2026 descrivono davvero questo quartiere: a piedi, senza fretta, deviando in un vicolo quando qualcosa attira l'occhio.
 
@@ -634,4 +634,4 @@ Man mano che prenoti qualcosa, dimmi la cifra e aggiorno la tabella.
 
 *Prossimi passi: proseguire con treni, hotel e biglietti seguendo il calendario in sezione 10. Lungo il percorso trovate sempre le due opzioni 📸/🔸 affiancate — decidete giorno per giorno.*
 
-*Versione v12 — 01/10/2026*
+*Versione v13 — 01/10/2026*
