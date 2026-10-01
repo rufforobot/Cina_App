@@ -282,13 +282,11 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
 .stop-acts { grid-column: 1 / -1; }
 .stop-acts > .btn-grid:first-child { margin-top: 0; }
 .btn-grid > .btn { background: var(--surface-2); width: 100%; min-height: 42px; padding: 8px 4px; border-radius: 12px; white-space: nowrap; min-width: 0; text-decoration: none; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
-.btn-grid > .btn.taxi-btn { background: var(--warn); color: #fff; border-color: transparent; font-weight: 700; }
 .btn-grid > .btn.primary { background: var(--accent-2); color: #fff; border-color: transparent; }
 .act-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .act-row .btn, .act-row a.btn { text-decoration: none; }
 .act-row .btn, .stop-pills .btn { background: var(--surface); }
 .act-row .btn.primary { background: var(--accent-2); color: #fff; }
-.btn.taxi-btn, .act-row .btn.taxi-btn, .stop-pills .btn.taxi-btn { background: var(--warn); color: #fff; font-weight: 700; }
 .stop-pills .btn { background: var(--surface-2); }
 .modal-body .act-row .btn { background: var(--surface-2); }
 .modal-body .act-row .btn.primary { background: var(--accent-2); color: #fff; }
@@ -723,7 +721,7 @@ function bAct(label, fn, cls) { const b = document.createElement('button'); b.ty
 function bLink(label, href, cls, ext) { const a = document.createElement('a'); a.className = 'btn small ' + (cls || ''); a.href = href; a.textContent = label; if (ext) { a.target = '_blank'; a.rel = 'noopener'; } return a; }
 function routeRow(q, taxiFn) {
   const it = [];
-  if (taxiFn) it.push(bAct('Taxi', taxiFn, 'taxi-btn'));
+  if (taxiFn) it.push(bAct('Taxi', taxiFn));
   if (q) { it.push(bLink('Mappa', appleMaps(q))); it.push(bLink('Metro', transitApple(q))); }
   return it.length ? btnGrid(it) : null;
 }
