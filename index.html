@@ -566,6 +566,8 @@ main { padding: 16px 16px 140px; }
 .news-item p { margin: 0; font-size: 14px; color: var(--muted); }
 .news-item small { color: var(--muted); font-size: 13px; }
 .news-item a { color: var(--accent); font-size: 13px; font-weight: 600; text-decoration: none; }
+/* le mappe Leaflet hanno livelli con z-index alti: isolarle perché non passino sopra popup e menu */
+.day-map, #dmMap, .leaflet-container { isolation: isolate; }
 </style>
 </head>
 <body>
