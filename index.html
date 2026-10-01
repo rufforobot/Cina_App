@@ -129,6 +129,8 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
 .wsec[open] > summary::after { transform: rotate(180deg); }
 .wsec > .wallet-grid, .wsec > .utility-card { margin-top: 12px; }
 .utility-card.glist { padding: 16px 0 4px; }
+.card.glist { padding: 20px 0 8px; }
+.card.glist .grow:first-of-type { margin-top: 8px; }
 .glist .companion-meta { padding: 0 20px 6px; }
 .grow { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 10px; border: none; background: none; color: var(--text); text-align: left; padding: 12px 20px; border-top: 0.5px solid var(--glass-border); }
 .grow::after { content: '\203A'; color: var(--muted); font-size: 22px; line-height: 1; }
@@ -562,7 +564,7 @@ main { padding: 16px 16px 140px; }
 
     <section class="card" id="nowCard"></section>
 
-    <div id="todayGuides" style="margin-bottom:24px;"></div>
+    <div id="todayGuides"></div>
 
 
 
@@ -582,9 +584,6 @@ main { padding: 16px 16px 140px; }
         <button type="button" class="tool-btn" data-go="budget"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>Budget</button>
       </div>
     </section>
-
-    <div class="section-title"><div><h3>Guide nella tua città</h3></div></div>
-    <div id="todayGuides" style="margin-bottom:24px;"></div>
 
   </section>
 
@@ -1932,8 +1931,8 @@ function renderTodayGuides() {
   const d = trip.days[tripDayIndex()]; if (!d) return;
   const list = guidesForDay(d);
   if (!list.length) return;
-  const card = document.createElement('div'); card.className = 'utility-card glist';
-  card.innerHTML = `<div class="companion-meta">${tripStarted() ? 'Guide di oggi' : 'Guide del primo giorno'}</div>`;
+  const card = document.createElement('section'); card.className = 'card glist';
+  card.innerHTML = `<h3 style="padding:0 20px;">${tripStarted() ? 'Guide di oggi' : 'Guide del primo giorno'}</h3><p style="padding:0 20px;">Tocca per ascoltare o leggere la guida.</p>`;
   list.forEach((x, i) => {
     const b = document.createElement('button'); b.type = 'button'; b.className = 'grow';
     b.innerHTML = `<span><b>${esc(x.stop.title)}</b><small>${esc(x.city)} · ${esc(tagLabel(x.stop.tag))}</small></span>`;
