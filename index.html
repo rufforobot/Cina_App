@@ -130,6 +130,8 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
 .glist .companion-meta { padding: 0 20px 6px; }
 .grow { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 10px; border: none; background: none; color: var(--text); text-align: left; padding: 12px 20px; border-top: 0.5px solid var(--glass-border); }
 .grow::after { content: '\203A'; color: var(--muted); font-size: 22px; line-height: 1; }
+.grow.nr::after { content: none; }
+.grow.nr .btn { flex: 0 0 auto; }
 .grow b { display: block; font-size: 16px; font-weight: 600; }
 .grow small { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
 .grow.more b { color: var(--accent-2); }
@@ -141,6 +143,7 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
 .seg button.on { background: var(--surface); box-shadow: 0 1px 4px rgba(0,0,0,.15); }
 .util-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .util-tile { text-align: left; border: 0.5px solid var(--glass-border); background: var(--glass); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); box-shadow: var(--shadow); border-radius: var(--radius); padding: 16px 16px 14px; color: var(--text); min-height: 92px; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; }
+.util-tile:last-child:nth-child(odd) { grid-column: 1 / -1; }
 .util-tile:active { transform: scale(.98); }
 .util-tile b { font-size: 17px; letter-spacing: -.3px; display: flex; justify-content: space-between; align-items: center; }
 .util-tile b::after { content: '\203A'; color: var(--muted); font-size: 22px; font-weight: 400; }
@@ -198,10 +201,12 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
 .badge.warn { background: color-mix(in srgb, var(--warn) 20%, var(--surface)); color: var(--warn); }
 .badge.done { background: color-mix(in srgb, var(--ok) 20%, var(--surface)); color: var(--ok); }
 
-.today-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
-.today-card { padding: 20px; background: var(--glass); border: 0.5px solid var(--glass-border); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); box-shadow: var(--shadow); border-radius: var(--radius); }
-.today-card h3 { margin: 0 0 6px; font-size: 20px; font-weight: 700; letter-spacing: -0.4px; }
-.today-card p { margin: 4px 0 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
+.now-card { padding: 20px; margin-bottom: 24px; background: var(--glass-strong, var(--glass)); border: 0.5px solid var(--glass-border); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); box-shadow: var(--shadow); border-radius: var(--radius); }
+.now-card .nc-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.now-card .nc-time { font-size: 15px; font-weight: 700; color: var(--accent-2); white-space: nowrap; }
+.now-card h3 { margin: 6px 0 4px; font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+.now-card p { margin: 0 0 14px; color: var(--muted); font-size: 14px; line-height: 1.45; }
+.now-card .btn-grid { margin-top: 0; }
 
 .bottom-nav {
   display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
@@ -293,7 +298,6 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
 
 @media (max-width: 640px) {
   .hero { grid-template-columns: 1fr; }
-  .today-grid { grid-template-columns: 1fr; }
   main { padding: 16px 16px 100px; }
   .city-grid, .companion-grid, .wallet-grid { grid-template-columns: 1fr; }
 }
@@ -421,28 +425,17 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
       </div>
     </div>
 
-    <div class="today-grid">
-      <div class="today-card" id="todayMode"></div>
-      <div class="today-card" id="todayNext"></div>
-    </div>
+    <div class="now-card" id="nowCard"></div>
 
     <div id="todayWeather" style="margin-bottom: 24px;"></div>
 
     <div id="todayHotel" style="margin-bottom: 24px;"></div>
 
-    <div class="home-pair">
-      <div>
-        <div class="section-title"><div><h3>Prossimo trasferimento</h3><p>Volo o treno in arrivo. Aggiungi posto, binario o gate.</p></div></div>
-        <div id="nextTransfer"></div>
-      </div>
-      <div>
-        <div class="section-title"><div><h3>Guide nella tua città</h3></div></div>
-        <div id="todayGuides"></div>
-      </div>
-    </div>
+    <div class="section-title"><div><h3>Guide nella tua città</h3></div></div>
+    <div id="todayGuides" style="margin-bottom:24px;"></div>
 
     <div class="section-title" id="bookingAlertsTitle" style="display:none;">
-      <div><h3>Alert Prenotazioni</h3><p>Da prenotare, in ordine di apertura (orario italiano).</p></div>
+      <div><h3>Da fare</h3><p>Promemoria e prenotazioni in scadenza (orario italiano).</p></div>
     </div>
     <div class="city-grid" id="bookingAlertsGrid" style="margin-bottom: 24px;"></div>
 
@@ -466,6 +459,7 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
 
   <!-- WALLET -->
   <section id="wallet" class="view">
+    <div class="btn-grid" style="--n:1; margin-bottom:12px;"><button class="btn small" id="impBtn" type="button">Importa da email</button></div>
     <details class="wsec" id="secTr"><summary><span>Trasferimenti</span><small id="cntTr"></small></summary>
       <div class="wallet-grid" id="transferGrid"></div></details>
 
@@ -474,6 +468,9 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
 
     <details class="wsec" id="secAttr"><summary><span>Attrazioni</span><small id="cntAttr"></small></summary>
       <div class="wallet-grid" id="walletGrid"></div></details>
+
+    <details class="wsec" id="secImp" hidden><summary><span>Importate da email</span><small id="cntImp"></small></summary>
+      <div class="wallet-grid" id="impGrid"></div></details>
 
     <details class="wsec"><summary><span>Promemoria sul calendario</span></summary>
       <div class="utility-card">
@@ -570,6 +567,21 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
       <div id="sosGrid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center; margin-top: 12px;"></div>
       <a class="btn small warn" id="sosAssist" style="width:100%; margin-top:12px;"></a>
     </div>
+    </div>
+    <div class="upanel" id="up-docs" hidden>
+      <button class="ubar" type="button" data-uback>&lsaquo; Utili</button>
+    <div class="section-title"><div><h3>Documenti</h3></div></div>
+    <div id="docsBox" style="margin-bottom:24px;"></div>
+    </div>
+    <div class="upanel" id="up-remind" hidden>
+      <button class="ubar" type="button" data-uback>&lsaquo; Utili</button>
+    <div class="section-title"><div><h3>Promemoria</h3></div></div>
+    <div id="remBox" style="margin-bottom:24px;"></div>
+    </div>
+    <div class="upanel" id="up-trans" hidden>
+      <button class="ubar" type="button" data-uback>&lsaquo; Utili</button>
+    <div class="section-title"><div><h3>Traduttore</h3></div></div>
+    <div id="transBox" style="margin-bottom:24px;"></div>
     </div>
     <div class="upanel" id="up-backup" hidden>
       <button class="ubar" type="button" data-uback>&lsaquo; Utili</button>
@@ -927,55 +939,67 @@ function pendingReservations() {
     .filter(r => r.status.includes('Da prenotare') && !state.booked[r.id])
     .sort((a, b) => (a.opens ? +parseOpens(a.opens) : Infinity) - (b.opens ? +parseOpens(b.opens) : Infinity));
 }
+function nextTransferObj() { return transfers.find(t => new Date(t.dep) > Date.now()); }
 function renderToday() {
   renderTodayHotel();
-  const modeEl = $('todayMode'), nextEl = $('todayNext');
+  const box = $('nowCard'); if (!box) return;
   const today = destToday();
   const started = today >= dayISO(trip.days[0]);
   const ended = today > dayISO(trip.days[trip.days.length - 1]);
   const d = trip.days[tripDayIndex()];
-
-  if (!started) {
-    const pending = pendingReservations();
-    modeEl.innerHTML = `<div class="companion-meta">Prima della partenza</div><h3>Giorno 1 · ${esc(d.city)}</h3><p>${esc(d.date)} · ${esc(d.title)}</p>`;
-    nextEl.innerHTML = pending.length
-      ? `<div class="companion-meta">Da prenotare</div><h3>${esc(pending[0].title)}</h3><p>Per il ${esc(pending[0].date)} · ${esc(pending[0].ref)}</p>`
-      : `<div class="companion-meta">Prenotazioni</div><h3>Tutto prenotato </h3><p>Nessuna prenotazione in sospeso.</p>`;
-    return;
-  }
+  const tr = nextTransferObj();
+  let label = '', time = '', title = '', sub = '', acts = null;
+  const nextIdx = started && !ended ? d.stops.findIndex((_, i) => !state.completed[`${d.day}-${i}`]) : -1;
+  const trSoon = tr && (new Date(tr.dep) - Date.now() < 86400000);
   if (ended) {
-    modeEl.innerHTML = `<div class="companion-meta">Viaggio</div><h3>Concluso ✓</h3><p>Rivedi le note nell'Itinerario.</p>`;
-    nextEl.innerHTML = `<div class="companion-meta">Prossima tappa</div><h3>A presto!</h3>`;
-    return;
-  }
-  modeEl.innerHTML = `<div class="companion-meta">Oggi · Giorno ${d.day}</div><h3>${esc(d.city)}</h3><p>${esc(d.date)} · ${esc(d.title)}</p>`;
-  const nextIdx = d.stops.findIndex((_, i) => !state.completed[`${d.day}-${i}`]);
-  if (nextIdx < 0) {
-    nextEl.innerHTML = `<div class="companion-meta">Prossima tappa</div><h3>Giornata completata </h3><p>Hai spuntato tutte le tappe di oggi.</p>`;
+    label = 'Viaggio'; title = 'Concluso'; sub = 'Rivedi le note nell\'Itinerario.';
+  } else if (tr && (!started || nextIdx < 0 || trSoon)) {
+    const ms = new Date(tr.dep) - Date.now();
+    const isFl = /Volo/.test(tr.type);
+    const depName = tr.title.split('→')[0].replace(/^[A-Z0-9]{2,7}\s*(\([^)]*\))?\s*·\s*/, '').trim();
+    label = (started ? 'Adesso' : 'Prima della partenza') + ' · ' + tr.type;
+    time = 'tra ' + relTime(ms);
+    title = tr.title; sub = 'Partenza ' + fmtLocal(tr.dep) + ' (ora locale)';
+    const q = tr.zh || (depName + (isFl ? ' airport' : ' station'));
+    acts = routeRow(q, tr.zh ? () => showPlaceCard({ title: depName, zh: tr.zh, latName: depName }) : null);
+  } else if (nextIdx >= 0) {
+    const st = d.stops[nextIdx], det = d.det && d.det[nextIdx];
+    label = `Adesso · Giorno ${d.day} · ${d.city}`; time = st[0];
+    title = L(st[1]); sub = L(st[2]);
+    if (det) { const p = placeInfo(d, nextIdx); acts = routeRow(stopMapQ(d, det, p), p.zh ? () => showPlaceCard(stopCardData(d, nextIdx)) : null); }
   } else {
-    const s = d.stops[nextIdx];
-    nextEl.innerHTML = `<div class="companion-meta">Prossima tappa · ${esc(s[0])}</div><h3>${esc(L(s[1]))}</h3><p>${esc(L(s[2]))}</p>`;
+    label = `Giorno ${d.day} · ${d.city}`; title = 'Giornata completata'; sub = 'Hai spuntato tutte le tappe di oggi.';
   }
+  box.innerHTML = `<div class="nc-top"><div class="companion-meta" style="margin:0;">${esc(label)}</div>${time ? `<span class="nc-time">${esc(time)}</span>` : ''}</div><h3>${esc(title)}</h3><p>${esc(sub)}</p>`;
+  if (acts) box.appendChild(acts);
 }
+function renderNextTransfer() { renderToday(); }
 
 /* ====================== ALERT PRENOTAZIONI ====================== */
 function renderBookingAlerts() {
   const wrap = $('bookingAlertsGrid'), title = $('bookingAlertsTitle');
   wrap.innerHTML = '';
   const toBook = pendingReservations();
-  if (!toBook.length) { title.style.display = 'none'; return; }
+  const due = typeof dueReminders === 'function' ? dueReminders() : [];
+  if (!toBook.length && !due.length) { title.style.display = 'none'; return; }
   title.style.display = 'flex';
+  due.forEach(r => {
+    const card = document.createElement('div'); card.className = 'utility-card';
+    card.innerHTML = `<div class="companion-meta">Promemoria</div><h4 style="margin:0; font-size:18px;">${esc(r.title)}</h4><p style="margin:8px 0 0; font-size:14px; font-weight:500;">${esc(r.sub)}</p><p style="margin:4px 0 0; font-size:14px; font-weight:600; color:var(--accent-2);">${esc(fmtDT(r.at))}</p><button class="btn small" style="width:100%; margin-top:12px;">Fatto</button>`;
+    card.querySelector('button').onclick = () => { state.remDone[r.id] = true; saveState(); renderBookingAlerts(); renderReminders(); };
+    wrap.appendChild(card);
+  });
   toBook.forEach(r => {
     let when = '';
     if (r.opens) {
       const ms = parseOpens(r.opens) - Date.now();
       when = ms > 0 ? `Apre tra ${relTime(ms)}` : 'Già aperta: prenota ora';
     }
-    const card = document.createElement('div'); card.className = 'utility-card'; card.style.border = '2px solid var(--warn)';
-    card.innerHTML = `<div style="display:flex; justify-content:space-between; gap:8px;"><div><div class="companion-meta">${esc(r.type)}</div><h4 style="margin:0; font-size:18px;">${esc(r.title)}</h4></div><span class="badge warn">${esc(r.ref)}</span></div>
+    const card = document.createElement('div'); card.className = 'utility-card';
+    card.innerHTML = `<div style="display:flex; justify-content:space-between; gap:8px;"><div><div class="companion-meta">${esc(r.type)}</div><h4 style="margin:0; font-size:18px;">${esc(r.title)}</h4></div><span class="badge">${esc(r.ref)}</span></div>
       <p style="margin: 8px 0 0; font-size:14px; font-weight: 500;">Per il: ${esc(r.date)}</p>
-      ${when ? `<p style="margin: 4px 0 0; font-size:14px; font-weight: 700; color: var(--warn);">${esc(when)}</p>` : ''}
-      <button class="btn warn small" style="width:100%; margin-top: 12px;">Fatto</button>`;
+      ${when ? `<p style="margin: 4px 0 0; font-size:14px; font-weight: 600; color: var(--accent-2);">${esc(when)}</p>` : ''}
+      <button class="btn small" style="width:100%; margin-top: 12px;">Fatto</button>`;
     card.querySelector('button').onclick = () => { if (!confirm('Confermi di aver già prenotato "' + r.title + '"?')) return; state.booked[r.id] = true; saveState(); renderBookingAlerts(); renderWallet(); renderToday(); };
     wrap.appendChild(card);
   });
@@ -1022,7 +1046,7 @@ function transferCard(t, ctx) {
     const nn = state.transferNotes[t.id], lv = q('[data-live]');
     lv.innerHTML = liveText(t, nn); lv.hidden = !lv.textContent.trim();
     // aggiorna l'altra vista senza togliere il focus da questa
-    if (ctx === 'next') renderTransfers(); else renderNextTransfer(true);
+    renderToday();
   };
   card.querySelectorAll('input').forEach(i => i.addEventListener('change', persist));
   return card;
@@ -1031,16 +1055,6 @@ function renderTransfers() {
   const wrap = $('transferGrid'); wrap.innerHTML = '';
   transfers.forEach(t => wrap.appendChild(transferCard(t, 'list')));
 }
-function renderNextTransfer(force) {
-  const box = $('nextTransfer');
-  if (!force && box.contains(document.activeElement) && document.activeElement !== document.body) return;
-  box.innerHTML = '';
-  const nxt = transfers.find(t => new Date(t.dep) > Date.now());
-  if (!nxt) { box.innerHTML = '<div class="utility-card">Nessun trasferimento in programma.</div>'; return; }
-  const card = transferCard(nxt, 'next');
-  box.appendChild(card);
-}
-
 /* ====================== CALENDARIO (.ics) ====================== */
 const icsStamp = d => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
 const icsEsc = s => String(s).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
@@ -1092,6 +1106,7 @@ function renderWallet() {
   hotels.forEach(r => hotelWrap.appendChild(resCard(r)));
   attrs.forEach(r => attrWrap.appendChild(resCard(r)));
   renderCodes();
+  if (typeof renderImported === 'function') renderImported();
 }
 function resCard(r) {
   const card = document.createElement('article'); card.className = 'wallet-card';
@@ -1454,18 +1469,17 @@ function renderCompanion() {
   list.forEach(({ city, stop }, i) => {
     const key = stopKey(city, stop);
     let intro = stop.text.split('. ')[0] + '.';
-    if (intro.length > 130) intro = intro.slice(0, 127) + '...';
+    if (intro.length > 100) intro = intro.slice(0, 97).replace(/\s+\S*$/, '') + '...';
     const card = document.createElement('div'); card.className = 'companion-card';
     card.innerHTML = `<div style="display:flex; justify-content:space-between; gap:8px;">
         <div style="min-width:0;"><div class="city-name">${esc(stop.title)}</div>
-        <div class="companion-meta" style="margin-top:6px;">${esc(city)} · ${esc(L(stop.native).replace(/^[\s·]+/,''))}</div></div>
+        <div class="companion-meta" style="margin-top:6px;">${esc(city)} · ${esc(tagLabel(stop.tag))}</div></div>
         <button class="del-btn fav" type="button" style="color:var(--warn); font-size:22px;" aria-label="Preferito">${state.favs[key] ? '★' : '☆'}</button>
       </div>
-      <div class="chip-row"><span class="chip">${esc(tagLabel(stop.tag))}</span></div>
-      <p style="font-size:14px; color:var(--muted); line-height:1.5; margin-top:12px;">${esc(intro)}</p>
-      <div style="display:flex; gap:10px; margin-top:16px;">
-        <button class="btn small primary read-btn" type="button">Leggi tutto</button>
-        <button class="btn small ghost listen-btn" type="button" data-label="Ascolta">Ascolta</button>
+      <p style="font-size:14px; color:var(--muted); line-height:1.5; margin:10px 0 14px;">${esc(intro)}</p>
+      <div class="btn-grid" style="--n:2;">
+        <button class="btn small read-btn" type="button">Leggi</button>
+        <button class="btn small listen-btn" type="button" data-label="Ascolta">Ascolta</button>
       </div>`;
     card.querySelector('.read-btn').addEventListener('click', () => openStop(list, i));
     card.querySelector('.listen-btn').addEventListener('click', e => speak(stop.text, meta.guideLang || 'it-IT', e.currentTarget, 0.95));
@@ -1738,6 +1752,239 @@ function setupOffline() {
   if (navigator.storage && navigator.storage.persist) navigator.storage.persist();
 }
 
+/* ====================== EXTRA: PROMEMORIA, DOCUMENTI, IMPORT EMAIL, TRADUTTORE ====================== */
+const fmtDT = ms => new Date(ms).toLocaleString('it-IT', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Rome' });
+const cardBase = (inner, extra) => { const d = document.createElement('div'); d.className = 'utility-card'; d.style.cssText = 'margin-bottom:12px;' + (extra || ''); d.innerHTML = inner; return d; };
+
+/* ---- Promemoria ---- */
+function buildReminders() {
+  const out = [];
+  state.imported = state.imported || [];
+  if (transfers[0]) out.push({ id: 'esim', title: "Attiva l'eSIM", sub: 'Con il Wi-Fi, prima di partire', at: new Date(transfers[0].dep).getTime() - 86400000 });
+  transfers.forEach(t => {
+    const dep = new Date(t.dep).getTime(), fl = /Volo/.test(t.type);
+    if (fl) out.push({ id: 'ci-' + t.id, title: 'Check-in online', sub: t.title, at: dep - 86400000 });
+    out.push({ id: 'go-' + t.id, title: fl ? "Parti per l'aeroporto" : 'Parti per la stazione', sub: t.title + ' · ' + fmtLocal(t.dep), at: dep - (fl ? 4 : 1.5) * 3600000 });
+  });
+  reservations.forEach(r => { if (r.opens && !state.booked[r.id]) out.push({ id: 'op-' + r.id, title: 'Apre la prenotazione', sub: r.title, at: +parseOpens(r.opens) }); });
+  state.imported.forEach(x => { if (x.dep) out.push({ id: 'imp-' + x.id, title: x.title, sub: 'Prenotazione importata', at: new Date(x.dep).getTime() - 3 * 3600000 }); });
+  (state.remCustom = state.remCustom || []).forEach(c => out.push({ id: 'c-' + c.id, title: c.title, sub: 'Tuo promemoria', at: c.at, custom: c.id }));
+  return out.filter(r => !isNaN(r.at)).sort((a, b) => a.at - b.at);
+}
+function dueReminders() {
+  const now = Date.now(); state.remDone = state.remDone || {};
+  return buildReminders().filter(r => !state.remDone[r.id] && !r.id.startsWith('op-') && r.at <= now + 86400000 && r.at >= now - 12 * 3600000);
+}
+function renderReminders() {
+  const box = $('remBox'); if (!box) return; box.innerHTML = '';
+  state.remDone = state.remDone || {};
+  const now = Date.now();
+  const all = buildReminders().filter(r => r.at >= now - 12 * 3600000 || r.id.startsWith('op-') || r.custom);
+  const open = all.filter(r => !state.remDone[r.id]), done = all.filter(r => state.remDone[r.id]);
+  const perm = 'Notification' in window ? Notification.permission : 'unsupported';
+  const top = cardBase(`<div class="grid-2" style="margin:0;"></div><p class="note-line" style="margin:10px 0 0;">Le notifiche partono solo quando l'app è aperta. Per essere avvisato anche a telefono bloccato, aggiungi i promemoria al calendario.</p>`);
+  const g = top.querySelector('.grid-2');
+  g.appendChild(bAct(perm === 'granted' ? 'Notifiche attive' : 'Attiva notifiche', async () => {
+    if (!('Notification' in window)) return toast('Non supportate da questo browser');
+    const p = await Notification.requestPermission(); toast(p === 'granted' ? 'Notifiche attivate' : 'Notifiche non consentite'); renderReminders();
+  }));
+  g.appendChild(bAct('Esporta calendario', () => downloadFile(`${meta.id}-promemoria.ics`, buildICS(open.map(r => ({ uid: 'rem-' + r.id, title: r.title + ' · ' + r.sub, start: new Date(r.at).toISOString(), mins: 15 }))), 'text/calendar')));
+  box.appendChild(top);
+  const add = cardBase(`<div class="companion-meta">Nuovo promemoria</div><input class="field" data-f="t" placeholder="Cosa devi ricordare?"><input class="field" type="datetime-local" data-f="d" style="margin-top:8px;"><div class="btn-grid" style="--n:1;margin-top:10px;"></div>`);
+  add.querySelector('.btn-grid').appendChild(bAct('Aggiungi', () => {
+    const t = add.querySelector('[data-f="t"]').value.trim(), d = add.querySelector('[data-f="d"]').value;
+    if (!t || !d) return toast('Scrivi il testo e scegli data e ora');
+    state.remCustom.push({ id: Date.now(), title: t, at: new Date(d).getTime() }); saveState(); renderReminders(); renderBookingAlerts();
+  }));
+  box.appendChild(add);
+  const list = cardBase('', 'padding:16px 0 4px;'); list.classList.add('glist');
+  const row = (r, isDone) => {
+    const d = document.createElement('div'); d.className = 'grow nr';
+    const late = r.at < now && !isDone;
+    d.innerHTML = `<div style="min-width:0;flex:1;"><div style="font-weight:600;">${esc(r.title)}</div><div class="note-line" style="margin:2px 0 0;">${esc(r.sub)} · ${late ? 'scaduto' : esc(fmtDT(r.at))}</div></div>`;
+    const b = bAct(isDone ? 'Ripristina' : 'Fatto', () => { if (isDone) delete state.remDone[r.id]; else state.remDone[r.id] = true; saveState(); renderReminders(); renderBookingAlerts(); });
+    d.appendChild(b);
+    if (r.custom) d.appendChild(bAct('Elimina', () => { state.remCustom = state.remCustom.filter(c => c.id !== r.custom); saveState(); renderReminders(); renderBookingAlerts(); }));
+    return d;
+  };
+  list.innerHTML = `<div class="companion-meta">Da fare · ${open.length}</div>`;
+  if (!open.length) list.insertAdjacentHTML('beforeend', '<div class="note-line" style="padding:0 20px 12px;">Nessun promemoria in sospeso.</div>');
+  open.forEach(r => list.appendChild(row(r, false)));
+  if (done.length) { list.insertAdjacentHTML('beforeend', `<div class="companion-meta" style="padding-top:14px;">Completati · ${done.length}</div>`); done.forEach(r => list.appendChild(row(r, true))); }
+  box.appendChild(list);
+}
+function checkNotify() {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  state.remDone = state.remDone || {}; state.remNotified = state.remNotified || {};
+  const now = Date.now(); let ch = false;
+  buildReminders().forEach(r => {
+    if (state.remDone[r.id] || state.remNotified[r.id] || r.at > now || r.at < now - 6 * 3600000) return;
+    state.remNotified[r.id] = true; ch = true;
+    const opt = { body: r.sub, icon: 'trips/' + meta.id + '/icon-192.png', tag: r.id };
+    if (navigator.serviceWorker && navigator.serviceWorker.ready) navigator.serviceWorker.ready.then(reg => reg.showNotification(r.title, opt)).catch(() => { try { new Notification(r.title, opt); } catch {} });
+    else { try { new Notification(r.title, opt); } catch {} }
+  });
+  if (ch) saveState();
+}
+
+/* ---- Documenti ---- */
+const DOC_PRESETS = ['Passaporto', 'Visto', 'Assicurazione', 'Carta d\'identità', 'Patente', 'Altro'];
+function compressImage(file, max = 1100, q = 0.6) {
+  return new Promise((res, rej) => {
+    const fr = new FileReader();
+    fr.onerror = rej;
+    fr.onload = () => { const im = new Image(); im.onerror = rej; im.onload = () => {
+      const k = Math.min(1, max / Math.max(im.width, im.height)), c = document.createElement('canvas');
+      c.width = Math.round(im.width * k); c.height = Math.round(im.height * k);
+      c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); res(c.toDataURL('image/jpeg', q)); };
+      im.src = fr.result; };
+    fr.readAsDataURL(file);
+  });
+}
+function openDocEditor(doc) {
+  const d = doc ? Object.assign({}, doc) : { id: Date.now(), title: '', num: '', exp: '', note: '', img: '' };
+  const box = document.createElement('div');
+  box.innerHTML = `<div class="chip-row" style="margin-bottom:10px;">${DOC_PRESETS.map(p => `<button type="button" class="chip" data-p="${esc(p)}">${esc(p)}</button>`).join('')}</div>
+    <input class="field" data-f="title" placeholder="Documento" value="${esc(d.title)}">
+    <div class="grid-2" style="margin-top:8px;"><input class="field" data-f="num" placeholder="Numero" value="${esc(d.num)}"><input class="field" data-f="exp" placeholder="Scadenza (gg/mm/aaaa)" value="${esc(d.exp)}"></div>
+    <textarea class="field" data-f="note" rows="2" placeholder="Note" style="margin-top:8px;">${esc(d.note)}</textarea>
+    <div class="grid-2" style="margin-top:8px;"><label class="btn block" for="docImg">${d.img ? 'Cambia foto' : 'Aggiungi foto'}</label>${d.img ? '<button class="btn" type="button" data-rm>Rimuovi foto</button>' : ''}</div>
+    <input type="file" id="docImg" accept="image/*" hidden>
+    <p class="note-line" id="docNote">La foto resta solo su questo telefono, ridotta per occupare poco spazio. Includila nel backup.</p>
+    <button class="btn primary block" data-save style="margin-top:12px;">Salva</button>`;
+  const q = s => box.querySelector(s);
+  box.querySelectorAll('[data-p]').forEach(b => b.onclick = () => { q('[data-f="title"]').value = b.dataset.p; });
+  q('#docImg').onchange = async e => { const f = e.target.files[0]; if (!f) return; try { d.img = await compressImage(f); q('#docNote').textContent = 'Foto pronta: premi Salva.'; } catch { toast('Immagine non leggibile'); } };
+  const rm = q('[data-rm]'); if (rm) rm.onclick = () => { d.img = ''; q('#docNote').textContent = 'Foto rimossa: premi Salva.'; };
+  q('[data-save]').onclick = () => {
+    d.title = q('[data-f="title"]').value.trim() || 'Documento'; d.num = q('[data-f="num"]').value.trim(); d.exp = q('[data-f="exp"]').value.trim(); d.note = q('[data-f="note"]').value.trim();
+    state.docs = (state.docs || []).filter(x => x.id !== d.id); state.docs.push(d); saveState(); closeModal(); renderDocs(); renderUtilHome();
+  };
+  $('modalTitle').textContent = doc ? 'Modifica documento' : 'Nuovo documento'; $('modalBody').replaceChildren(box); $('modal').classList.add('open');
+}
+function renderDocs() {
+  const box = $('docsBox'); if (!box) return; box.innerHTML = '';
+  state.docs = state.docs || [];
+  box.appendChild(btnGrid([bAct('Aggiungi documento', () => openDocEditor(null))]));
+  box.lastChild.style.marginBottom = '12px';
+  if (!state.docs.length) box.appendChild(cardBase('<p class="note-line" style="margin:0;">Passaporto, visto, assicurazione: salva numero, scadenza e una foto, così li hai anche senza rete.</p>'));
+  state.docs.forEach(d => {
+    const c = cardBase(`<div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;"><div style="min-width:0;"><div class="companion-meta">${esc(d.title)}</div>${d.num ? `<h4 style="margin:0;font-size:20px;word-break:break-all;">${esc(d.num)}</h4>` : ''}${d.exp ? `<div class="note-line" style="margin:4px 0 0;">Scade il ${esc(d.exp)}</div>` : ''}</div>${d.img ? `<img alt="" src="${d.img}" style="width:64px;height:64px;object-fit:cover;border-radius:12px;">` : ''}</div>${d.note ? `<p class="note-line" style="margin:8px 0 0;white-space:pre-wrap;">${esc(d.note)}</p>` : ''}<div data-a></div>`);
+    const items = [];
+    if (d.img) items.push(bAct('Mostra', () => openModal(d.title, `<img alt="" src="${d.img}" style="width:100%;border-radius:12px;">`)));
+    if (d.num) items.push(bAct('Copia', () => copyText(d.num)));
+    items.push(bAct('Modifica', () => openDocEditor(d)));
+    items.push(bAct('Elimina', () => { if (confirm('Eliminare "' + d.title + '"?')) { state.docs = state.docs.filter(x => x.id !== d.id); saveState(); renderDocs(); renderUtilHome(); } }));
+    const g = btnGrid(items); g.style.marginTop = '14px'; c.querySelector('[data-a]').replaceWith(g);
+    box.appendChild(c);
+  });
+}
+
+/* ---- Importa da email ---- */
+const MONTHS = { gen: 1, jan: 1, feb: 2, mar: 3, apr: 4, mag: 5, may: 5, giu: 6, jun: 6, lug: 7, jul: 7, ago: 8, aug: 8, set: 9, sep: 9, ott: 10, oct: 10, nov: 11, dic: 12, dec: 12 };
+function parseEmail(text) {
+  const t = text.replace(/ /g, ' ');
+  const out = { title: '', date: '', time: '', num: '' };
+  let m = t.match(/(?:booking|reservation|confirmation|conferma|pnr|codice|prenotazione|riferimento|order|ordine)[^A-Za-z0-9\n]{0,20}(?:n[°o.]?|no\.?|number|code|ref\.?)?[^A-Za-z0-9\n]{0,6}([A-Z0-9]{5,12})\b/i);
+  if (m && /\d|[A-Z]{5}/.test(m[1]) && !/^(CONFIRM|BOOKING|RESERVA)/i.test(m[1])) out.num = m[1].toUpperCase();
+  const fl = t.match(/\b([A-Z]{2}|[A-Z]\d|\d[A-Z])\s?(\d{2,4})\b/);
+  const route = t.match(/\b([A-Z]{3})\s*(?:→|->|–|-|to|a)\s*([A-Z]{3})\b/);
+  let d = t.match(/\b(\d{4})-(\d{2})-(\d{2})\b/);
+  if (d) out.date = `${d[1]}-${d[2]}-${d[3]}`;
+  if (!out.date) { d = t.match(/\b(\d{1,2})[\/.](\d{1,2})[\/.](\d{4})\b/); if (d) out.date = `${d[3]}-${d[2].padStart(2, '0')}-${d[1].padStart(2, '0')}`; }
+  if (!out.date) { d = t.match(/\b(\d{1,2})\s+([A-Za-zì]{3,9})\.?,?\s+(\d{4})\b/); if (d && MONTHS[d[2].slice(0, 3).toLowerCase()]) out.date = `${d[3]}-${String(MONTHS[d[2].slice(0, 3).toLowerCase()]).padStart(2, '0')}-${d[1].padStart(2, '0')}`; }
+  const tm = t.match(/\b([01]?\d|2[0-3])[:.]([0-5]\d)\b/); if (tm) out.time = tm[1].padStart(2, '0') + ':' + tm[2];
+  const first = t.split('\n').map(x => x.trim()).find(x => x.length > 3 && x.length < 90) || '';
+  out.title = fl ? (fl[1] + fl[2] + (route ? ` · ${route[1]} → ${route[2]}` : '')) : first.replace(/^(subject|oggetto)\s*:\s*/i, '');
+  /* collegamento a una prenotazione già presente */
+  const low = t.toLowerCase();
+  const cand = reservations.concat(Object.keys(HOTELS).map(k => ({ id: 'hotel-' + k.toLowerCase(), title: L(hotelInfo(k).name) })));
+  let best = null, sc = 0;
+  cand.forEach(r => { const w = L(r.title).toLowerCase().replace(/\(.*?\)/g, '').split(/[^a-z0-9àèéìòù']+/).filter(x => x.length > 3); const s = w.filter(x => low.includes(x)).length; if (s > sc) { sc = s; best = r; } });
+  out.link = sc ? best.id : '';
+  return out;
+}
+function openImport() {
+  const box = document.createElement('div');
+  box.innerHTML = `<p class="note-line" style="margin:0 0 8px;">Incolla il testo dell'email di conferma: riconosco codice, data e ora, poi controlli tu.</p>
+    <textarea class="field" data-f="txt" rows="7" placeholder="Incolla qui l'email"></textarea>
+    <button class="btn primary block" data-go style="margin-top:12px;">Leggi il testo</button><div data-res></div>`;
+  const q = s => box.querySelector(s);
+  q('[data-go]').onclick = () => {
+    const txt = q('[data-f="txt"]').value.trim(); if (!txt) return toast('Incolla prima il testo');
+    const p = parseEmail(txt);
+    const opts = ['<option value="">Nuova voce</option>'].concat(reservations.map(r => `<option value="${esc(r.id)}"${p.link === r.id ? ' selected' : ''}>${esc(r.title)}</option>`)).concat(Object.keys(HOTELS).map(k => { const id = 'hotel-' + k.toLowerCase(); return `<option value="${esc(id)}"${p.link === id ? ' selected' : ''}>Hotel · ${esc(L(hotelInfo(k).name))}</option>`; }));
+    q('[data-res]').innerHTML = `<div class="sub-title" style="margin-top:14px;">Controlla i dati</div>
+      <label class="note-line">Collega a</label><select class="field" data-f="link">${opts.join('')}</select>
+      <input class="field" data-f="title" style="margin-top:8px;" placeholder="Titolo" value="${esc(p.title)}">
+      <div class="grid-2" style="margin-top:8px;"><input class="field" data-f="date" type="date" value="${esc(p.date)}"><input class="field" data-f="time" type="time" value="${esc(p.time)}"></div>
+      <input class="field" data-f="num" style="margin-top:8px;" placeholder="Numero prenotazione" value="${esc(p.num)}">
+      <button class="btn primary block" data-ok style="margin-top:12px;">Salva</button>`;
+    q('[data-ok]').onclick = () => {
+      const v = s => q(`[data-f="${s}"]`).value.trim(), link = v('link'), num = v('num');
+      state.resCodes = state.resCodes || {};
+      if (link) { if (num) state.resCodes[link] = num; state.booked[link] = true; }
+      else { state.imported = state.imported || []; state.imported.push({ id: Date.now(), title: v('title') || 'Prenotazione', num, date: v('date'), time: v('time'), dep: v('date') ? `${v('date')}T${v('time') || '09:00'}:00` : '' }); }
+      saveState(); closeModal(); renderWallet(); renderBookingAlerts(); renderToday(); renderReminders(); toast('Salvato');
+    };
+  };
+  $('modalTitle').textContent = 'Importa da email'; $('modalBody').replaceChildren(box); $('modal').classList.add('open');
+}
+function renderImported() {
+  const sec = $('secImp'), wrap = $('impGrid'); if (!sec) return;
+  const list = state.imported || []; sec.hidden = !list.length; wrap.innerHTML = '';
+  $('cntImp').textContent = list.length;
+  list.forEach(x => {
+    const c = document.createElement('article'); c.className = 'wallet-card';
+    c.innerHTML = `<div class="companion-meta">Importata</div><h4 style="margin:0;font-size:18px;">${esc(x.title)}</h4><p style="margin:8px 0 0;font-size:15px;">${esc([x.date && x.date.split('-').reverse().join('/'), x.time].filter(Boolean).join(' · ') || 'Data non indicata')}</p>${x.num ? `<p class="note-line" style="margin:4px 0 0;">N° ${esc(x.num)}</p>` : ''}<div data-a></div>`;
+    const it = []; if (x.num) { it.push(bAct('Mostra QR', () => showQR(x.title, x.num))); it.push(bAct('Copia', () => copyText(x.num))); }
+    it.push(bAct('Elimina', () => { if (confirm('Eliminare "' + x.title + '"?')) { state.imported = state.imported.filter(y => y.id !== x.id); saveState(); renderImported(); renderReminders(); } }));
+    const g = btnGrid(it); g.style.marginTop = '14px'; c.querySelector('[data-a]').replaceWith(g); wrap.appendChild(c);
+  });
+}
+
+/* ---- Traduttore ---- */
+function renderTrans() {
+  const box = $('transBox'); if (!box) return;
+  const lang = (meta.tts || '').split('-')[0];
+  let name = ''; try { name = new Intl.DisplayNames(['it'], { type: 'language' }).of(lang) || ''; } catch {}
+  box.innerHTML = `<div class="utility-card"><div class="companion-meta">Italiano → ${esc(name || lang)}</div>
+    <textarea class="field" id="trIn" rows="3" placeholder="Scrivi in italiano"></textarea>
+    <div class="grid-2" style="margin-top:10px;"><button class="btn primary" id="trGo">Traduci</button><button class="btn" id="trClear">Cancella</button></div>
+    <div id="trOut"></div><p class="note-line" style="margin:10px 0 0;">Serve internet. Le ultime traduzioni restano salvate qui sotto.</p></div><div id="trHist"></div>`;
+  const out = $('trOut');
+  const show = (src, tr) => {
+    out.innerHTML = `<div class="sub-title" style="margin-top:14px;">${esc(src)}</div><div id="trText" style="font-size:24px;font-weight:700;line-height:1.35;margin:4px 0 12px;">${esc(tr)}</div><div class="btn-grid" style="--n:3;"></div>`;
+    const g = out.querySelector('.btn-grid');
+    g.append(bAct('Ascolta', () => speak(tr, meta.tts, null, 0.85)), bAct('Copia', () => copyText(tr)), bAct('Mostra', () => showBig(src, tr, '')));
+  };
+  const hist = () => {
+    const h = state.trHist || [], hb = $('trHist'); hb.innerHTML = '';
+    if (!h.length) return;
+    const c = cardBase('<div class="companion-meta">Recenti</div>', 'padding:16px 0 4px;'); c.classList.add('glist');
+    h.forEach(x => { const r = document.createElement('div'); r.className = 'grow nr'; r.innerHTML = `<div style="min-width:0;flex:1;font-weight:600;">${esc(x.s)}</div>`; r.appendChild(bAct('Apri', () => show(x.s, x.t))); c.appendChild(r); });
+    hb.appendChild(c);
+  };
+  $('trClear').onclick = () => { $('trIn').value = ''; out.innerHTML = ''; };
+  $('trGo').onclick = async () => {
+    const s = $('trIn').value.trim(); if (!s) return;
+    out.innerHTML = '<p class="note-line" style="margin-top:12px;">Traduzione in corso…</p>';
+    try {
+      const r = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(s)}&langpair=it|${encodeURIComponent(meta.tts)}`);
+      const j = await r.json(); const tr = j && j.responseData && j.responseData.translatedText;
+      if (!tr || /MYMEMORY WARNING|INVALID/i.test(tr)) throw 0;
+      show(s, tr); state.trHist = [{ s, t: tr }].concat((state.trHist || []).filter(x => x.s !== s)).slice(0, 8); saveState(); hist();
+    } catch { out.innerHTML = '<p class="note-line" style="margin-top:12px;">Traduzione non disponibile: controlla la connessione. Intanto prova le Frasi utili.</p>'; }
+  };
+  hist();
+}
+function initExtras() {
+  state.docs = state.docs || []; state.imported = state.imported || []; state.remCustom = state.remCustom || [];
+  renderReminders(); renderDocs(); renderImported(); renderTrans();
+  if ($('impBtn')) $('impBtn').onclick = openImport;
+  checkNotify(); setInterval(() => { checkNotify(); }, 60000);
+}
+
 /* ====================== NAVIGAZIONE / INIT ====================== */
 function setView(view) {
   document.querySelectorAll('.bottom-nav button').forEach(b => b.classList.remove('active'));
@@ -1760,8 +2007,11 @@ function renderUtilHome() {
   const tiles = [
     ['budget', 'Budget', true, () => $('expenseTotal').textContent.replace(/ *\(.*\)/, '')],
     ['check', 'Checklist', true, () => $('checkProgress').textContent + ' completate'],
+    ['docs', 'Documenti', true, () => (state.docs || []).length ? state.docs.length + ' salvati' : 'Passaporto, visto'],
+    ['remind', 'Promemoria', true, () => { const n = buildReminders().filter(r => !(state.remDone || {})[r.id]).length; return n + ' da fare'; }],
     ['info', 'Info paese', hasInfo, () => INFO.length + ' argomenti'],
     ['phrases', 'Frasi utili', hasPhr, () => phrases.length + ' frasi con audio'],
+    ['trans', 'Traduttore', true, () => 'Italiano e lingua locale'],
     ['weather', 'Meteo', true, () => cache ? 'Aggiornato ' + new Date(cache.ts).toLocaleDateString('it-IT', { day: 'numeric', month: 'short' }) : 'Da scaricare'],
     ['sos', 'Emergenze', true, () => (meta.emergency[0] ? meta.emergency[0][0] + ' · ' + meta.emergency[0][1] : 'Numeri utili')],
     ['backup', 'Backup', true, () => state.lastBackup ? 'Ultimo: ' + new Date(state.lastBackup).toLocaleDateString('it-IT', { day: 'numeric', month: 'short' }) : 'Mai eseguito']
@@ -1829,13 +2079,14 @@ $('sosAssist').href = 'tel:' + meta.assistance.tel; $('sosAssist').textContent =
 $('convLabel').textContent = `${meta.currency.name} (${meta.currency.symbol})`; $('curOpt').textContent = meta.currency.symbol;
 setupConverter(); setupExpenseForm(); setupBackup(); refreshRate();
 renderCities(); renderUtilHome(); renderItinerary(); renderGuideControls(); renderCompanion(); renderTodayGuides(); renderTransfers(); renderWallet(); renderCodes();
-renderExpenses(); renderBookingAlerts(); renderToday(); renderNextTransfer(true);
+initExtras();
+renderExpenses(); renderBookingAlerts(); renderToday();
 renderChecklist(); renderPhrases(''); renderWeather(); renderBackupInfo(); updateRateUI(); updateMetrics();
 setupOffline();
 
 const wxCache = readWxCache();
 if (navigator.onLine && (!wxCache || wxCache.v !== 2 || Date.now() - wxCache.ts > 3 * 3600 * 1000)) refreshWeather(false);
-setInterval(() => { renderNextTransfer(false); renderBookingAlerts(); updateCountdown(); }, 60000);
+setInterval(() => { renderBookingAlerts(); updateCountdown(); }, 60000);
 </script>
 </body>
 </html>
