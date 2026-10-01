@@ -300,7 +300,7 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
 .pl-empty { color: var(--muted); font-size: 14px; }
 .dsec { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; padding: 12px 0; border-top: 0.5px solid var(--glass-border); }
 .dsec:first-child { border-top: none; padding-top: 4px; }
-.dsec .di { font-size: 18px; line-height: 1.3; text-align: center; }
+.dsec .di { color: var(--muted); display: flex; justify-content: center; padding-top: 1px; }
 .dsec b { display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; color: var(--muted); margin-bottom: 3px; }
 .dsec div, .dsec li { font-size: 15px; line-height: 1.55; }
 .dsec .dn { font-weight: 700; }
@@ -315,7 +315,11 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
 .sec div, .sec li { font-size: 14.5px; line-height: 1.55; }
 .sec ul { margin: 0; padding-left: 18px; }
 .warnbox { margin-top: 12px; padding: 10px 12px; border-radius: 12px; background: color-mix(in srgb, var(--warn) 18%, var(--surface)); font-size: 14px; line-height: 1.5; font-weight: 500; }
-.vb { font-size: 12px; font-weight: 600; margin-top: 12px; color: var(--muted); }
+.vb { margin-top: 12px; display: flex; gap: 6px; flex-wrap: wrap; }
+.vbadge { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: var(--surface-2); color: var(--muted); }
+.vbadge.ok { background: color-mix(in srgb, var(--ok) 18%, transparent); color: var(--ok); }
+.vbadge.warn { background: color-mix(in srgb, var(--warn) 20%, transparent); color: var(--warn); }
+.warnbox b, .alert b { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 2px; }
 .taxi-lat { text-align: center; padding: 4px 0 10px; border-bottom: 0.5px solid var(--border); margin-bottom: 10px; }
 .lat-n { font-size: 17px; font-weight: 700; line-height: 1.35; }
 .lat-a { font-size: 15px; color: var(--muted); line-height: 1.4; margin-top: 4px; }
@@ -395,17 +399,17 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
 
     <div class="home-pair">
       <div>
-        <div class="section-title"><div><h3>🧳 Prossimo trasferimento</h3><p>Volo o treno in arrivo. Aggiungi posto, binario o gate.</p></div></div>
+        <div class="section-title"><div><h3>Prossimo trasferimento</h3><p>Volo o treno in arrivo. Aggiungi posto, binario o gate.</p></div></div>
         <div id="nextTransfer"></div>
       </div>
       <div>
-        <div class="section-title"><div><h3>🎧 Guide nella tua città</h3><p>Tocca una tappa per leggerla o ascoltarla.</p></div></div>
+        <div class="section-title"><div><h3>Guide nella tua città</h3><p>Tocca una tappa per leggerla o ascoltarla.</p></div></div>
         <div id="todayGuides"></div>
       </div>
     </div>
 
     <div class="section-title" id="bookingAlertsTitle" style="display:none;">
-      <div><h3>🔔 Alert Prenotazioni</h3><p>Da prenotare, in ordine di apertura (orario italiano).</p></div>
+      <div><h3>Alert Prenotazioni</h3><p>Da prenotare, in ordine di apertura (orario italiano).</p></div>
     </div>
     <div class="city-grid" id="bookingAlertsGrid" style="margin-bottom: 24px;"></div>
 
@@ -435,16 +439,16 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
 
   <!-- WALLET -->
   <section id="wallet" class="view">
-    <details class="wsec" id="secTr"><summary><span>✈️ Trasferimenti</span><small id="cntTr"></small></summary>
+    <details class="wsec" id="secTr"><summary><span>Trasferimenti</span><small id="cntTr"></small></summary>
       <div class="wallet-grid" id="transferGrid"></div></details>
 
-    <details class="wsec" id="secHotel"><summary><span>🏨 Hotel</span><small id="cntHotel"></small></summary>
+    <details class="wsec" id="secHotel"><summary><span>Hotel</span><small id="cntHotel"></small></summary>
       <div class="wallet-grid" id="hotelGrid"></div></details>
 
-    <details class="wsec" id="secAttr"><summary><span>🎟️ Attrazioni</span><small id="cntAttr"></small></summary>
+    <details class="wsec" id="secAttr"><summary><span>Attrazioni</span><small id="cntAttr"></small></summary>
       <div class="wallet-grid" id="walletGrid"></div></details>
 
-    <details class="wsec"><summary><span>📅 Promemoria sul calendario</span></summary>
+    <details class="wsec"><summary><span>Promemoria sul calendario</span></summary>
       <div class="utility-card">
         <p class="note-line" style="margin:0 0 10px;">Scarica un file .ics e aprilo per aggiungere gli eventi.</p>
         <div class="grid-2">
@@ -454,7 +458,7 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
       </div></details>
 
     <div id="oldCodes" hidden>
-      <div class="section-title"><div><h3>🔑 Altri codici</h3><p>Salvati in precedenza. Ora i codici e le note si inseriscono dentro ogni prenotazione.</p></div></div>
+      <div class="section-title"><div><h3>Altri codici</h3><p>Salvati in precedenza. Ora i codici e le note si inseriscono dentro ogni prenotazione.</p></div></div>
       <div class="utility-card"><div id="codeList"></div></div>
     </div>
   </section>
@@ -462,21 +466,21 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
   <!-- UTILI -->
   <section id="useful" class="view">
     <div class="chips-nav" id="utilNav">
-      <button class="chip-btn" id="navPay" data-go="sec-pay">💳 Pagamenti</button>
-      <button class="chip-btn" id="navConv" data-go="sec-conv">💱 Cambio</button>
-      <button class="chip-btn" data-go="sec-budget">💶 Budget</button>
-      <button class="chip-btn" data-go="sec-check">✅ Checklist</button>
-      <button class="chip-btn" id="navInfo" data-go="sec-info">ℹ️ Info paese</button>
-      <button class="chip-btn" id="navPhr" data-go="sec-phrases">🗣️ Frasi</button>
-      <button class="chip-btn" data-go="sec-weather">⛅ Meteo</button>
-      <button class="chip-btn" data-go="sec-sos">🚨 Emergenze</button>
-      <button class="chip-btn" data-go="sec-backup">💾 Backup</button>
+      <button class="chip-btn" id="navPay" data-go="sec-pay">Pagamenti</button>
+      <button class="chip-btn" id="navConv" data-go="sec-conv">Cambio</button>
+      <button class="chip-btn" data-go="sec-budget">Budget</button>
+      <button class="chip-btn" data-go="sec-check">Checklist</button>
+      <button class="chip-btn" id="navInfo" data-go="sec-info">Info paese</button>
+      <button class="chip-btn" id="navPhr" data-go="sec-phrases">Frasi</button>
+      <button class="chip-btn" data-go="sec-weather">Meteo</button>
+      <button class="chip-btn" data-go="sec-sos">Emergenze</button>
+      <button class="chip-btn" data-go="sec-backup">Backup</button>
     </div>
 
-    <div class="section-title" id="sec-pay" hidden><div><h3>📱 App utili</h3></div></div>
+    <div class="section-title" id="sec-pay" hidden><div><h3>App utili</h3></div></div>
     <div class="quick-apps" id="quickApps" style="margin-bottom: 24px;" hidden></div>
 
-    <div class="section-title" id="sec-conv"><div><h3>💱 Convertitore Rapido</h3><p id="rateLabel">Calcolo istantaneo offline.</p></div></div>
+    <div class="section-title" id="sec-conv"><div><h3>Convertitore Rapido</h3><p id="rateLabel">Calcolo istantaneo offline.</p></div></div>
     <div class="utility-card" id="convCard" style="margin-bottom: 24px;">
       <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: center;">
         <div>
@@ -491,7 +495,7 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
       </div>
     </div>
 
-    <div class="section-title" id="sec-budget"><div><h3>💶 Gestione Budget</h3></div></div>
+    <div class="section-title" id="sec-budget"><div><h3>Gestione Budget</h3></div></div>
     <div class="expense-card" style="margin-bottom: 24px;">
       <div style="width: 100%;">
         <div class="companion-meta">Totale Viaggio</div>
@@ -512,7 +516,7 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
       <div class="expense-list" id="expenseList"></div>
     </div>
 
-    <div class="section-title" id="sec-check"><div><h3>✅ Checklist pre-partenza</h3><p>Completate: <strong id="checkProgress">0/0</strong></p></div></div>
+    <div class="section-title" id="sec-check"><div><h3>Checklist pre-partenza</h3><p>Completate: <strong id="checkProgress">0/0</strong></p></div></div>
     <div class="utility-card" style="margin-bottom: 24px;">
       <div id="checklistBox"></div>
       <div class="grid-2" style="margin-top:14px;">
@@ -521,30 +525,30 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
       </div>
     </div>
 
-    <div class="section-title" id="sec-info" hidden><div><h3>ℹ️ Info paese</h3></div></div>
+    <div class="section-title" id="sec-info" hidden><div><h3>Info paese</h3></div></div>
     <div class="utility-card" id="infoBox" style="margin-bottom: 24px;" hidden></div>
 
-    <div class="section-title" id="sec-phrases"><div><h3>🗣️ Frasi utili</h3></div></div>
+    <div class="section-title" id="sec-phrases"><div><h3>Frasi utili</h3></div></div>
     <div class="utility-card" id="phrasesCard" style="margin-bottom: 24px;">
       <input class="field" id="phraseSearch" placeholder="Cerca (es. bagno, conto, allergico)">
       <div id="phrasesBox"></div>
     </div>
 
-    <div class="section-title" id="sec-weather"><div><h3>⛅ Meteo</h3></div></div>
+    <div class="section-title" id="sec-weather"><div><h3>Meteo</h3></div></div>
     <div class="utility-card" style="margin-bottom: 24px;">
-      <button class="btn block" id="wxRefresh">🔄 Aggiorna meteo</button>
+      <button class="btn block" id="wxRefresh">Aggiorna meteo</button>
       <div class="note-line" id="wxStamp" style="margin:8px 0;"></div>
       <div id="weatherBox"></div>
     </div>
 
-    <div class="section-title" id="sec-sos"><div><h3>🚨 Emergenze</h3><p id="sosNote"></p></div></div>
+    <div class="section-title" id="sec-sos"><div><h3>Emergenze</h3><p id="sosNote"></p></div></div>
     <div class="utility-card" style="margin-bottom: 24px;">
       <h4 style="margin:0; font-size:18px;">Numeri Utili</h4>
       <div id="sosGrid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center; margin-top: 12px;"></div>
       <a class="btn small warn" id="sosAssist" style="width:100%; margin-top:12px;"></a>
     </div>
 
-    <div class="section-title" id="sec-backup"><div><h3>💾 Backup e offline</h3><p>I dati stanno solo in questo browser: fai un backup ogni tanto.</p></div></div>
+    <div class="section-title" id="sec-backup"><div><h3>Backup e offline</h3><p>I dati stanno solo in questo browser: fai un backup ogni tanto.</p></div></div>
     <div class="utility-card">
       <div class="note-line" id="backupInfo"></div>
       <div class="grid-2" style="margin-top:12px;">
@@ -586,7 +590,7 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
   const show = msg => {
     let b = document.getElementById('errBanner');
     if (!b) { b = document.createElement('div'); b.id = 'errBanner'; b.style.cssText = 'position:fixed;left:0;right:0;top:0;z-index:99999;background:#b00020;color:#fff;font:13px/1.4 -apple-system,sans-serif;padding:10px 14px;white-space:pre-wrap;word-break:break-word'; document.body.appendChild(b); }
-    b.textContent = '⚠️ ' + msg;
+    b.textContent = '' + msg;
   };
   window.addEventListener('error', e => show('Errore: ' + (e.message || e.error) + (e.lineno ? ' (riga ' + e.lineno + ')' : '')));
   window.addEventListener('unhandledrejection', e => show('Errore: ' + (e.reason && e.reason.message || e.reason)));
@@ -628,6 +632,17 @@ const L = t => String(t ?? '').replace(SCRIPT_RUN, '').replace(/\(\s*[,·]\s*/g,
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 /* ====================== DATI DEL VIAGGIO (da trips/*.js) ====================== */
+/* nell'app niente emoji: si tolgono dai testi del viaggio (prima si salva ciò che la logica deve sapere) */
+(window.TRIP_DATA.reservations || []).forEach(r => { r.fileBooked = String(r.status || '').includes('\u2705'); });
+const EMO = /[\p{Extended_Pictographic}\uFE0F\u200D]/gu;
+(function strip(o, k) {
+  if (!o || typeof o !== 'object') return;
+  for (const key of Object.keys(o)) {
+    const v = o[key];
+    if (typeof v === 'string') { if (key !== 'flag' && key !== 'logo') o[key] = v.replace(EMO, '').replace(/^\s+|\s+$/g, '').replace(/ {2,}/g, ' '); }
+    else strip(v, key);
+  }
+})(window.TRIP_DATA);
 const { meta, trip, companionData, HOTELS, DRIVER_PHRASES, DIARY, CITY_KEY, reservations, transfers, checklistData, phrases, CATS } = window.TRIP_DATA;
 const INFO = window.TRIP_DATA.INFO || [];
 /* collega diario e hotel ai dati base */
@@ -708,8 +723,8 @@ function bAct(label, fn, cls) { const b = document.createElement('button'); b.ty
 function bLink(label, href, cls, ext) { const a = document.createElement('a'); a.className = 'btn small ' + (cls || ''); a.href = href; a.textContent = label; if (ext) { a.target = '_blank'; a.rel = 'noopener'; } return a; }
 function routeRow(q, taxiFn) {
   const it = [];
-  if (taxiFn) it.push(bAct('🚕 Taxi', taxiFn, 'taxi-btn'));
-  if (q) { it.push(bLink('🧭 Mappa', appleMaps(q))); it.push(bLink('🚇 Metro', transitApple(q))); }
+  if (taxiFn) it.push(bAct('Taxi', taxiFn, 'taxi-btn'));
+  if (q) { it.push(bLink('Mappa', appleMaps(q))); it.push(bLink('Metro', transitApple(q))); }
   return it.length ? btnGrid(it) : null;
 }
 const hotelQ = h => h.zh || h.addr || [h.name && h.name.replace(/ \(.*$/, ''), h.city, meta.country].filter(Boolean).join(', ');
@@ -793,13 +808,13 @@ function transitApple(q) {
 /* Scheda da mostrare al tassista: nome e indirizzo grandi, frase pronta, telefono, mappe, modifica */
 function showPlaceCard(p) {
   const zh = (p.zh || '').trim(), addr = (p.addr || '').trim();
-  if (!zh && !addr) { toast('Inserisci prima nome o indirizzo nella lingua locale (✏️)'); if (p.onEdit) p.onEdit(); return; }
+  if (!zh && !addr) { toast('Inserisci prima nome o indirizzo nella lingua locale ()'); if (p.onEdit) p.onEdit(); return; }
   const q = zh || addr;
   const btnCount = (p.tel ? 1 : 0) + 1 + (p.onEdit ? 1 : 0);
   const btns = [
-    p.tel ? `<a class="btn small primary" href="tel:${esc(p.tel)}">📞 Chiama</a>` : '',
-    `<button class="btn small" data-act="copy">📋 Copia</button>`,
-    p.onEdit ? `<button class="btn small" data-act="edit">✏️ Modifica</button>` : ''
+    p.tel ? `<a class="btn small primary" href="tel:${esc(p.tel)}">Chiama</a>` : '',
+    `<button class="btn small" data-act="copy">Copia</button>`,
+    p.onEdit ? `<button class="btn small" data-act="edit">Modifica</button>` : ''
   ].join('');
   openModal(p.title || "Mostra all'autista", `
     <div class="taxi-lat">
@@ -830,7 +845,7 @@ function showTaxiCard(zh) {
 
 /* Modifica nome/indirizzo in cinese: resta salvato sul telefono */
 function editAddr(key, cur, title, done) {
-  openModal('✏️ ' + title, `<div class="edit-form">
+  openModal('' + title, `<div class="edit-form">
     <label class="lbl">Nome nella lingua locale (come sull'app/biglietto)</label><input class="field" id="edZh" value="${esc(cur.zh || '')}" placeholder="nome nella scrittura locale">
     <label class="lbl">Indirizzo nella lingua locale</label><input class="field" id="edAd" value="${esc(cur.addr || '')}" placeholder="indirizzo nella scrittura locale">
     <label class="lbl">Indirizzo in caratteri latini (mostrato nell'app)</label><input class="field" id="edLat" value="${esc(cur.lat || '')}" placeholder="indirizzo in caratteri latini">
@@ -849,25 +864,25 @@ function hotelInfo(k) {
 }
 function hotelCardData(k, after) {
   const h = hotelInfo(k);
-  return { title: '🏨 ' + h.city, zh: h.zh, addr: h.addr, tel: h.tel, latName: L(h.name.replace(/ = .*$/, '')), latAddr: h.en, more: hotelMoreHTML(k),
+  return { title: '' + h.city, zh: h.zh, addr: h.addr, tel: h.tel, latName: L(h.name.replace(/ = .*$/, '')), latAddr: h.en, more: hotelMoreHTML(k),
     onEdit: () => editAddr('h-' + k, { zh: h.zh, addr: h.addr, lat: h.en }, 'Hotel ' + h.city, () => { renderCities(); renderItinerary(); renderToday(); if (after) after(); }) };
 }
 function hotelBoxHTML(k, withNight) {
   const h = hotelInfo(k);
-  return `<div class="hb-line"><span class="hb-ic">🏨</span><div><div class="hb-name">${esc(h.name.replace(/ \(.*$/, '').replace(/ = .*$/, ''))}${withNight ? ' · ' + esc(h.nights) : ''}</div>
+  return `<div class="hb-line"><span class="hb-ic"></span><div><div class="hb-name">${esc(h.name.replace(/ \(.*$/, '').replace(/ = .*$/, ''))}${withNight ? ' · ' + esc(h.nights) : ''}</div>
     <div class="py">${esc(h.en || 'Indirizzo personalizzato salvato')}</div></div></div>`;
 }
 function hotelMoreHTML(k) {
   const h = hotelInfo(k);
-  return dsec('📍', 'Posizione', `<div>${esc(L(h.metro))}</div>`) + dsec('🕒', 'Check-in / check-out', `<div>${esc(h.cin)} · ${esc(h.cout)}</div>`) +
-    (h.telShow ? dsec('📞', 'Telefono', `<div>${esc(h.telShow)}</div>`) : '') + (h.booking ? dsec('🎟️', 'Prenotazione', `<div>${esc(h.booking)}</div>`) : '') +
-    (h.warn ? `<div class="warnbox">⚠️ ${esc(L(h.warn))}</div>` : '') +
-    `<div class="vb">${h.custom ? '✏️ Dati modificati da te' : (h.v === 'ok' ? '✅ Letto su fonti online' : '🟡 Da verificare con la tua conferma')}</div>`;
+  return dsec('pin', 'Posizione', `<div>${esc(L(h.metro))}</div>`) + dsec('clock', 'Check-in / check-out', `<div>${esc(h.cin)} · ${esc(h.cout)}</div>`) +
+    (h.telShow ? dsec('phone', 'Telefono', `<div>${esc(h.telShow)}</div>`) : '') + (h.booking ? dsec('ticket', 'Prenotazione', `<div>${esc(h.booking)}</div>`) : '') +
+    (h.warn ? `<div class="warnbox"><b>Attenzione</b> ${esc(L(h.warn))}</div>` : '') +
+    `<div class="vb">${h.custom ? '<span class="vbadge">Modificato da te</span>' : (h.v === 'ok' ? '<span class="vbadge ok">Verificato su fonti online</span>' : '<span class="vbadge warn">Da verificare con la tua conferma</span>')}</div>`;
 }
 function hotelActs(k, host) {
   const h = hotelInfo(k);
   const g = routeRow(hotelQ(h), () => showPlaceCard(hotelCardData(k))); if (g) host.appendChild(g);
-  if (h.tel) host.appendChild(btnGrid([bLink('📞 Chiama', 'tel:' + h.tel)]));
+  if (h.tel) host.appendChild(btnGrid([bLink('Chiama', 'tel:' + h.tel)]));
 }
 function renderTodayHotel() {
   const box = $('todayHotel'); if (!box) return;
@@ -899,7 +914,7 @@ function renderToday() {
     modeEl.innerHTML = `<div class="companion-meta">Prima della partenza</div><h3>Giorno 1 · ${esc(d.city)}</h3><p>${esc(d.date)} · ${esc(d.title)}</p>`;
     nextEl.innerHTML = pending.length
       ? `<div class="companion-meta">Da prenotare</div><h3>${esc(pending[0].title)}</h3><p>Per il ${esc(pending[0].date)} · ${esc(pending[0].ref)}</p>`
-      : `<div class="companion-meta">Prenotazioni</div><h3>Tutto prenotato ✅</h3><p>Nessuna prenotazione in sospeso.</p>`;
+      : `<div class="companion-meta">Prenotazioni</div><h3>Tutto prenotato </h3><p>Nessuna prenotazione in sospeso.</p>`;
     return;
   }
   if (ended) {
@@ -910,7 +925,7 @@ function renderToday() {
   modeEl.innerHTML = `<div class="companion-meta">Oggi · Giorno ${d.day}</div><h3>${esc(d.city)}</h3><p>${esc(d.date)} · ${esc(d.title)}</p>`;
   const nextIdx = d.stops.findIndex((_, i) => !state.completed[`${d.day}-${i}`]);
   if (nextIdx < 0) {
-    nextEl.innerHTML = `<div class="companion-meta">Prossima tappa</div><h3>Giornata completata ✅</h3><p>Hai spuntato tutte le tappe di oggi.</p>`;
+    nextEl.innerHTML = `<div class="companion-meta">Prossima tappa</div><h3>Giornata completata </h3><p>Hai spuntato tutte le tappe di oggi.</p>`;
   } else {
     const s = d.stops[nextIdx];
     nextEl.innerHTML = `<div class="companion-meta">Prossima tappa · ${esc(s[0])}</div><h3>${esc(L(s[1]))}</h3><p>${esc(L(s[2]))}</p>`;
@@ -933,8 +948,8 @@ function renderBookingAlerts() {
     const card = document.createElement('div'); card.className = 'utility-card'; card.style.border = '2px solid var(--warn)';
     card.innerHTML = `<div style="display:flex; justify-content:space-between; gap:8px;"><div><div class="companion-meta">${esc(r.type)}</div><h4 style="margin:0; font-size:18px;">${esc(r.title)}</h4></div><span class="badge warn">${esc(r.ref)}</span></div>
       <p style="margin: 8px 0 0; font-size:14px; font-weight: 500;">Per il: ${esc(r.date)}</p>
-      ${when ? `<p style="margin: 4px 0 0; font-size:14px; font-weight: 700; color: var(--warn);">⏰ ${esc(when)}</p>` : ''}
-      <button class="btn warn small" style="width:100%; margin-top: 12px;">✅ Fatto</button>`;
+      ${when ? `<p style="margin: 4px 0 0; font-size:14px; font-weight: 700; color: var(--warn);">${esc(when)}</p>` : ''}
+      <button class="btn warn small" style="width:100%; margin-top: 12px;">Fatto</button>`;
     card.querySelector('button').onclick = () => { if (!confirm('Confermi di aver già prenotato "' + r.title + '"?')) return; state.booked[r.id] = true; saveState(); renderBookingAlerts(); renderWallet(); renderToday(); };
     wrap.appendChild(card);
   });
@@ -943,7 +958,7 @@ function renderBookingAlerts() {
 /* ====================== TRASFERIMENTI ====================== */
 function liveText(t, n) {
   const fl = /Volo/.test(t.type);
-  return [n.term && 'Terminal ' + esc(n.term), n.gate && (fl ? 'Gate ' : 'Binario ') + esc(n.gate), n.seat && 'Posto ' + esc(n.seat), n.delay && '⏱ ' + esc(n.delay)].filter(Boolean).join(' · ');
+  return [n.term && 'Terminal ' + esc(n.term), n.gate && (fl ? 'Gate ' : 'Binario ') + esc(n.gate), n.seat && 'Posto ' + esc(n.seat), n.delay && '' + esc(n.delay)].filter(Boolean).join(' · ');
 }
 function transferCard(t, ctx) {
   const n = state.transferNotes[t.id] || {};
@@ -969,10 +984,10 @@ function transferCard(t, ctx) {
     <div data-go></div>
     `;
   { const host = card.querySelector('[data-go]');
-    const rr = routeRow(zhVal || '', zhVal ? () => showPlaceCard({ title: '🚕 ' + depName, zh: zhVal, latName: depName }) : null);
+    const rr = routeRow(zhVal || '', zhVal ? () => showPlaceCard({ title: '' + depName, zh: zhVal, latName: depName }) : null);
     if (rr) host.parentNode.insertBefore(rr, host);
-    const st = [bLink(isFl ? '🛰 Stato volo' : '🚄 Stato treno', isFl ? 'https://www.flightradar24.com/data/flights/' + code.toLowerCase() : 'https://www.trip.com/trains/', '', true)];
-    if (isFl) st.push(bLink('✈️ FlightAware', 'https://www.flightaware.com/live/flight/' + code, '', true));
+    const st = [bLink(isFl ? 'Stato volo' : 'Stato treno', isFl ? 'https://www.flightradar24.com/data/flights/' + code.toLowerCase() : 'https://www.trip.com/trains/', '', true)];
+    if (isFl) st.push(bLink('FlightAware', 'https://www.flightaware.com/live/flight/' + code, '', true));
     host.parentNode.insertBefore(btnGrid(st), host); host.remove(); }
   const q = sel => card.querySelector(sel);
   const persist = () => {
@@ -1044,7 +1059,7 @@ function renderWallet() {
   const hotelWrap = $('hotelGrid'), attrWrap = $('walletGrid'); hotelWrap.innerHTML = ''; attrWrap.innerHTML = '';
   const list = reservations.filter(r => !isTransportRes(r));
   /* gli hotel vengono da tutta la sezione "# Hotel" del viaggio, non solo dalle righe di "# Prenotazioni" */
-  const hotels = Object.keys(HOTELS).map(k => { const h = hotelInfo(k); return { hk: k, id: 'hotel-' + k.toLowerCase(), type: '🏨 Hotel · ' + h.city, title: L(h.name.replace(/ \(.*$/, '').replace(/ = .*$/, '')), date: h.nights, ref: h.booking || '—', status: h.booking ? '✅ Prenotato' : '🟡 Da prenotare' }; });
+  const hotels = Object.keys(HOTELS).map(k => { const h = hotelInfo(k); return { hk: k, id: 'hotel-' + k.toLowerCase(), type: 'Hotel · ' + h.city, title: L(h.name.replace(/ \(.*$/, '').replace(/ = .*$/, '')), date: h.nights, ref: h.booking || '—', fileBooked: !!h.booking, status: h.booking ? 'Prenotato' : 'Da prenotare' }; });
   const attrs = list.filter(r => !/hotel/i.test(r.type));
   $('secHotel').hidden = !hotels.length; $('secAttr').hidden = !attrs.length;
   $('cntHotel').textContent = hotels.length; $('cntAttr').textContent = attrs.length; $('cntTr').textContent = transfers.length;
@@ -1054,11 +1069,11 @@ function renderWallet() {
 }
 function resCard(r) {
   const card = document.createElement('article'); card.className = 'wallet-card';
-  const fileBooked = r.status.includes('✅'), isBooked = fileBooked || state.booked[r.id];
+  const fileBooked = r.fileBooked, isBooked = fileBooked || state.booked[r.id];
   const ex = resExtra(r.id), save = () => { saveState(); renderWallet(); };
   card.innerHTML = `<div style="display:flex; justify-content:space-between; gap:8px; margin-bottom:12px;">
       <div><div class="companion-meta">${esc(r.type)}</div><h4 style="margin:0; font-size:18px;">${esc(r.title)}</h4></div>
-      <span class="badge ${isBooked ? 'done' : 'warn'}">${isBooked ? 'Prenotato' : 'Da Fare'}</span>
+      <span class="badge ${isBooked ? 'done' : 'warn'}">${isBooked ? 'Prenotato' : 'Da prenotare'}</span>
     </div><p style="margin:0; font-size: 15px;"><strong>Date:</strong> ${esc(r.date)}</p><p style="margin:4px 0 0; color:var(--muted); font-size: 13px;">Rif: ${esc(r.ref)}</p>`;
   const add = (el) => { card.appendChild(el); return el; };
   if (r.hk) { const g = routeRow(hotelQ(hotelInfo(r.hk)), () => showPlaceCard(hotelCardData(r.hk))); if (g) { g.style.marginTop = '14px'; card.appendChild(g); } }
@@ -1068,7 +1083,7 @@ function resCard(r) {
   const num = state.resCodes[r.id];
   /* contenuto compilato: sempre visibile fuori dalla parte espandibile */
   if (num) {
-    const d = add(mk(`<div class="companion-meta" style="margin:0;">N° prenotazione</div><div class="val" style="font-weight:700; word-break:break-all; margin:2px 0 8px;">${esc(num)}</div><div class="city-actions" style="margin-top:0;"><button class="btn small primary" data-q="qr">📱 Mostra QR</button></div>`));
+    const d = add(mk(`<div class="companion-meta" style="margin:0;">N° prenotazione</div><div class="val" style="font-weight:700; word-break:break-all; margin:2px 0 8px;">${esc(num)}</div><div class="city-actions" style="margin-top:0;"><button class="btn small primary" data-q="qr">Mostra QR</button></div>`));
     d.querySelector('[data-q="qr"]').onclick = () => showQR(r.title, num);
   }
   ex.codes.forEach(c => {
@@ -1078,9 +1093,9 @@ function resCard(r) {
   if (ex.note) add(mk(`<div class="companion-meta" style="margin:0;">Note</div><div style="white-space:pre-wrap; font-size:14px;">${esc(ex.note)}</div>`));
   /* inserimento / modifica in una finestra dedicata (niente menù dentro menù) */
   const filled = !!(num || ex.note || ex.codes.length);
-  const row2 = [bAct('🔑 Codici e note' + (filled ? ' · modifica' : ''), () => openResEditor(r, isBooked))];
-  if (state.booked[r.id]) row2.push(bAct('↩️ Non prenotato', () => toggle(false)));
-  else if (r.status.includes('Da prenotare')) row2.push(bAct('✅ Prenotato', () => toggle(true)));
+  const row2 = [bAct('Codici e note' + (filled ? ' · modifica' : ''), () => openResEditor(r, isBooked))];
+  if (state.booked[r.id]) row2.push(bAct('Non prenotato', () => toggle(false)));
+  else if (r.status.includes('Da prenotare')) row2.push(bAct('Segna prenotato', () => toggle(true)));
   card.appendChild(btnGrid(row2));
   return card;
 }
@@ -1089,11 +1104,11 @@ function openResEditor(r, isBooked) {
   const num = state.resCodes[r.id] || '';
   const done = () => { saveState(); closeModal(); renderWallet(); };
   const box = document.createElement('div');
-  box.innerHTML = `<div class="dsec"><div class="di">🔢</div><div><b>N° prenotazione</b>${isBooked ? `<input class="field" data-f="num" placeholder="Se c'è il QR, scrivilo qui" value="${esc(num)}">` : '<div>Disponibile dopo la prenotazione.</div>'}</div></div>
-    <div class="dsec"><div class="di">🔑</div><div><b>Codici</b>
+  box.innerHTML = `<div class="dsec"><div class="di">${ICON.num}</div><div><b>N° prenotazione</b>${isBooked ? `<input class="field" data-f="num" placeholder="Se c'è il QR, scrivilo qui" value="${esc(num)}">` : '<div>Disponibile dopo la prenotazione.</div>'}</div></div>
+    <div class="dsec"><div class="di">${ICON.key}</div><div><b>Codici</b>
       ${ex.codes.map(c => `<div class="code-line"><span>${esc(c.title)}: <strong>${esc(c.value)}</strong></span><button class="btn small" data-del="${c.id}">✕</button></div>`).join('')}
       <div class="grid-2" style="margin-top:8px;"><input class="field" data-f="ct" placeholder="Titolo (es. PIN)"><input class="field" data-f="cv" placeholder="Codice o testo"></div></div></div>
-    <div class="dsec"><div class="di">📝</div><div><b>Note</b><textarea class="field" data-f="note" rows="3" placeholder="Note">${esc(ex.note)}</textarea></div></div>
+    <div class="dsec"><div class="di">${ICON.note}</div><div><b>Note</b><textarea class="field" data-f="note" rows="3" placeholder="Note">${esc(ex.note)}</textarea></div></div>
     <button class="btn primary block" data-b="save" style="margin-top:14px;">Salva</button>`;
   const q = sel => box.querySelector(sel);
   box.querySelectorAll('[data-del]').forEach(b => b.onclick = () => { ex.codes = ex.codes.filter(c => String(c.id) !== b.dataset.del); done(); });
@@ -1206,10 +1221,10 @@ function renderCities() {
       <div class="city-dates">${esc(h.en || '')}</div>
       `;
     const g1 = routeRow(hotelQ(h), () => showPlaceCard(hotelCardData(city.key))); if (g1) card.appendChild(g1);
-    card.appendChild(btnGrid([bAct('🗓 Itinerario', () => {
+    card.appendChild(btnGrid([bAct('Itinerario', () => {
       setView('itinerary');
       setTimeout(() => $(`day-${city.days[0]}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
-    }, 'primary')].concat(h.tel ? [bLink('📞 Chiama', 'tel:' + h.tel)] : [])));
+    }, 'primary')].concat(h.tel ? [bLink('Chiama', 'tel:' + h.tel)] : [])));
     wrap.appendChild(card);
   });
 }
@@ -1222,22 +1237,35 @@ function placeInfo(day, i) {
 }
 function stopCardData(day, i) {
   const st = day.det[i], p = placeInfo(day, i);
-  return { title: `🚕 ${L(st.title)}`, zh: p.zh, addr: p.addr, tel: st.tel, latName: L(p.py || st.title), latAddr: p.pya,
+  return { title: `${L(st.title)}`, zh: p.zh, addr: p.addr, tel: st.tel, latName: L(p.py || st.title), latAddr: p.pya,
     onEdit: () => editAddr(`${day.day}-${i}`, { zh: p.zh, addr: p.addr, lat: p.pya }, st.title, () => { renderItinerary(); renderToday(); }) };
 }
 function stopMapQ(day, st, p) {
   return p.zh || st.map || (/^(volo|treno|aereo|bus|traghetto)\b/i.test(st.title) ? '' : String(day.city).includes('→') ? `${st.title}, ${meta.country}` : `${st.title}, ${day.city}, ${meta.country}`);
 }
-const dsec = (ic, label, html) => html ? `<div class="dsec"><div class="di">${ic}</div><div><b>${label}</b>${html}</div></div>` : '';
+const SVG = (d) => `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const ICON = {
+  pin: SVG('<path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>'),
+  route: SVG('<circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><path d="M8 18h6a3 3 0 0 0 0-6h-4a3 3 0 0 1 0-6h6"/>'),
+  clock: SVG('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
+  coin: SVG('<circle cx="12" cy="12" r="9"/><path d="M14.5 9.2a3 3 0 0 0-2.5-1.2c-1.7 0-2.8 1-2.8 2.2 0 3 5.6 1.6 5.6 4.6 0 1.3-1.2 2.2-3 2.2a3.5 3.5 0 0 1-3-1.5M12 6.5V8m0 8v1.5"/>'),
+  ticket: SVG('<path d="M4 8V7a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v1a2 2 0 0 0 0 4v0a2 2 0 0 0 0 4v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1a2 2 0 0 0 0-4v0a2 2 0 0 0 0-4z"/><path d="M14 6v12" stroke-dasharray="2 2"/>'),
+  bulb: SVG('<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>'),
+  phone: SVG('<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>'),
+  num: SVG('<path d="M5 9h14M5 15h14M10 4 8 20M16 4l-2 16"/>'),
+  key: SVG('<circle cx="8" cy="15" r="4"/><path d="M11 12l8-8M16 7l3 3"/>'),
+  note: SVG('<path d="M5 4h14v16H5zM9 9h6M9 13h6"/>')
+};
+const dsec = (ic, label, html) => html ? `<div class="dsec"><div class="di">${ICON[ic] || ic}</div><div><b>${label}</b>${html}</div></div>` : '';
 function detHTML(day, i) {
   const st = day.det[i], p = placeInfo(day, i);
   const txt = t => t ? `<div>${esc(L(t))}</div>` : '';
   let h = '';
-  if (p.zh || p.addr) h += dsec('📍', 'Dove', `<div class="dn">${esc(L(p.py || st.title))}</div>${p.pya ? `<div>${esc(p.pya)}</div>` : ''}<div class="py">I caratteri locali sono nel pulsante 🚕 Taxi</div>`);
-  h += dsec('🧭', 'Come arrivare', txt(st.how)) + dsec('🕒', 'Orari', txt(st.hours)) + dsec('💶', 'Costi', txt(st.cost)) + dsec('🎟️', 'Prenotazione', txt(st.book));
-  if (st.warn) h += `<div class="warnbox">⚠️ ${esc(L(st.warn))}</div>`;
-  if (st.tips && st.tips.length) h += dsec('💡', 'Consigli', `<ul>${st.tips.map(t => `<li>${esc(L(t))}</li>`).join('')}</ul>`);
-  h += `<div class="vb">${st.v === 'ok' ? '✅ Dati letti su fonti online' : '🟡 Da verificare prima di partire'}${p.custom ? ' · ✏️ modificato da te' : ''}</div>`;
+  if (p.zh || p.addr) h += dsec('pin', 'Dove', `<div class="dn">${esc(L(p.py || st.title))}</div>${p.pya ? `<div>${esc(p.pya)}</div>` : ''}<div class="py">I caratteri locali sono nel pulsante Taxi</div>`);
+  h += dsec('route', 'Come arrivare', txt(st.how)) + dsec('clock', 'Orari', txt(st.hours)) + dsec('coin', 'Costi', txt(st.cost)) + dsec('ticket', 'Prenotazione', txt(st.book));
+  if (st.warn) h += `<div class="warnbox"><b>Attenzione</b> ${esc(L(st.warn))}</div>`;
+  if (st.tips && st.tips.length) h += dsec('bulb', 'Consigli', `<ul>${st.tips.map(t => `<li>${esc(L(t))}</li>`).join('')}</ul>`);
+  h += `<div class="vb">${st.v === 'ok' ? '<span class="vbadge ok">Verificato su fonti online</span>' : '<span class="vbadge warn">Da verificare prima di partire</span>'}${p.custom ? '<span class="vbadge">Modificato da te</span>' : ''}</div>`;
   return h;
 }
 function isCheckinDay(day, hk) {
@@ -1248,11 +1276,11 @@ function renderDay(day, target) {
   const hk = hotelKeyForDay(day);
   const section = document.createElement('article'); section.className = 'day-card'; section.id = `day-${day.day}`;
   section.innerHTML = `<div class="day-head"><div class="day-title"><h4>Giorno ${day.day} · ${esc(day.city)}</h4><p>${esc(day.date)} · ${esc(day.title)}</p></div><div class="wx-line" data-wxday="${day.day}"></div></div>
-    ${day.alert ? `<div class="alert">⚠️ ${esc(day.alert)}</div>` : ''}
+    ${day.alert ? `<div class="alert"><b>Attenzione</b> ${esc(day.alert)}</div>` : ''}
     ${hk && isCheckinDay(day, hk) ? `<div class="hotel-box" data-hotel>${hotelBoxHTML(hk, false)}</div>` : ''}
     <div class="timeline"></div>
     <div class="note-area">
-      <label class="lbl" for="note-${day.day}">📝 Diario della giornata</label>
+      <label class="lbl" for="note-${day.day}">Diario della giornata</label>
       <textarea id="note-${day.day}" placeholder="Ricordi, appunti, sensazioni..."></textarea>
     </div>`;
   if (hk && section.querySelector('[data-hotel]')) hotelActs(hk, section.querySelector('[data-hotel]'));
@@ -1281,8 +1309,8 @@ function renderDay(day, target) {
       const mq = stopMapQ(day, st, p);
       const g1 = routeRow(mq, hasPlace ? () => showPlaceCard(stopCardData(day, i)) : null); if (g1) acts.appendChild(g1);
       const r2 = [];
-      if (st.guide) r2.push(bAct('🎧 Guida', () => openGuideByTitle(st.guide)));
-      if (st.tel) r2.push(bLink('📞 Chiama', 'tel:' + st.tel));
+      if (st.guide) r2.push(bAct('Guida', () => openGuideByTitle(st.guide)));
+      if (st.tel) r2.push(bLink('Chiama', 'tel:' + st.tel));
       const tg = bAct('Dettagli ▾'); tg.dataset.a = 'tg'; tg.setAttribute('aria-expanded', 'false'); r2.push(tg);
       acts.appendChild(btnGrid(r2));
       const det = row.querySelector('.stop-det');
@@ -1311,8 +1339,8 @@ function renderItinerary() { const wrap = $('fullItinerary'); wrap.innerHTML = '
 /* ====================== AUDIOGUIDA ====================== */
 const guide = { city: 'all', tag: 'all', q: '', favOnly: false };
 guide.city = todayGuideCity() || 'all';
-const TAGS = { influencer: '📸 Influencer', local: '🔸 Local' };
-const tagLabel = t => (t && TAGS[t]) || '🎧 Classica';
+const TAGS = { influencer: 'Influencer', local: 'Local' };
+const tagLabel = t => (t && TAGS[t]) || 'Classica';
 const stopKey = (city, stop) => `${city}|${stop.title}`;
 const hanziOf = native => (String(native).match(new RegExp('[' + SCRIPT_CLS + ']+', 'g')) || []).join(' ');
 const allStops = () => companionData.flatMap(c => c.stops.map(s => ({ city: c.name, stop: s })));
@@ -1338,7 +1366,7 @@ function speak(text, lang, btn, rate) {
   const parts = []; let cur = '';
   sentences.forEach(s => { if (cur && (cur + s).length > 220) { parts.push(cur); cur = s; } else cur += s; });
   if (cur) parts.push(cur);
-  if (btn) { btn.textContent = '⏹️ Ferma'; speech.btn = btn; }
+  if (btn) { btn.textContent = 'Ferma'; speech.btn = btn; }
   const voice = pickVoice(lang.slice(0, 2).toLowerCase());
   parts.forEach((p, i) => {
     const u = new SpeechSynthesisUtterance(p.trim());
@@ -1378,12 +1406,12 @@ function renderGuideControls() {
   const rowC = $('guideCities'); rowC.innerHTML = '';
   rowC.appendChild(mk('Tutte', guide.city === 'all', () => { guide.city = 'all'; refreshGuide(); }));
   const today = todayGuideCity();
-  if (today) rowC.appendChild(mk(tripStarted() ? '📍 Oggi' : '📍 Prima tappa', guide.city === today, () => { guide.city = today; refreshGuide(); }));
+  if (today) rowC.appendChild(mk(tripStarted() ? 'Oggi' : 'Prima tappa', guide.city === today, () => { guide.city = today; refreshGuide(); }));
   companionData.forEach(c => rowC.appendChild(mk(`${c.name} (${c.stops.length})`, guide.city === c.name, () => { guide.city = c.name; refreshGuide(); })));
   const rowT = $('guideTags'); rowT.innerHTML = '';
-  [['all', 'Tutti i tipi'], ['influencer', TAGS.influencer], ['local', TAGS.local], ['classic', '🎧 Classiche']]
+  [['all', 'Tutti i tipi'], ['influencer', TAGS.influencer], ['local', TAGS.local], ['classic', 'Classiche']]
     .forEach(([k, l]) => rowT.appendChild(mk(l, guide.tag === k, () => { guide.tag = k; refreshGuide(); })));
-  rowT.appendChild(mk('⭐ Preferiti', guide.favOnly, () => { guide.favOnly = !guide.favOnly; refreshGuide(); }));
+  rowT.appendChild(mk('Preferiti', guide.favOnly, () => { guide.favOnly = !guide.favOnly; refreshGuide(); }));
 }
 function refreshGuide() { stopSpeech(); renderGuideControls(); renderCompanion(); }
 
@@ -1406,8 +1434,8 @@ function renderCompanion() {
       <div class="chip-row"><span class="chip">${esc(tagLabel(stop.tag))}</span></div>
       <p style="font-size:14px; color:var(--muted); line-height:1.5; margin-top:12px;">${esc(intro)}</p>
       <div style="display:flex; gap:10px; margin-top:16px;">
-        <button class="btn small primary read-btn" type="button">📖 Leggi tutto</button>
-        <button class="btn small ghost listen-btn" type="button" data-label="🔊 Ascolta">🔊 Ascolta</button>
+        <button class="btn small primary read-btn" type="button">Leggi tutto</button>
+        <button class="btn small ghost listen-btn" type="button" data-label="Ascolta">Ascolta</button>
       </div>`;
     card.querySelector('.read-btn').addEventListener('click', () => openStop(list, i));
     card.querySelector('.listen-btn').addEventListener('click', e => speak(stop.text, meta.guideLang || 'it-IT', e.currentTarget, Number(state.ttsRate) || 0.95));
@@ -1446,16 +1474,16 @@ function openStop(list, i) {
     ${section('Tradizioni & Eventi', stop.tradizioni)}
     ${section('Oggi', stop.oggi)}
     ${section('Particolarità', stop.particolarita)}
-    ${section('📷 Cosa osservare sul posto', stop.osservare)}
-    ${section('📸 La foto perfetta', stop.foto)}
-    ${section('🗣 Una parola locale', stop.parola)}
+    ${section('Cosa osservare sul posto', stop.osservare)}
+    ${section('La foto perfetta', stop.foto)}
+    ${section('Una parola locale', stop.parola)}
     <div class="grid-2" style="margin-top:28px;">
       <button class="btn m-prev" type="button" ${i === 0 ? 'disabled' : ''}>← Precedente</button>
       <button class="btn m-next" type="button" ${i === list.length - 1 ? 'disabled' : ''}>Successiva →</button>
     </div>`;
   { const host = box.querySelector('[data-go]');
-    const g1 = routeRow(`${stop.title}, ${city}, ${meta.country}`, hanzi ? () => { stopSpeech(); showBig('Mostra all\'autista', hanzi, 'Mi porti qui, per favore.', '🚕'); } : null);
-    const listen = bAct('🔊 Ascolta', null, 'primary'); listen.dataset.label = '🔊 Ascolta';
+    const g1 = routeRow(`${stop.title}, ${city}, ${meta.country}`, hanzi ? () => { stopSpeech(); showBig('Mostra all\'autista', hanzi, 'Mi porti qui, per favore.', ''); } : null);
+    const listen = bAct('Ascolta', null, 'primary'); listen.dataset.label = 'Ascolta';
     listen.addEventListener('click', e => speak(stop.text, meta.guideLang || 'it-IT', e.currentTarget, Number(state.ttsRate) || 0.95));
     const fav = bAct(state.favs[key] ? '★ Preferito' : '☆ Preferito', e => {
       if (state.favs[key]) delete state.favs[key]; else state.favs[key] = true;
@@ -1525,7 +1553,7 @@ function renderPhrases(filter) {
     if (p[0] !== last) { last = p[0]; const h = document.createElement('div'); h.className = 'phrase-cat'; h.textContent = p[0]; box.appendChild(h); }
     const row = document.createElement('div'); row.className = 'phrase';
     row.innerHTML = `<div><div class="it">${esc(p[1])}</div><div class="zh">${esc(p[2])}</div><div class="py">${esc(p[3])}</div></div>
-      <div class="acts"><button class="btn small" type="button">Ingrandisci</button><button class="btn small ghost" type="button" aria-label="Ascolta">🔊</button></div>`;
+      <div class="acts"><button class="btn small" type="button">Ingrandisci</button><button class="btn small ghost" type="button" aria-label="Ascolta"></button></div>`;
     const [show, say] = row.querySelectorAll('button');
     show.addEventListener('click', () => showBig(p[1], p[2], p[3]));
     say.addEventListener('click', () => speakZh(p[2]));
@@ -1565,7 +1593,7 @@ function renderHomeWeather() {
   if (!day) { day = trip.days.find(d => dayISO(d) > today && wxCityOf(d)); note = day ? 'primo giorno in ' + meta.countryIt + ' · ' + day.date : ''; }
   if (!day) { box.innerHTML = ''; return; }
   const city = wxCityOf(day), f = wxFor(city, dayISO(day));
-  if (!f) { box.innerHTML = `<div class="utility-card"><b>⛅ Meteo · ${esc(city)}</b><p class="note-line" style="margin:6px 0 0;">Nessun dato salvato: si aggiorna da solo quando c'è connessione.</p></div>`; return; }
+  if (!f) { box.innerHTML = `<div class="utility-card"><b>Meteo · ${esc(city)}</b><p class="note-line" style="margin:6px 0 0;">Nessun dato salvato: si aggiorna da solo quando c'è connessione.</p></div>`; return; }
   let slots = '';
   if (f.kind === 'fc' && f.w.hourly) {
     const iso = dayISO(day), H = f.w.hourly;
@@ -1577,7 +1605,7 @@ function renderHomeWeather() {
       return `<div class="wx-slot"><b>${l}</b>${wxIcon(code)} ${Math.round(Math.min(...temps))}°–${Math.round(Math.max(...temps))}°<br>💧${pop}%</div>`;
     }).join('') + '</div>';
   }
-  box.innerHTML = `<div class="utility-card"><div class="wc-head" style="margin-bottom:0"><strong>⛅ ${esc(city)} · ${esc(note)}</strong><span>${esc(wxText(f))}</span></div>${slots}</div>`;
+  box.innerHTML = `<div class="utility-card"><div class="wc-head" style="margin-bottom:0"><strong>${esc(city)} · ${esc(note)}</strong><span>${esc(wxText(f))}</span></div>${slots}</div>`;
 }
 function readWxCache() { try { return JSON.parse(localStorage.getItem(WX_KEY)); } catch { return null; } }
 function renderWeather() {
@@ -1626,7 +1654,7 @@ async function refreshWeather(manual) {
   } catch (e) {
     if (manual) alert('Meteo non raggiungibile: servono connessione e accesso al servizio. Restano i dati salvati.');
   } finally {
-    btn.disabled = false; btn.textContent = '🔄 Aggiorna meteo';
+    btn.disabled = false; btn.textContent = 'Aggiorna meteo';
   }
 }
 
@@ -1739,7 +1767,7 @@ const _am = document.querySelector('meta[name="apple-mobile-web-app-title"]'); i
 $('heroTitle').textContent = meta.countryIt || meta.title;
 $('sosNote').textContent = meta.emergencyNote;
 $('sosGrid').innerHTML = meta.emergency.map(e => `<div style="padding:10px; background:var(--surface-2); border-radius:12px;"><strong>${esc(e[0])}</strong><br><small>${esc(e[1])}</small></div>`).join('');
-$('sosAssist').href = 'tel:' + meta.assistance.tel; $('sosAssist').textContent = '☎ ' + meta.assistance.label;
+$('sosAssist').href = 'tel:' + meta.assistance.tel; $('sosAssist').textContent = '' + meta.assistance.label;
 $('convLabel').textContent = `${meta.currency.name} (${meta.currency.symbol})`; $('curOpt').textContent = meta.currency.symbol;
 setupConverter(); setupExpenseForm(); setupBackup(); refreshRate();
 renderCities(); renderItinerary(); renderGuideControls(); renderCompanion(); renderTodayGuides(); renderTransfers(); renderWallet(); renderCodes();
