@@ -632,6 +632,9 @@ button.wp { cursor: pointer; }
 .sc-h { font-weight: 600; font-size: 16px; line-height: 1.25; letter-spacing: -.2px; }
 .sc-s { color: var(--muted); font-size: 13px; margin-top: 2px; line-height: 1.3; }
 .sc-c { font-style: normal; color: var(--muted); font-size: 20px; }
+.racc .dlink { margin-top: 14px; }
+.racc-body { margin: 10px 16px 0; padding: 14px 16px 4px; background: var(--glass); border: 0.5px solid var(--glass-border); border-radius: 18px; font-size: 15px; line-height: 1.6; }
+.racc-body[hidden] { display: none; }
 .diary { padding: 0 0 16px; }
 .diary .dlink { margin-top: 6px; }
 .diary .note-area { padding: 10px 16px 0; }
@@ -1928,7 +1931,7 @@ function openRacconto(n) {
 document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-racconto]'); if (b) openRacconto(Number(b.dataset.racconto)); });
 
 let selDay = null;
-const diaryOpen = new Set();
+const diaryOpen = new Set(), raccOpen = new Set();
 function stopSheet(day, i) {
   const s = day.stops[i], st = day.det ? day.det[i] : null, p = st ? placeInfo(day, i) : { zh: '', addr: '' };
   const hasPlace = !!(p.zh || p.addr), box = document.createElement('div');
@@ -1953,7 +1956,7 @@ function renderDay(day, target) {
     ${day.alert ? `<div class="alert"><b>Attenzione</b> ${esc(day.alert)}</div>` : ''}
     ${hk && isCheckinDay(day, hk) ? `<div class="hotel-box" data-hotel>${hotelBoxHTML(hk, false)}</div>` : ''}
     <div class="day-map" data-daymap><div class="dm-mini"></div><div class="dm-chip"></div></div>
-    ${RACCONTO[day.day] ? `<button class="dlink" type="button" data-racconto="${day.day}"><span>Leggi il racconto del giorno</span><i>›</i></button>` : ''}
+    ${RACCONTO[day.day] ? `<div class="racc"><button class="dlink dtog" type="button" aria-expanded="false"><span>Racconto del giorno</span><i>▾</i></button><div class="racc-body" hidden></div></div>` : ''}
     <div class="timeline"></div>
     <div class="diary"><button class="dlink dtog" type="button" aria-expanded="false"><span>Diario della giornata</span><i>▾</i></button>
       <div class="note-area" hidden><textarea id="note-${day.day}" aria-label="Diario della giornata" placeholder="Ricordi, appunti, sensazioni..."></textarea></div></div>`;
@@ -1966,7 +1969,12 @@ function renderDay(day, target) {
     row.onclick = () => openSheetNode(L(s[1]), () => stopSheet(day, i));
     timeline.appendChild(row);
   });
-  const ta = section.querySelector('textarea'), area = section.querySelector('.note-area'), tog = section.querySelector('.dtog');
+  { const rc = section.querySelector('.racc'); if (rc) {
+    const rb = rc.querySelector('.racc-body'), rt = rc.querySelector('.dtog'); let filled = false;
+    const setR = open => { if (open && !filled) { rb.innerHTML = raccontoHTML(RACCONTO[day.day].text); filled = true; } rb.hidden = !open; rt.setAttribute('aria-expanded', open); rt.querySelector('i').textContent = open ? '▴' : '▾'; if (open) raccOpen.add(day.day); else raccOpen.delete(day.day); };
+    rt.onclick = () => setR(rb.hidden); if (raccOpen.has(day.day)) setR(true);
+  } }
+  const ta = section.querySelector('textarea'), area = section.querySelector('.note-area'), tog = section.querySelector('.diary .dtog');
   ta.value = state.notes[day.day] || '';
   const setDiary = open => { area.hidden = !open; tog.setAttribute('aria-expanded', open); tog.querySelector('i').textContent = open ? '▴' : '▾'; if (open) diaryOpen.add(day.day); else diaryOpen.delete(day.day); };
   tog.querySelector('span').textContent = 'Diario della giornata' + (ta.value.trim() ? ' · scritto' : '');
