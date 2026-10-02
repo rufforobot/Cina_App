@@ -2119,8 +2119,8 @@ function renderDay(day, target) {
 function alignDayChips() {
   const c = $('dayChips'); if (!c) return;
   const on = c.querySelector('.on'), first = c.firstElementChild; if (!on || !first) return;
-  const d = on.getBoundingClientRect().left - first.getBoundingClientRect().left;
-  if (d || c.scrollLeft) c.scrollLeft += d;
+  if (!c.offsetWidth) return; /* vista nascosta: riallinea quando diventa visibile */
+  c.scrollLeft = on.offsetLeft - first.offsetLeft;
 }
 function goDay(n, scroll = true) {
   selDay = n; renderItinerary();
@@ -2828,6 +2828,7 @@ function setView(view) {
   document.querySelectorAll(`.bottom-nav [data-view="${nav}"]`).forEach(b => b.classList.add('active'));
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   $(view).classList.add('active');
+  if (view === 'itinerary') { alignDayChips(); requestAnimationFrame(alignDayChips); setTimeout(alignDayChips, 250); }
   if (view === 'itinerary') requestAnimationFrame(alignDayChips);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
