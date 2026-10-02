@@ -683,6 +683,27 @@ button.wp { cursor: pointer; }
 .bt.hot .bi, .bt.night .bi { background: rgba(255,255,255,.2); color: #fff; }
 .bt.night { background: linear-gradient(160deg, #3a4a66, #1c2433); color: #fff; }
 .bt.night .bl, .bt.night .bs { color: rgba(255,255,255,.78); }
+
+/* stile Bento esteso: angoli ampi, titoli forti, indice dei giorni a tessere, dock con voce attiva a pillola */
+.card { border-radius: 30px; }
+.card h3, .section-title h3 { font-weight: 800; letter-spacing: -.03em; }
+.dchips { gap: 10px; }
+.dchips button { width: 124px; text-align: left; padding: 14px 16px; border-radius: 26px; background: var(--surface); border: 0; display: flex; flex-direction: column; gap: 2px; }
+.dchips button small { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
+.dchips button b { font-size: 17px; font-weight: 800; letter-spacing: -.03em; line-height: 1.15; overflow-wrap: anywhere; }
+.dchips button em { font-style: normal; font-size: 12px; font-weight: 500; opacity: .75; }
+.dchips button.on { background: var(--accent); color: rgba(255,255,255,.85); }
+.dchips button.on b { color: #fff; }
+.wtile { border-radius: 30px; padding: 20px; min-height: 138px; justify-content: space-between; }
+.wtile .wi { width: 40px; height: 40px; border-radius: 50%; }
+.wtile .wt { font-size: 19px; font-weight: 800; letter-spacing: -.03em; }
+.wtile .ws { font-size: 14px; }
+.wsec-t { margin: 26px 6px 12px; }
+.bottom-nav { border-radius: 99px; padding: 8px; gap: 4px; }
+.bottom-nav button { border-radius: 99px; padding: 8px 4px; }
+.bottom-nav button.active { background: var(--text); color: var(--bg); }
+.modal-card { border-radius: 32px; }
+.modal.sheet .modal-card { border-radius: 32px 32px 0 0; }
 </style>
 </head>
 <body>
@@ -2040,7 +2061,7 @@ function renderItinerary() {
   const wrap = $('fullItinerary'); wrap.innerHTML = '';
   if (selDay == null || !trip.days.some(d => d.day === selDay)) selDay = trip.days[tripDayIndex()].day;
   const chips = document.createElement('div'); chips.className = 'dchips'; chips.id = 'dayChips';
-  trip.days.forEach(d => { const b = document.createElement('button'); b.type = 'button'; b.className = d.day === selDay ? 'on' : ''; b.innerHTML = `<small>G${d.day}</small><b>${esc(d.date.slice(0, 2))}</b>`; b.onclick = () => goDay(d.day, false); chips.appendChild(b); });
+  trip.days.forEach(d => { const b = document.createElement('button'); b.type = 'button'; b.className = d.day === selDay ? 'on' : ''; b.innerHTML = `<small>Giorno ${d.day}</small><b>${esc(d.city.split('→').pop().trim())}</b><em>${esc(d.date)}</em>`; b.onclick = () => goDay(d.day, false); chips.appendChild(b); });
   wrap.appendChild(chips);
   renderDay(trip.days.find(d => d.day === selDay), wrap);
   if (typeof renderDayWeather === 'function') renderDayWeather();
