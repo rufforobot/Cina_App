@@ -1485,7 +1485,7 @@ function renderWallet() {
   const isBk = r => !!(r.fileBooked || state.booked[r.id]);
   const items = [];
   transfers.forEach(t => { const fl = /Volo/.test(t.type); items.push({ cat: fl ? 'Voli' : 'Treni', ic: fl ? 'flight' : 'train', iso: t.dep.slice(0, 10), ms: new Date(t.dep).getTime(), t: trCities(t).join(' → '), s: `${trCode(t)} · ${t.dep.slice(11, 16)}`, st: new Date(t.dep) > now ? null : { txt: 'Partito', cls: 'mute' }, open: () => openSheetNode(t.title, () => journeySheet(t)) }); });
-  hotels.forEach(r => { const iso = hotelStartISO(r.date); items.push({ cat: 'Hotel', ic: 'hotel', iso, ms: iso ? new Date(iso + 'T15:00:00+08:00').getTime() : 9e15, t: short(r.title), s: `${r.city || ''}${r.city ? ' · ' : ''}${r.date}`, st: isBk(r) ? { txt: 'Prenotato', cls: 'ok' } : { txt: 'Da prenotare', cls: 'warn' }, res: r, open: () => openSheetNode(r.title, () => resCard(r)) }); });
+  hotels.forEach(r => { const iso = hotelStartISO(r.date); items.push({ cat: 'Hotel', ic: 'hotel', iso, ms: iso ? new Date(iso + 'T15:00:00+08:00').getTime() : 9e15, t: short(r.title), s: `${r.city || ''}${r.city ? ' · ' : ''}${r.date}`, st: isBk(r) ? null : { txt: 'Da prenotare', cls: 'warn' }, res: r, open: () => openSheetNode(r.title, () => resCard(r)) }); });
   const ATT_KEY = { cooking: /xiaolongbao/i, mutianyu: /mutianyu/i, panda: /panda/i, tianmen: /tianmen shan/i, terracotta: /terracotta/i, forbidden: /proibita/i, tiananmen: /ti[ae]nanmen/i };
   const attTime = r => {
     const k = ATT_KEY[r.id], day = k && trip.days.find(d => d.date === String(r.date).padStart(5, '0')); if (!day) return '';
@@ -1496,7 +1496,7 @@ function renderWallet() {
   };
   rest.forEach(r => {
     const att = isAttr(r), m = String(r.date).match(/^(\d{1,2})\/(\d{1,2})$/), iso = m ? iso2(m[2], m[1]) : '', tm = att ? attTime(r) : '';
-    items.push({ cat: att ? 'Biglietti' : 'Altro', ic: att ? 'ticket' : (/sim/i.test(r.type + r.title) ? 'sim' : /assic/i.test(r.type + r.title) ? 'shield' : 'info'), iso, ms: iso ? new Date(iso + 'T' + ((tm.match(/\d{1,2}:\d{2}/) || ['12:00'])[0]) + ':00+08:00').getTime() : -1, t: short(r.title), s: tm ? `${r.date} · ${tm}` : r.date, st: isBk(r) ? { txt: 'Prenotato', cls: 'ok' } : { txt: 'Da prenotare', cls: 'warn' }, res: r, open: () => openSheetNode(r.title, () => resCard(r)) });
+    items.push({ cat: att ? 'Biglietti' : 'Altro', ic: att ? 'ticket' : (/sim/i.test(r.type + r.title) ? 'sim' : /assic/i.test(r.type + r.title) ? 'shield' : 'info'), iso, ms: iso ? new Date(iso + 'T' + ((tm.match(/\d{1,2}:\d{2}/) || ['12:00'])[0]) + ':00+08:00').getTime() : -1, t: short(r.title), s: tm ? `${r.date} · ${tm}` : r.date, st: isBk(r) ? null : { txt: 'Da prenotare', cls: 'warn' }, res: r, open: () => openSheetNode(r.title, () => resCard(r)) });
   });
   (state.imported || []).forEach(x => items.push({ cat: 'Altro', ic: 'mail', iso: x.date || '', ms: x.date ? new Date(x.date + 'T12:00:00+08:00').getTime() : 8e15, t: x.title, s: [x.date && x.date.split('-').reverse().join('/'), x.time].filter(Boolean).join(' · ') || 'Importata da email', st: { txt: 'Email', cls: 'mute' }, open: () => openSheetNode(x.title, () => importedCard(x)) }));
   items.sort((a, b) => a.ms - b.ms);
@@ -1559,7 +1559,7 @@ function resCard(r) {
   const ex = resExtra(r.id), save = () => { saveState(); renderWallet(); };
   card.innerHTML = `<div style="display:flex; justify-content:space-between; gap:8px; margin-bottom:12px;">
       <div style="min-width:0;"><div class="companion-meta">${esc(r.type)}</div><h4 style="margin:0; font-size:18px;">${esc(r.title)}</h4></div>
-      <span class="badge ${isBooked ? 'done' : 'warn'}">${isBooked ? 'Prenotato' : 'Da prenotare'}</span>
+      ${isBooked ? '' : '<span class="badge warn">Da prenotare</span>'}
     </div><p style="margin:0; font-size: 15px;"><strong>Date:</strong> ${esc(r.date)}</p><p style="margin:4px 0 0; color:var(--muted); font-size: 13px;">Rif: ${esc(r.ref)}</p>`;
   const add = (el) => { card.appendChild(el); return el; };
   if (r.hk) { const g = routeRow(hotelQ(hotelInfo(r.hk)), () => showPlaceCard(hotelCardData(r.hk))); if (g) { g.style.marginTop = '14px'; card.appendChild(g); } }
