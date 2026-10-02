@@ -251,13 +251,13 @@ Scegliete in base al fiato che avete quella mattina. Chi arriva a piedi dalla va
 
 | Orario | Destinazione | Trasporto | Note |
 |---|---|---|---|
-| **08:00** | Cabinovia Tianmen Shan | 🚶 (a due passi dall'hotel) | apertura, 7,5km/~30min salita |
-| **08:30-13:00** | Tianmen Shan (Guigu Path + 999 gradini) | 🚶 | 4-4,5h |
-| **13:30** | Pranzo | 🚶 | in zona |
-| **15:30** | Trasferimento Zhangjiajie Ovest | 🚕 Didi | ~25-30 min |
+| **08:00** | Tianmen Shan, piano base Linea C (cabinovia veloce su e giù) | 🚕 Didi al cancello della montagna | arrivo 07:30, impianti dalle 08:00 |
+| **08:30-13:30** | Tianmen Shan (Grotta del Cielo, passerelle Panlong/West Line) | 🚶 | 4,5-5,5h, alle 12:30 già in discesa |
+| **14:00** | Rientro in hotel, valigie e pranzo leggero | 🚕 | giù dalla montagna entro le 14:00 |
+| **15:00** | Trasferimento Zhangjiajie Ovest | 🚕 Didi | ~25-30 min |
 | **16:49** | Treno D3970 per Chongqing — PRENOTATO | 🚄 | arrivo 19:37 |
 
-mattina e primo pomeriggio a **Tianmen Shan**, letteralmente a due passi dall'hotel — la cabinovia più lunga del mondo (7,5 km, ~30 min) sale dal centro città fino alla cima, poi la **Guigu Cliffside Path** sospesa sul vuoto e i **999 gradini** della Grotta del Cielo (il varco naturale di 131m che dà il nome alla montagna). Qui il trekking libero è limitato ai soli 999 gradini — il resto si fa in cabinovia, bus e scale mobili.
+mattina e primo pomeriggio a **Tianmen Shan**, letteralmente a due passi dall'hotel — la cabinovia più lunga del mondo (7,5 km, ~30 min) sale dal centro città fino alla cima, poi la **Guigu Cliffside Path** sospesa sul vuoto e i **999 gradini** della Grotta del Cielo (il varco naturale di 131m che dà il nome alla montagna). Piano base: Linea C (cabinovia veloce su e giù, 4,5-5,5 h), perché una guida del 30/09/2026 segnala dal 13/10 la sospensione delle linee A e B; la funivia alta è chiusa da novembre 2025 e la East Line delle passerelle di vetro dal 12/05/2026. Regola dell'orologio: alle 12:30 già in discesa, alle 14:00 in hotel.
 
 ---
 
@@ -565,7 +565,7 @@ Ordinato per quanto sono rigide le finestre — alcune di queste non sono un con
 | ~~Treno Chengdu → Xi'an~~ | Giorno 12, mar 27/10 | 15 giorni prima, inclusi (12306) | ✅ **Prenotato** (via Trip.com, in attesa vendita 13/10) |
 | ~~Treno Xi'an → Pechino~~ | Giorno 14, gio 29/10 | 15 giorni prima, inclusi (12306) | ✅ **Prenotato** (via Trip.com, in attesa vendita 15/10) |
 | Panda Base | Giorno 11, lun 26/10 | 7 giorni prima | **19/10/2026** |
-| Tianmen Shan | Giorno 8, ven 23/10 | 5 giorni prima (10gg in alta stagione, ma fine ottobre non lo è) | **18/10/2026** |
+| Tianmen Shan | Giorno 8, ven 23/10 | probabilmente 15 giorni prima | **08/10/2026** (riprovare ogni giorno) |
 | Esercito di Terracotta | Giorno 13, mer 28/10 | 7 giorni prima sul canale ufficiale, a mezzanotte ora di Pechino (fino a 30gg su Trip.com) | **21/10/2026** (prima se via Trip.com) |
 | Città Proibita | Giorno 15, ven 30/10 | Esattamente 7 giorni prima, verso le 20:00 ora di Pechino (14:00 in Italia) | **23/10/2026 sera** |
 | Piazza Tienanmen | Giorno 15, ven 30/10 | **9 giorni prima**, mini-program WeChat "Tiananmen Square Visit Reservation" — separata dal biglietto Città Proibita | **21/10/2026** |
@@ -574,7 +574,7 @@ Ordinato per quanto sono rigide le finestre — alcune di queste non sono un con
 
 📌 **Quanto sono rigidi, in pratica — margine reale per ciascuno:**
 - **Città Proibita**: il più rigido di tutti. Sparisce in **5-10 minuti** dall'apertura nei periodi di punta — impostate una sveglia precisa per le 20:00 di Pechino del 23/10. Fine ottobre non è alta stagione come l'estate, ma non rischiate.
-- **Tianmen Shan**: capacità giornaliera limitata (35.000 visitatori), "si esaurisce con giorni di anticipo" secondo più fonti — prenotate il 18/10 stesso, non aspettate.
+- **Tianmen Shan**: capacità giornaliera limitata (35.000 visitatori), "si esaurisce con giorni di anticipo" secondo più fonti — provate dal 08/10 e riprovate ogni giorno; ¥288, passaporto, fascia più presto (07:30-08:30).
 - **Terracotta**: capienza molto più alta (fino a 65.000/giorno, max 13.700 in contemporanea) — margine reale maggiore, ma il canale ufficiale rilascia a mezzanotte quindi se preferite dormire, usate Trip.com che prenota anche con settimane di anticipo.
 - **Panda Base**: pressione moderata, soprattutto per gli slot mattutini (7:30-9:00) quando i panda sono attivi — prenotate il giorno stesso dell'apertura per lo slot giusto.
 - **Treni**: variano molto per tratta/orario. Le tratte che avete voi sono tutte ad alta frequenza (non l'ultimo treno della giornata), quindi margine discreto — ma l'orario esatto di apertura vendite **varia per stazione di partenza, non è uguale in tutta la Cina**: controllate il vostro orario specifico nell'app 12306 (sezione "My" → "Travel Services" → "On-Sale Time") 1-2 giorni prima di ciascuna apertura.
