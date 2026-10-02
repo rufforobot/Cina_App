@@ -808,6 +808,9 @@ button.wp { cursor: pointer; }
 #bdTiles .bt.big .bv{font-size:36px}
 .bd-sec{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:14px 0 4px}
 .bd-sec:first-child{padding-top:0}
+.bd-btns{display:flex;gap:8px}
+.bd-card:has(#expenseList[hidden]){padding-bottom:18px}
+.bd-card:has(#expenseList[hidden]) .bd-row{margin-bottom:0}
 </style>
 </head>
 <body>
@@ -918,7 +921,7 @@ button.wp { cursor: pointer; }
   <button class="btn primary bd-add" id="addExpenseBtn" type="button">Aggiungi spesa</button>
   <div class="bento-grid" id="bdTiles"></div>
   <div class="card bd-card"><div class="bd-row"><h3 class="bd-h">Ripartizione</h3><div class="seg two bd-seg" id="bdSeg"><button type="button" data-v="cat" class="on">Categoria</button><button type="button" data-v="city">Città</button></div></div><div id="breakdown"></div></div>
-  <div class="card bd-card"><div class="bd-row"><h3 class="bd-h">Elenco spese</h3><button class="btn small" id="expCsv" type="button">Esporta CSV</button></div><div class="expense-list" id="expenseList"></div></div>
+  <div class="card bd-card"><div class="bd-row"><h3 class="bd-h">Elenco spese</h3><div class="bd-btns"><button class="btn small" id="expCsv" type="button">Esporta CSV</button><button class="btn small" id="expToggle" type="button">Mostra</button></div></div><div class="expense-list" id="expenseList" hidden></div></div>
 </div>
     </section>
     <section class="card ugroup" id="up-lang">
@@ -1695,7 +1698,7 @@ function barsHTML(entries) {
   return entries.map(([label, v]) => `<div class="bar-row"><span>${esc(label)}</span><div class="bar"><span style="width:${Math.max(3, Math.round(v / max * 100))}%"></span></div><strong>${fmtEur(v)}</strong></div>`).join('');
 }
 
-let bdView = 'cat';
+let bdView = 'cat', bdListOpen = false;
 const catName = k => catOf(k)[2];
 /* Costi già prenotati (voli, treni, hotel, assicurazione...): letti dal prezzo in euro scritto nella colonna riferimento delle prenotazioni */
 function bookedCosts() {
@@ -1717,6 +1720,7 @@ function bookedCosts() {
 const catOfExp = x => x.catLabel || catName(x.cat);
 function renderExpenses() {
   const wrap = $('expenseList'); wrap.innerHTML = '';
+  wrap.hidden = !bdListOpen; $('expToggle').textContent = bdListOpen ? 'Nascondi' : 'Mostra';
   const currentDay = trip.days[tripDayIndex()].day;
   const all = state.expenses, fixed = bookedCosts(), every = fixed.concat(all);
   const total = sumEuro(every), spent = sumEuro(all), booked = sumEuro(fixed), today = sumEuro(all.filter(x => x.day === currentDay));
@@ -1811,6 +1815,7 @@ function exportCsv() {
 function setupExpenseForm() {
   $('addExpenseBtn').addEventListener('click', () => openSheetNode('Nuova spesa', expenseSheet));
   $('expCsv').addEventListener('click', exportCsv);
+  $('expToggle').addEventListener('click', () => { bdListOpen = !bdListOpen; renderExpenses(); });
   $('bdSeg').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; bdView = b.dataset.v; renderExpenses(); });
   $('bdTiles').addEventListener('click', e => {
     const b = e.target.closest('[data-bd]'); if (!b) return;
