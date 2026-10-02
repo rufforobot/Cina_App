@@ -717,10 +717,10 @@ button.wp { cursor: pointer; }
 #companion .guide-bar{grid-template-columns:1fr auto;gap:8px}
 #companion .guide-bar .field,#companion .guide-bar .btn{border-radius:99px;height:44px}
 #companion .guide-bar .btn.primary{background:var(--text);color:var(--bg)}
-#companion .seg{display:flex;gap:8px;overflow-x:auto;background:none;padding:2px 0 4px;scrollbar-width:none;margin-top:10px}
-#companion .seg::-webkit-scrollbar{display:none}
-#companion .seg button{flex:0 0 auto;border-radius:99px;padding:9px 16px;font-weight:700;background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
-#companion .seg button.on{background:var(--text);color:var(--bg)}
+.view > .seg{display:flex;gap:8px;overflow-x:auto;background:none;padding:2px 0 4px;scrollbar-width:none;margin-top:10px}
+.view > .seg::-webkit-scrollbar{display:none}
+.view > .seg button{flex:0 0 auto;border-radius:99px;padding:9px 16px;font-weight:700;background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+.view > .seg button.on{background:var(--text);color:var(--bg)}
 #guideCount{font-weight:700;letter-spacing:.2px}
 .companion-card{border-radius:30px!important;padding:20px 20px 18px!important}
 .companion-card .city-name{font-size:21px;font-weight:800;letter-spacing:-.4px;line-height:1.15}
@@ -732,6 +732,7 @@ button.wp { cursor: pointer; }
 .cc-head .city-name{flex:1;min-width:0}
 .cc-head .companion-meta{flex:0 0 auto;margin:0!important;white-space:nowrap;font-size:11px!important;padding:5px 10px!important}
 .cc-head .fav{flex:0 0 auto;margin-right:-6px}
+.view > .seg.two{margin:0 0 12px}
 </style>
 </head>
 <body>
