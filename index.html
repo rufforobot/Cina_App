@@ -728,6 +728,10 @@ button.wp { cursor: pointer; }
 .companion-card .btn-grid .btn{border-radius:99px;height:42px;font-weight:700}
 .companion-card .btn-grid .btn.read-btn{background:var(--text);color:var(--bg)}
 .companion-card .btn-grid .btn.listen-btn{background:var(--fill);color:var(--text)}
+.cc-head{display:flex;align-items:center;gap:8px}
+.cc-head .city-name{flex:1;min-width:0}
+.cc-head .companion-meta{flex:0 0 auto;margin:0!important;white-space:nowrap;font-size:11px!important;padding:5px 10px!important}
+.cc-head .fav{flex:0 0 auto;margin-right:-6px}
 </style>
 </head>
 <body>
@@ -2185,9 +2189,9 @@ function renderCompanion() {
     let intro = stop.text.split('. ')[0] + '.';
     if (intro.length > 100) intro = intro.slice(0, 97).replace(/\s+\S*$/, '') + '...';
     const card = document.createElement('div'); card.className = 'companion-card';
-    card.innerHTML = `<div style="display:flex; justify-content:space-between; gap:8px;">
-        <div style="min-width:0;"><div class="city-name">${esc(stop.title)}</div>
-        <div class="companion-meta" style="margin-top:6px;">${esc(city)} · ${esc(tagLabel(stop.tag))}</div></div>
+    card.innerHTML = `<div class="cc-head">
+        <div class="city-name">${esc(stop.title)}</div>
+        <div class="companion-meta">${esc(city)} · ${esc(tagLabel(stop.tag))}</div>
         <button class="del-btn fav" type="button" style="color:var(--warn); font-size:22px;" aria-label="Preferito">${state.favs[key] ? '★' : '☆'}</button>
       </div>
       <p style="font-size:14px; color:var(--muted); line-height:1.5; margin:10px 0 14px;">${esc(intro)}</p>
