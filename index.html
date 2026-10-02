@@ -660,6 +660,23 @@ button.wp { cursor: pointer; }
 .modal.sheet.open { align-items: flex-end; padding: 0; animation: sheetUp .35s cubic-bezier(.32,.72,0,1); }
 .modal.sheet .modal-card { width: 100%; max-height: 88vh; border-radius: 28px 28px 0 0; padding-bottom: env(safe-area-inset-bottom); }
 @keyframes sheetUp { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* Oggi in stile Bento: tessere grandi con angoli ampi, la tappa successiva in evidenza */
+.bento-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+.bt { text-align: left; border: 0; font: inherit; color: var(--text); background: var(--surface); border-radius: 30px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; gap: 8px; min-width: 0; min-height: 138px; position: relative; overflow: hidden; box-shadow: var(--shadow); transition: transform .2s cubic-bezier(.25,1,.5,1); }
+.bt:active { transform: scale(.95); }
+.bt.wide { grid-column: 1 / -1; min-height: 0; }
+.bt .bl { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding-right: 46px; }
+.bt .bv { font-size: 30px; font-weight: 800; letter-spacing: -.04em; line-height: 1.08; overflow-wrap: anywhere; margin-top: 8px; }
+.bt .bv.s { font-size: 24px; }
+.bt .bs { font-size: 14px; color: var(--muted); font-weight: 500; line-height: 1.35; margin-top: 4px; }
+.bt .bi { position: absolute; right: 16px; top: 16px; width: 38px; height: 38px; border-radius: 50%; background: var(--fill); color: var(--accent); display: flex; align-items: center; justify-content: center; }
+.bt .bi svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.bt.hot { background: var(--accent); color: #fff; }
+.bt.hot .bl, .bt.hot .bs { color: rgba(255,255,255,.82); }
+.bt.hot .bi, .bt.night .bi { background: rgba(255,255,255,.2); color: #fff; }
+.bt.night { background: linear-gradient(160deg, #3a4a66, #1c2433); color: #fff; }
+.bt.night .bl, .bt.night .bs { color: rgba(255,255,255,.78); }
 </style>
 </head>
 <body>
@@ -686,7 +703,8 @@ button.wp { cursor: pointer; }
 <main>
   <!-- DASHBOARD -->
   <section id="dashboard" class="view active">
-    <section class="card" id="todayWeather" hidden></section>
+    <div class="bento-grid" id="bentoTop"></div>
+    <section class="card" id="todayWeather" hidden style="display:none"></section>
 
     <section class="card" id="nowCard"></section>
 
@@ -702,16 +720,6 @@ button.wp { cursor: pointer; }
       <div class="todo-list" id="bookingAlertsGrid"></div>
     </section>
 
-
-    <section class="card">
-      <h3>Strumenti</h3>
-      <div class="tools-grid">
-        <button type="button" class="tool-btn" data-go="cambio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 7.5 12 12l3.5-4.5M8.5 12h7M8.5 15h7M12 12v5"/></svg>Cambio valuta</button>
-        <button type="button" class="tool-btn" data-go="weather"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3"/><path d="M9 3v1.5M3 9h1.5M4.8 4.8l1 1M13.2 4.8l-1 1"/><path d="M8 19h9a3.5 3.5 0 0 0 .4-7A5 5 0 0 0 8 13a3 3 0 0 0 0 6z"/></svg>Meteo</button>
-        <button type="button" class="tool-btn" data-go="trans"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h9v7H8l-3 3v-3H4zM11 12v3h5l3 3v-3h1v-7h-5"/></svg>Traduttore</button>
-        <button type="button" class="tool-btn" data-go="budget"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>Budget</button>
-      </div>
-    </section>
 
   </section>
 
@@ -1215,7 +1223,7 @@ function pendingReservations() {
 }
 function nextTransferObj() { return transfers.find(t => new Date(t.dep) > Date.now()); }
 function renderToday() {
-  renderTodayHotel();
+  renderTodayHotel(); renderBento();
   const box = $('nowCard'); if (!box) return;
   const today = destToday();
   const started = today >= dayISO(trip.days[0]);
@@ -1234,6 +1242,37 @@ function renderToday() {
     list.appendChild(r);
   });
   box.appendChild(list);
+}
+
+/* tessere Bento di Oggi: tappa successiva, meteo, cambio, alloggio */
+const BIC = { pin: '<path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>', cloud: '<path d="M7 18h10a4 4 0 0 0 .5-8A5.5 5.5 0 0 0 7 8.5 3.8 3.8 0 0 0 7 18z"/>', cash: '<circle cx="12" cy="12" r="9"/><path d="M8.5 7.5 12 12l3.5-4.5M8 12h8M8 15h8M12 12v6"/>', hotel: '<path d="M4 20V6l8-3 8 3v14M9 20v-5h6v5M9 9h.01M15 9h.01M9 12h.01M15 12h.01"/>' };
+function renderBento() {
+  const box = $('bentoTop'); if (!box) return; box.innerHTML = '';
+  const today = destToday();
+  if (today > dayISO(trip.days[trip.days.length - 1])) return;
+  const tile = (cls, label, val, sub, ic, onclick, small) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'bt ' + cls;
+    b.innerHTML = `<span class="bi"><svg viewBox="0 0 24 24">${BIC[ic]}</svg></span><div><div class="bl">${esc(label)}</div><div class="bv${small ? ' s' : ''}">${esc(val)}</div>${sub ? `<div class="bs">${esc(sub)}</div>` : ''}</div>`;
+    b.onclick = onclick; box.appendChild(b); return b;
+  };
+  const d = trip.days[tripDayIndex()];
+  const started = today >= dayISO(trip.days[0]);
+  const hm = new Date().toLocaleTimeString('en-GB', { timeZone: meta.tz, hour: '2-digit', minute: '2-digit' });
+  const nowMin = (+hm.slice(0, 2)) * 60 + (+hm.slice(3, 5));
+  const ni = started ? d.stops.findIndex(st => { const m = String(st[0]).match(/^(\d{1,2})[:.](\d{2})/); return m ? (+m[1]) * 60 + (+m[2]) >= nowMin - 30 : false; }) : 0;
+  const st = d.stops[ni];
+  if (st) tile('hot wide', (started ? 'Prossima tappa' : 'Primo giorno') + ' · ' + st[0], L(st[1]).replace(/\s*\(.*?\)/g, ''), L(st[2]), 'pin', () => { setView('itinerary'); goDay(d.day); }, true);
+  /* meteo di oggi */
+  const wd = trip.days.find(x => dayISO(x) === today && wxCityOf(x)) || trip.days.find(x => dayISO(x) > today && wxCityOf(x)) || [...trip.days].reverse().find(x => wxCityOf(x));
+  const city = wd && wxCityOf(wd), f = city && wxFor(city, today);
+  if (city) {
+    const cur = f && f.kind === 'fc' && f.w.current;
+    tile('', city, f ? Math.round(cur ? cur.temperature_2m : f.max) + '°' : '--', f ? WX_IT(cur ? cur.weather_code : f.code) + ' · max ' + Math.round(f.max) + '°' : 'Tocca per aggiornare', 'cloud', () => goTool('weather'));
+  }
+  const sym = meta.currency && meta.currency.symbol;
+  if (sym && sym !== '€') tile('', 'Cambio', '100 ' + sym, '≈ ' + (100 / rate()).toFixed(2).replace('.', ',') + ' €', 'cash', () => goTool('cambio'), true);
+  const hk = hotelKeyForDay(d);
+  if (hk) { const h = hotelInfo(hk); tile('night wide', isCheckinDay(d, hk) ? 'Check-in oggi' : 'Alloggio', h.name.replace(/ \(.*$/, '').replace(/ = .*$/, ''), [h.cin && 'Check-in ' + h.cin, h.nights].filter(Boolean).join(' · '), 'hotel', () => showPlaceCard(hotelCardData(hk)), true); }
 }
 function renderNextTransfer() { renderToday(); }
 
@@ -2303,6 +2342,7 @@ function renderDayWeather() {
 const WX_IT = c => c === 0 ? 'Sereno' : c === 1 ? 'Prevalentemente sereno' : c === 2 ? 'Parzialmente nuvoloso' : c === 3 ? 'Nuvoloso' : c <= 48 ? 'Nebbia' : c <= 57 ? 'Pioviggine' : c <= 67 ? 'Pioggia' : c <= 77 ? 'Neve' : c <= 82 ? 'Rovesci' : c <= 86 ? 'Rovesci di neve' : 'Temporale';
 const DROP = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></svg>';
 function renderHomeWeather() {
+  renderBento();
   const box = $('todayWeather'); if (!box) return;
   const today = destToday();
   /* sempre il meteo di oggi: durante il viaggio nella città del giorno, prima/dopo nella prima/ultima città */
