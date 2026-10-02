@@ -2210,13 +2210,16 @@ async function loadNews() {
 }
 function renderTodayNews() {
   const box = $('todayNews'); if (!box) return; box.innerHTML = '';
-  const d = trip.days[tripDayIndex()]; if (!d || !newsData || !Array.isArray(newsData.items)) return;
-  const iso = dayISO(d);
-  const items = newsData.items.filter(x => x && x.title && (x.date === iso || (!x.date && x.city && !String(d.city).includes('→') && String(d.city).includes(x.city)))).slice(0, 6);
+  if (!newsData || !Array.isArray(newsData.items)) return;
+  /* notizie del giorno in cui apri l'app (anche prima della partenza), per la città del giorno o la prima del viaggio */
+  const iso = destToday();
+  const dd = trip.days.find(x => dayISO(x) === iso && wxCityOf(x)) || trip.days.find(x => dayISO(x) > iso && wxCityOf(x)) || [...trip.days].reverse().find(x => wxCityOf(x));
+  const d = { city: dd ? wxCityOf(dd) : '' };
+  const items = newsData.items.filter(x => x && x.title && (x.date === iso || (!x.date && x.city && d.city && String(d.city).includes(x.city)))).slice(0, 6);
   if (!items.length) return;
   const card = document.createElement('section'); card.className = 'card news-card';
   const upd = newsData.updated ? new Date(newsData.updated) : null;
-  card.innerHTML = `<h3>${tripStarted() ? 'Da non perdere oggi' : 'Da non perdere il primo giorno'}</h3><p class="note-line" style="margin:2px 0 6px;">${esc(d.city)}${upd && !isNaN(upd) ? ' · aggiornato il ' + upd.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' }) : ''}</p>`;
+  card.innerHTML = `<h3>Da non perdere oggi</h3><p class="note-line" style="margin:2px 0 6px;">${esc(d.city)}${upd && !isNaN(upd) ? ' · aggiornato il ' + upd.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' }) : ''}</p>`;
   items.forEach(x => {
     const it = document.createElement('div'); it.className = 'news-item';
     const meta2 = [x.place, x.time].filter(Boolean).join(' · ');
@@ -2302,13 +2305,14 @@ const DROP = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke
 function renderHomeWeather() {
   const box = $('todayWeather'); if (!box) return;
   const today = destToday();
-  let day = trip.days.find(d => dayISO(d) === today && wxCityOf(d));
-  const isToday = !!day;
-  if (!day) day = trip.days.find(d => dayISO(d) > today && wxCityOf(d));
+  /* sempre il meteo di oggi: durante il viaggio nella città del giorno, prima/dopo nella prima/ultima città */
+  const onTrip = trip.days.find(d => dayISO(d) === today && wxCityOf(d));
+  const day = onTrip || trip.days.find(d => dayISO(d) > today && wxCityOf(d)) || [...trip.days].reverse().find(d => wxCityOf(d));
   if (!day) { box.hidden = true; return; }
   box.hidden = false;
-  const city = wxCityOf(day), iso = dayISO(day), f = wxFor(city, iso);
-  const head = `<div class="companion-meta">Meteo · ${esc(city)}${isToday ? '' : ' · ' + esc(day.date)}</div>`;
+  const isToday = true;
+  const city = wxCityOf(day), iso = today, f = wxFor(city, iso);
+  const head = `<div class="companion-meta">Meteo · ${esc(city)}${onTrip ? '' : ' · oggi'}</div>`;
   if (!f) { box.innerHTML = head + '<p style="margin:0;">Nessun dato salvato: si aggiorna da solo quando c\'è connessione.</p>'; return; }
   const cur = isToday && f.kind === 'fc' && f.w.current;
   const big = cur ? cur.temperature_2m : f.max, code = cur ? cur.weather_code : f.code;
