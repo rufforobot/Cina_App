@@ -464,7 +464,7 @@ main { padding: 16px 16px 140px; }
 .live-line, .metric, .wx-slot, .wx-tile, .clocks-x { background: var(--bg); }
 
 /* nav fluttuante */
-.bottom-nav { grid-template-columns: repeat(4, 1fr); left: 16px; right: 16px; bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); max-width: 520px; margin: 0 auto; padding: 12px 8px; border-radius: 32px; background: light-dark(rgba(255,255,255,.85), rgba(28,28,30,.85)); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); box-shadow: 0 10px 40px rgba(0,0,0,.1); border: 1px solid light-dark(rgba(255,255,255,.4), rgba(255,255,255,.08)); }
+.bottom-nav { grid-template-columns: repeat(5, 1fr); left: 16px; right: 16px; bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); max-width: 520px; margin: 0 auto; padding: 12px 8px; border-radius: 32px; background: light-dark(rgba(255,255,255,.85), rgba(28,28,30,.85)); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); box-shadow: 0 10px 40px rgba(0,0,0,.1); border: 1px solid light-dark(rgba(255,255,255,.4), rgba(255,255,255,.08)); }
 .bottom-nav button { font-size: .7rem; }
 .bottom-nav button.active { color: var(--accent); }
 .bottom-nav button.active svg { transform: scale(1.1); }
@@ -761,6 +761,37 @@ button.wp { cursor: pointer; }
 .how-list { margin: 0; padding-left: 18px; } .how-list li { margin: 0 0 6px; line-height: 1.45; }
 .companion-grid{grid-template-columns:repeat(auto-fill,minmax(min(320px,100%),1fr))}
 .companion-card{min-width:0;max-width:100%}
+
+/* ===== Guida in tab: timeline ===== */
+.bottom-nav button{font-size:10.5px;padding-left:2px;padding-right:2px;min-width:0}
+#guideTrip{display:flex;flex-direction:column;gap:12px}
+.gnow{background:var(--accent);color:#fff;border-radius:30px;padding:20px;box-shadow:var(--shadow)}
+.gnow-l{font-size:12px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;opacity:.9}
+.gnow-t{font-size:24px;font-weight:800;letter-spacing:-.5px;line-height:1.15;margin:6px 0 4px}
+.gnow-s{font-size:13px;font-weight:600;opacity:.92}
+.gnow-p{font-size:14px;line-height:1.5;margin:12px 0 16px;opacity:.95}
+.gnow-b{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.gnow-b button{height:44px;border-radius:99px;border:0;font:inherit;font-weight:700;background:#fff;color:#111;cursor:pointer}
+.gnow-b button+button{background:rgba(255,255,255,.22);color:#fff}
+.gday{border-radius:30px!important;padding:16px 16px 8px!important}
+.gday h4{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:0 0 6px;font-size:15px;font-weight:800;text-transform:capitalize}
+.gday h4 small{font-size:12px;font-weight:600;color:var(--muted);text-transform:none}
+.grow2{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--fill)}
+.grow2:first-of-type{border-top:0}
+.g2-main{flex:1;min-width:0;text-align:left;background:none;border:0;padding:4px 0;font:inherit;color:var(--text);cursor:pointer}
+.g2-main b{display:block;font-size:15px;font-weight:700}
+.g2-main span{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+.g2-l,.g2-un{flex:0 0 auto;min-height:40px;padding:0 14px;border-radius:99px;border:0;background:var(--fill);color:var(--text);font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.grow2.past{opacity:.6}
+.gpast-t{width:100%;border-radius:99px;background:var(--surface);color:var(--text);box-shadow:var(--shadow);font-weight:700}
+.gall{width:100%;min-height:44px;border-radius:99px;border:0;background:var(--text);color:var(--bg);font:inherit;font-weight:700;cursor:pointer}
+.gdone{border-radius:30px!important;padding:20px!important;display:flex;flex-direction:column;gap:6px}
+.gdone span{font-size:13px;color:var(--muted)}
+.companion-card.now{background:var(--accent)!important;color:#fff}
+.companion-card.now p,.companion-card.now .city-name{color:#fff!important}
+.companion-card.now .companion-meta{background:rgba(255,255,255,.22);color:#fff}
+.companion-card.now .btn-grid .btn.read-btn{background:#fff;color:#111}
+.companion-card.now .btn-grid .btn.listen-btn{background:rgba(255,255,255,.22);color:#fff}
 .cc-head .city-name{overflow-wrap:anywhere}
 .cc-head .companion-meta{flex:0 1 auto!important;min-width:0;max-width:46%;overflow:hidden;text-overflow:ellipsis}
 .companion-card .btn-grid{min-width:0}
@@ -903,11 +934,15 @@ button.wp { cursor: pointer; }
 
   <!-- AUDIOGUIDA -->
   <section id="companion" class="view">
-    <input class="field" id="guideSearch" placeholder="Cerca una tappa (es. panda, tè, muraglia)">
-    <div class="guide-bar"><select class="field" id="guideCities" aria-label="Città"></select><button class="btn" id="guideFav" type="button">Preferiti</button></div>
-    <div class="seg" id="guideTags" role="tablist"></div>
-    <div style="margin:6px 0 16px;"><span class="note-line" id="guideCount"></span></div>
-    <div class="companion-grid" id="companionGrid"></div>
+    <div class="seg two" id="guideMode"><button type="button" data-m="trip" class="on">Viaggio</button><button type="button" data-m="all">Tutte</button></div>
+    <div id="guideTrip"></div>
+    <div id="guideAll" hidden>
+      <input class="field" id="guideSearch" placeholder="Cerca una tappa (es. panda, tè, muraglia)">
+      <div class="guide-bar"><select class="field" id="guideCities" aria-label="Città"></select><button class="btn" id="guideFav" type="button">Preferiti</button></div>
+      <div class="seg" id="guideTags" role="tablist"></div>
+      <div style="margin:6px 0 16px;"><span class="note-line" id="guideCount"></span></div>
+      <div class="companion-grid" id="companionGrid"></div>
+    </div>
   </section>
 
   <!-- WALLET -->
@@ -1034,6 +1069,7 @@ button.wp { cursor: pointer; }
 <nav class="bottom-nav" id="bottomNav">
   <button class="active" data-view="dashboard"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>Oggi</button>
   <button data-view="itinerary"><svg viewBox="0 0 24 24"><path d="M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 7zM9 4v13M15 7v12.5"/></svg>Tappe</button>
+  <button data-view="companion"><svg viewBox="0 0 24 24"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="14" width="4" height="6" rx="2"/><rect x="17" y="14" width="4" height="6" rx="2"/></svg>Guida</button>
   <button data-view="wallet"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="14" rx="3"/><path d="M3 10h18M16 15h2"/></svg>Prenotazioni</button>
   <button data-view="useful"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>Utili</button>
 </nav>
@@ -1118,7 +1154,7 @@ const catOf = k => CATS.find(c => c[0] === k) || CATS[CATS.length - 1];
 
 /* ====================== STATO ====================== */
 const STATE_KEY = meta.stateKey;
-const defaultState = () => ({completed:{}, booked:{}, expenses:[], notes:{}, transferNotes:{}, codes:[], checklist:{}, checkCustom:[], rate:meta.currency.rate, lastBackup:null, budget:0, favs:{}, ttsRate:0.95, addr:{}});
+const defaultState = () => ({completed:{}, booked:{}, expenses:[], notes:{}, transferNotes:{}, codes:[], checklist:{}, checkCustom:[], rate:meta.currency.rate, lastBackup:null, budget:0, guideSeen:{}, favs:{}, ttsRate:0.95, addr:{}});
 const state = loadState();
 
 function loadState() {
@@ -2289,7 +2325,7 @@ function renderItinerary() {
 }
 
 /* ====================== AUDIOGUIDA ====================== */
-const guide = { city: 'all', tag: 'all', q: '', favOnly: false };
+const guide = { city: 'all', tag: 'all', q: '', favOnly: false, mode: 'trip', pastOpen: false };
 guide.city = todayGuideCity() || 'all';
 const TAGS = { influencer: 'Influencer', local: 'Local' };
 const tagLabel = t => (t && TAGS[t]) || 'Classica';
@@ -2371,7 +2407,88 @@ function renderGuideControls() {
 }
 function refreshGuide() { stopSpeech(); renderGuideControls(); renderCompanion(); }
 
+/* Guida del viaggio: la guida della tappa in corso in rosso, poi le prossime, le già viste/passate nascoste */
+function guideTimeline() {
+  const seen = state.guideSeen || {}, today = destToday();
+  const hm = new Date().toLocaleTimeString('en-GB', { timeZone: meta.tz, hour: '2-digit', minute: '2-digit' });
+  const nowMin = (+hm.slice(0, 2)) * 60 + (+hm.slice(3, 5));
+  const used = new Set(), entries = [];
+  trip.days.forEach((d, di) => d.stops.forEach((st, si) => {
+    guidesForStop(d, si).forEach(x => {
+      const key = stopKey(x.city, x.stop); if (used.has(key)) return; used.add(key);
+      const m = String(st[0]).match(/^(\d{1,2})[:.](\d{2})/);
+      entries.push({ x, key, d, di, si, time: m ? m[1].padStart(2, '0') + ':' + m[2] : '', iso: dayISO(d), min: m ? (+m[1]) * 60 + (+m[2]) : 12 * 60, label: L(st[1]).replace(/\s*\(.*?\)/g, '') });
+    });
+  }));
+  const isPast = e => seen[e.key] || e.iso < today || (e.iso === today && e.min < nowMin - 30);
+  const up = entries.filter(e => !isPast(e));
+  return { entries, past: entries.filter(isPast), up, current: up[0] || null, today, nowMin, total: allStops().length };
+}
+function guideSeen(key) { if (!state.guideSeen) state.guideSeen = {}; if (!state.guideSeen[key]) { state.guideSeen[key] = true; saveState(); } }
+document.querySelectorAll('#guideMode button').forEach(b => b.addEventListener('click', () => { guide.mode = b.dataset.m; stopSpeech(); renderCompanion(); }));
+function renderGuideTrip() {
+  const box = $('guideTrip'); box.innerHTML = '';
+  const T = guideTimeline(), cur = T.current, started = tripStarted();
+  const wdFmt = iso => new Date(iso + 'T12:00:00').toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'numeric' }).replace('.', '');
+  const cityOf = d => L(d.city).split('→').pop().trim();
+  const intro = stop => { let t = stop.text.split('. ')[0] + '.'; return t.length > 110 ? t.slice(0, 107).replace(/\s+\S*$/, '') + '...' : t; };
+  const act = (list, i) => { guideSeen(stopKey(list[i].city, list[i].stop)); openStop(list, i); };
+  if (cur) {
+    const lbl = cur.iso === T.today ? (cur.min <= T.nowMin + 20 ? 'In corso' : 'Prossima · ' + cur.time) : (started ? 'Prossima · ' + wdFmt(cur.iso) : 'Prima tappa');
+    const hero = document.createElement('div'); hero.className = 'gnow';
+    hero.innerHTML = `<div class="gnow-l">${esc(lbl)} · Giorno ${cur.d.day}</div><div class="gnow-t">${esc(cur.x.stop.title)}</div>
+      <div class="gnow-s">${esc(cur.label)}${cur.time ? ' · ' + esc(cur.time) : ''} · ${esc(cityOf(cur.d))}</div>
+      <p class="gnow-p">${esc(intro(cur.x.stop))}</p>
+      <div class="gnow-b"><button type="button" class="gnow-read">Leggi</button><button type="button" class="gnow-listen" data-label="Ascolta">Ascolta</button></div>`;
+    hero.querySelector('.gnow-read').onclick = () => act([cur.x], 0);
+    hero.querySelector('.gnow-listen').onclick = e => { guideSeen(cur.key); speak(cur.x.stop.text, meta.guideLang || 'it-IT', e.currentTarget, 0.95); };
+    box.appendChild(hero);
+  } else {
+    const m = document.createElement('div'); m.className = 'card gdone';
+    m.innerHTML = `<b>${T.entries.length ? 'Hai visto tutte le guide del viaggio' : 'Nessuna guida collegata alle tappe'}</b><span>Le altre guide le trovi in "Tutte".</span>`;
+    box.appendChild(m);
+  }
+  const rest = T.up.filter(e => e !== cur), byDay = new Map();
+  rest.forEach(e => { if (!byDay.has(e.di)) byDay.set(e.di, []); byDay.get(e.di).push(e); });
+  const row = (e, list, i, past) => {
+    const r = document.createElement('div'); r.className = 'grow2' + (past ? ' past' : '');
+    r.innerHTML = `<button type="button" class="g2-main"><b>${esc(e.x.stop.title)}</b><span>${esc(e.time ? e.time + ' · ' : '')}${esc(e.label)}${past ? ' · ' + esc(wdFmt(e.iso)) : ''}</span></button>${past && state.guideSeen && state.guideSeen[e.key] ? '<button type="button" class="g2-un">Rimetti</button>' : '<button type="button" class="g2-l" data-label="Ascolta">Ascolta</button>'}`;
+    r.querySelector('.g2-main').onclick = () => act(list, i);
+    const un = r.querySelector('.g2-un'); if (un) un.onclick = () => { delete state.guideSeen[e.key]; saveState(); renderGuideTrip(); };
+    const l = r.querySelector('.g2-l'); if (l) l.onclick = ev => { guideSeen(e.key); speak(e.x.stop.text, meta.guideLang || 'it-IT', ev.currentTarget, 0.95); };
+    return r;
+  };
+  byDay.forEach((es, di) => {
+    const d = trip.days[di], isToday = dayISO(d) === T.today;
+    const card = document.createElement('section'); card.className = 'card gday';
+    card.innerHTML = `<h4>${isToday ? 'Più tardi oggi' : esc(wdFmt(dayISO(d)))}<small>Giorno ${d.day} · ${esc(cityOf(d))}</small></h4>`;
+    const list = es.map(e => e.x);
+    es.forEach((e, i) => card.appendChild(row(e, list, i, false)));
+    box.appendChild(card);
+  });
+  if (T.past.length) {
+    const tg = document.createElement('button'); tg.type = 'button'; tg.className = 'btn gpast-t';
+    tg.textContent = (guide.pastOpen ? 'Nascondi' : 'Mostra') + ` già viste o passate (${T.past.length})`;
+    tg.onclick = () => { guide.pastOpen = !guide.pastOpen; renderGuideTrip(); };
+    box.appendChild(tg);
+    if (guide.pastOpen) {
+      const card = document.createElement('section'); card.className = 'card gday gpast';
+      const list = T.past.map(e => e.x);
+      T.past.forEach((e, i) => card.appendChild(row(e, list, i, true)));
+      box.appendChild(card);
+    }
+  }
+  const all = document.createElement('button'); all.type = 'button'; all.className = 'gall';
+  all.textContent = `Esplora tutte le guide (${T.total})`;
+  all.onclick = () => { guide.mode = 'all'; renderCompanion(); };
+  box.appendChild(all);
+}
+
 function renderCompanion() {
+  document.querySelectorAll('#guideMode button').forEach(b => b.classList.toggle('on', b.dataset.m === guide.mode));
+  $('guideTrip').hidden = guide.mode !== 'trip'; $('guideAll').hidden = guide.mode !== 'all';
+  if (guide.mode === 'trip') { renderGuideTrip(); return; }
+  const curKey = (guideTimeline().current || {}).key;
   const wrap = $('companionGrid'); wrap.innerHTML = '';
   const list = filteredStops();
   $('guideCount').textContent = `${list.length} ${list.length === 1 ? 'tappa' : 'tappe'} su ${allStops().length}`;
@@ -2381,7 +2498,7 @@ function renderCompanion() {
     const key = stopKey(city, stop);
     let intro = stop.text.split('. ')[0] + '.';
     if (intro.length > 100) intro = intro.slice(0, 97).replace(/\s+\S*$/, '') + '...';
-    const card = document.createElement('div'); card.className = 'companion-card';
+    const card = document.createElement('div'); card.className = 'companion-card' + (key === curKey ? ' now' : '');
     card.innerHTML = `<div class="cc-head">
         <div class="city-name">${esc(stop.title)}</div>
         <div class="companion-meta">${guide.city === 'all' ? esc(city) + ' · ' : ''}${esc(tagLabel(stop.tag))}</div>
@@ -2392,8 +2509,8 @@ function renderCompanion() {
         <button class="btn small read-btn" type="button">Leggi</button>
         <button class="btn small listen-btn" type="button" data-label="Ascolta">Ascolta</button>
       </div>`;
-    card.querySelector('.read-btn').addEventListener('click', () => openStop(list, i));
-    card.querySelector('.listen-btn').addEventListener('click', e => speak(stop.text, meta.guideLang || 'it-IT', e.currentTarget, 0.95));
+    card.querySelector('.read-btn').addEventListener('click', () => { guideSeen(key); openStop(list, i); });
+    card.querySelector('.listen-btn').addEventListener('click', e => { guideSeen(key); speak(stop.text, meta.guideLang || 'it-IT', e.currentTarget, 0.95); });
     card.querySelector('.fav').addEventListener('click', e => {
       if (state.favs[key]) delete state.favs[key]; else state.favs[key] = true;
       saveState();
@@ -2456,8 +2573,7 @@ function openStop(list, i) {
 }
 
 const normG = t => String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
-function guidesForDay(d) {
-  const hay = ' ' + d.stops.map((st, i) => normG(L(st[1]) + ' ' + (d.det && d.det[i] ? L(d.det[i].title) : '') + ' ' + L(st[2]))).join(' | ') + ' ';
+function matchGuides(hay) {
   const out = [];
   allStops().forEach(x => {
     const t = normG(x.stop.title); if (!t) return;
@@ -2468,6 +2584,9 @@ function guidesForDay(d) {
   });
   return out;
 }
+const stopHay = (d, i) => normG(L(d.stops[i][1]) + ' ' + (d.det && d.det[i] ? L(d.det[i].title) : '') + ' ' + L(d.stops[i][2]));
+function guidesForDay(d) { return matchGuides(' ' + d.stops.map((st, i) => stopHay(d, i)).join(' | ') + ' '); }
+function guidesForStop(d, i) { return matchGuides(' ' + stopHay(d, i) + ' '); }
 function renderTodayGuides() {
   const box = $('todayGuides'); box.innerHTML = '';
   const d = trip.days[tripDayIndex()]; if (!d) return;
@@ -3027,7 +3146,7 @@ function initExtras() {
 }
 
 /* ====================== NAVIGAZIONE / INIT ====================== */
-const NAV_PARENT = { companion: 'itinerary', docsView: 'useful' };
+const NAV_PARENT = { docsView: 'useful' };
 function setView(view) {
   const nav = NAV_PARENT[view] || view;
   document.querySelectorAll('.bottom-nav button').forEach(b => b.classList.remove('active'));
@@ -3036,11 +3155,12 @@ function setView(view) {
   $(view).classList.add('active');
   if (view === 'itinerary') { alignDayChips(); requestAnimationFrame(alignDayChips); setTimeout(alignDayChips, 250); }
   if (view === 'itinerary') requestAnimationFrame(alignDayChips);
+  if (view === 'companion') { guide.mode = 'trip'; renderCompanion(); }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-/* sotto-schede: Tappe = Itinerario | Guida, Documenti sono in Utili */
+/* nessuna sotto-scheda: Guida è una tab a sé, Documenti sono in Utili */
 function initSubTabs() {
-  const sets = [[['itinerary', 'Itinerario'], ['companion', 'Guida']]];
+  const sets = [];
   sets.forEach(set => set.forEach(([id]) => {
     const sec = $(id); if (!sec || sec.querySelector('.seg.two')) return;
     const seg = document.createElement('div'); seg.className = 'seg two';
