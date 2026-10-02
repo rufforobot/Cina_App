@@ -11,12 +11,12 @@
 Bagaglio da stiva incluso. Prezzo pagato: **724,08€ a persona**, **1.456,72€ totali per la coppia** (bagaglio incluso + assicurazione bagagli).
 
 **Andata — Milano → Shanghai, venerdì 16/10:**
-- EY82: Malpensa 10:05 → Abu Dhabi 18:50 (6h45) — ⚠️ **orario aggiornato da Etihad** (originariamente 11:40→19:40, partenza anticipata di 1h35)
-- Scalo ad Abu Dhabi: 2h25 (più comodo del precedente 1h35)
-- EY866: Abu Dhabi 21:15 → Shanghai Pudong 10:05 (+1, 8h50) — invariato
+- EY82: Malpensa 10:05 → Abu Dhabi 18:50 (6h45)
+- Scalo ad Abu Dhabi: 2h25
+- EY866: Abu Dhabi 21:15 → Shanghai Pudong 10:05 (+1, 8h50)
 - **Totale: 18h00. Arrivo sabato 17/10.**
 
-📌 **Conseguenza pratica:** con la partenza anticipata a 10:05, bisogna essere a Malpensa per il check-in verso le **07:00-07:15** (non più 08:40-08:55).
+📌 **Check-in:** a Malpensa verso le **07:00-07:15**.
 
 Nota: il Giorno 3 a Shanghai ha un ritmo contenuto (mattina tranquilla, sera libera) — buon margine di recupero dopo un volo lungo con scalo.
 
