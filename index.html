@@ -867,6 +867,7 @@ button.wp { cursor: pointer; }
 .obadge { display: inline-block; padding: 2px 9px; border-radius: 99px; color: #fff; font-size: 11px; font-weight: 700; letter-spacing: .2px; line-height: 1.5; }
 .obadge.mainstream { background: #b7791f; }
 .obadge.local { background: #2f855a; }
+.obadge.hotpot, .obadge.barbecue { background: #6b7280; }
 .sc-o { display: flex; gap: 6px; margin-top: 6px; }
 .dopts .orow { display: flex; gap: 10px; align-items: flex-start; padding: 6px 0; }
 .dopts .orow .obadge { flex: 0 0 92px; margin-top: 3px; text-align: center; }
@@ -1953,10 +1954,11 @@ function howHTML(t) {
   return `<ul class="how-list">${parts.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`;
 }
 /* Doppia opzione: ogni voce è "mainstream: testo" o "local: testo" */
-const OPT_LABEL = { mainstream: 'Mainstream', local: 'Local' };
+const OPT_LABEL = { mainstream: 'Mainstream', local: 'Local', hotpot: 'Hotpot', barbecue: 'Barbecue' };
 function optsOf(st) {
-  return ((st && st.opts) || []).map(o => { const m = String(L(o)).match(/^(mainstream|local)\s*:\s*(.+)$/i); return m ? { k: m[1].toLowerCase(), t: m[2].trim() } : null; }).filter(Boolean);
+  return ((st && st.opts) || []).map(o => { const m = String(L(o)).match(/^(mainstream|local|hotpot|barbecue)\s*:\s*(.+)$/i); return m ? { k: m[1].toLowerCase(), t: m[2].trim() } : null; }).filter(Boolean);
 }
+function optBadge(st) { const k = String((st && st.opt) || '').toLowerCase(); return OPT_LABEL[k] && (k === 'mainstream' || k === 'local') ? `<span class="obadge ${k}">${OPT_LABEL[k]}</span>` : ''; }
 function optsBadges(st) { return optsOf(st).map(o => `<span class="obadge ${o.k}">${OPT_LABEL[o.k]}</span>`).join(''); }
 function detHTML(day, i) {
   const st = day.det[i], p = placeInfo(day, i);
@@ -2286,7 +2288,7 @@ function renderDay(day, target) {
   const timeline = section.querySelector('.timeline');
   day.stops.forEach((s, i) => {
     const row = document.createElement('button'); row.type = 'button'; row.className = 'stopc';
-    row.innerHTML = `<div class="sc-t">${esc(s[0])}</div><div class="sc-bar"></div><div class="sc-i"><div class="sc-h">${esc(L(s[1]))}${guidesForStop(day, i).length ? '<em class="sc-g">Guida</em>' : ''}</div>${s[2] ? `<div class="sc-s">${esc(L(s[2]))}</div>` : ''}${optsOf(day.det[i]).length ? `<div class="sc-o">${optsBadges(day.det[i])}</div>` : ''}</div><i class="sc-c">›</i>`;
+    row.innerHTML = `<div class="sc-t">${esc(s[0])}</div><div class="sc-bar"></div><div class="sc-i"><div class="sc-h">${esc(L(s[1]))}${guidesForStop(day, i).length ? '<em class="sc-g">Guida</em>' : ''}</div>${optBadge(day.det[i]) ? `<div class="sc-o">${optBadge(day.det[i])}</div>` : ''}${s[2] ? `<div class="sc-s">${esc(L(s[2]))}</div>` : ''}${optsOf(day.det[i]).length ? `<div class="sc-o">${optsBadges(day.det[i])}</div>` : ''}</div><i class="sc-c">›</i>`;
     row.onclick = () => openSheetNode(L(s[1]), () => stopSheet(day, i));
     timeline.appendChild(row);
   });
