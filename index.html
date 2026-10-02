@@ -850,7 +850,6 @@ button.wp { cursor: pointer; }
 .wxtip b{font-size:15px;font-weight:800}
 .wxtip span{font-size:14px;color:var(--muted);line-height:1.45}
 #utilGroups.single #up-weather{background:none;box-shadow:none;border:0;padding:0;backdrop-filter:none;-webkit-backdrop-filter:none}
-#up-weather #wxRefresh{background:var(--text);color:var(--bg);border-radius:99px;padding:9px 16px;font-weight:700}
 </style>
 </head>
 <body>
@@ -977,7 +976,7 @@ button.wp { cursor: pointer; }
 </div>
     </section>
     <section class="card" id="up-weather">
-        <div class="section-title" id="sec-weather"><div><h3>Meteo</h3><p id="wxStamp"></p></div><button class="btn small" id="wxRefresh" style="flex:0 0 auto;">Aggiorna</button></div>
+        <div class="section-title" id="sec-weather"><div><h3>Meteo</h3><p id="wxStamp"></p></div></div>
     <div class="wx-cities" id="weatherBox"></div>
     </section>
     </div>
@@ -2713,8 +2712,9 @@ function renderWeather() {
   const tip = wxTip(sel.name, sel.dates);
   if (tip) { const el = document.createElement('div'); el.className = 'wxtip'; el.innerHTML = `<b>Cosa aspettarsi a ${esc(sel.name)}</b><span>${esc(tip)}</span>`; box.appendChild(el); }
 }
+let wxBusy = false;
 async function refreshWeather(manual) {
-  const btn = $('wxRefresh'); btn.disabled = true; btn.textContent = 'Aggiorno…';
+  if (wxBusy) return; wxBusy = true; const st = $('wxStamp'), prev = st.textContent; st.textContent = 'Aggiorno…';
   try {
     const entries = await Promise.all(Object.entries(wxCities).map(async ([name, [la, lo]]) => {
       const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${la}&longitude=${lo}&current=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunrise,sunset&hourly=temperature_2m,weather_code,precipitation_probability&timezone=auto&forecast_days=16`);
@@ -2735,7 +2735,7 @@ async function refreshWeather(manual) {
   } catch (e) {
     if (manual) alert('Meteo non raggiungibile: servono connessione e accesso al servizio. Restano i dati salvati.');
   } finally {
-    btn.disabled = false; btn.textContent = 'Aggiorna';
+    wxBusy = false; if ($('wxStamp').textContent === 'Aggiorno…') $('wxStamp').textContent = prev;
   }
 }
 
@@ -3071,6 +3071,7 @@ function showUtil(id) {
   if (id === 'docs') { setView('docsView'); return; }
   const t = UTOOLS[id];
   if (id === 'budget') renderExpenses();
+  if (id === 'weather' && navigator.onLine) { const c = readWxCache(); if (!c || c.v !== 3 || Date.now() - c.ts > 10 * 60 * 1000) refreshWeather(false); }
   $('utilHome').hidden = !!id && !t;
   $('utilTiles').hidden = !!t; $('utilGroups').hidden = !t; $('utilBack').hidden = !t; $('utilToolTitle').hidden = !t || id === 'weather';
   document.querySelectorAll('.upanel').forEach(pn => { pn.hidden = pn.id !== 'up-' + id; });
@@ -3109,7 +3110,6 @@ $('checkAdd').addEventListener('click', () => {
 });
 $('guideSearch').addEventListener('input', e => { guide.q = e.target.value; stopSpeech(); renderCompanion(); });
 $('phraseSearch').addEventListener('input', e => renderPhrases(e.target.value));
-$('wxRefresh').addEventListener('click', () => refreshWeather(true));
 
 /* personalizzazione dal file del viaggio */
 const hasInfo = INFO.length > 0, hasPhr = phrases.length > 0;
