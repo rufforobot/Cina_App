@@ -766,6 +766,46 @@ button.wp { cursor: pointer; }
 .companion-card .btn-grid{min-width:0}
 .companion-card .btn-grid .btn{min-width:0}
 @supports (overflow-x: clip) { html, body, #app { overflow-x: clip; } }
+
+/* Budget in stile Bento */
+#up-budget .bd-add{width:100%;height:50px;border-radius:99px;font-weight:800;margin-bottom:14px}
+#up-budget .bento-grid{margin-bottom:14px}
+.bd-prog{height:10px;border-radius:99px;background:var(--fill);overflow:hidden;margin-top:8px}
+.bd-prog i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent-2),var(--accent))}
+.bd-line{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px}
+.bd-pill{font-size:12px;font-weight:700;border-radius:99px;padding:5px 11px;background:color-mix(in srgb,var(--ok,#1f9d55) 16%,transparent);color:var(--ok,#1f9d55)}
+.bd-pill.bad{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
+.bd-link{border:0;background:none;color:var(--accent-2);font:inherit;font-size:13px;font-weight:700;padding:4px 0}
+.bd-fx{cursor:pointer}
+.bd-card{padding:18px 18px 8px;margin-bottom:14px}
+.bd-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.bd-h{margin:0;font-size:19px;font-weight:800;letter-spacing:-.03em}
+.bd-seg{margin:0;width:auto}
+.bd-seg button{padding:7px 14px}
+.bd-bar{margin-bottom:14px}
+.bd-bl{display:flex;justify-content:space-between;gap:10px;font-size:14px;margin-bottom:6px}
+.bd-bl b{font-variant-numeric:tabular-nums}
+.bd-bl em{font-style:normal;font-weight:600;color:var(--muted);font-size:12px;margin-left:4px}
+.bd-track{height:9px;border-radius:99px;background:var(--fill);overflow:hidden}
+.bd-track i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent-2),var(--accent))}
+.bd-item{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:12px 0;border-top:.5px solid var(--border)}
+.bd-it-main{min-width:0;display:flex;flex-direction:column}
+.bd-it-main b{font-size:15px;overflow-wrap:anywhere}
+.bd-it-main span,.bd-it-amt span{font-size:12px;color:var(--muted)}
+.bd-it-amt{text-align:right;display:flex;flex-direction:column;font-variant-numeric:tabular-nums}
+.bd-del{grid-column:1/-1;justify-self:start;border:0;background:none;color:var(--muted);font:inherit;font-size:12px;font-weight:600;padding:2px 0}
+.bd-form{display:flex;flex-direction:column;gap:12px}
+.bd-form .field,.bd-form .btn{border-radius:99px;height:48px}
+.bd-form select.field{padding-left:16px}
+.bd-amt{display:flex;gap:10px;align-items:center}
+.bd-amt .field{flex:1;min-width:0}
+.bd-amt .seg{width:110px;margin:0;flex:none}
+.bd-conv{min-height:18px;margin-top:-4px;padding-left:16px;font-size:13px;font-weight:600;color:var(--muted)}
+.bd-chips{display:flex;flex-wrap:wrap;gap:8px}
+.bd-chips button{border:0;background:var(--fill);color:var(--text);font:inherit;font-weight:700;font-size:13px;border-radius:99px;padding:9px 15px}
+.bd-chips button.on{background:var(--text);color:var(--bg)}
+#utilGroups.single #up-money{background:none;box-shadow:none;border:0;padding:0;backdrop-filter:none;-webkit-backdrop-filter:none}
+#bdTiles .bt.big .bv{font-size:36px}
 </style>
 </head>
 <body>
@@ -873,25 +913,10 @@ button.wp { cursor: pointer; }
     </div>
 </div>
 <div class="upane" id="up-budget" hidden>
-        <div class="expense-card" >
-      <div style="width: 100%;">
-        <div class="companion-meta">Totale Viaggio</div>
-        <div class="expense-total" id="expenseTotal">€0,00</div>
-        <div style="margin-top: 6px; font-size: 15px; font-weight: 600; color: var(--accent-2);" id="expenseToday">Oggi: €0,00</div>
-        <div class="note-line" id="expenseAvg" style="margin-top:4px;"></div>
-      </div>
-      <div class="expense-form">
-        <input id="expenseDesc" class="full" placeholder="Cos'hai comprato?"/>
-        <input id="expenseAmount" type="text" inputmode="decimal" placeholder="Importo"/>
-        <select id="expenseCurrency"><option id="curOpt">¥</option><option>€</option></select>
-        <select id="expenseCat"></select>
-        <select id="expenseCity"></select>
-        <button class="btn primary full" id="addExpense">Aggiungi spesa</button>
-      </div>
-      <div id="breakdown"></div>
-      <div class="sub-title">Elenco spese</div>
-      <div class="expense-list" id="expenseList"></div>
-    </div>
+  <button class="btn primary bd-add" id="addExpenseBtn" type="button">Aggiungi spesa</button>
+  <div class="bento-grid" id="bdTiles"></div>
+  <div class="card bd-card"><div class="bd-row"><h3 class="bd-h">Ripartizione</h3><div class="seg two bd-seg" id="bdSeg"><button type="button" data-v="cat" class="on">Categoria</button><button type="button" data-v="city">Città</button></div></div><div id="breakdown"></div></div>
+  <div class="card bd-card"><div class="bd-row"><h3 class="bd-h">Elenco spese</h3><button class="btn small" id="expCsv" type="button">Esporta CSV</button></div><div class="expense-list" id="expenseList"></div></div>
 </div>
     </section>
     <section class="card ugroup" id="up-lang">
@@ -1049,7 +1074,7 @@ const catOf = k => CATS.find(c => c[0] === k) || CATS[CATS.length - 1];
 
 /* ====================== STATO ====================== */
 const STATE_KEY = meta.stateKey;
-const defaultState = () => ({completed:{}, booked:{}, expenses:[], notes:{}, transferNotes:{}, codes:[], checklist:{}, checkCustom:[], rate:meta.currency.rate, lastBackup:null, favs:{}, ttsRate:0.95, addr:{}});
+const defaultState = () => ({completed:{}, booked:{}, expenses:[], notes:{}, transferNotes:{}, codes:[], checklist:{}, checkCustom:[], rate:meta.currency.rate, lastBackup:null, budget:0, favs:{}, ttsRate:0.95, addr:{}});
 const state = loadState();
 
 function loadState() {
@@ -1668,49 +1693,101 @@ function barsHTML(entries) {
   return entries.map(([label, v]) => `<div class="bar-row"><span>${esc(label)}</span><div class="bar"><span style="width:${Math.max(3, Math.round(v / max * 100))}%"></span></div><strong>${fmtEur(v)}</strong></div>`).join('');
 }
 
+let bdView = 'cat';
+const catName = k => catOf(k)[2];
 function renderExpenses() {
   const wrap = $('expenseList'); wrap.innerHTML = '';
   const currentDay = trip.days[tripDayIndex()].day;
-  const all = state.expenses;
-  const total = sumEuro(all);
-  $('expenseTotal').innerHTML = `${fmtEur(total)} <span style="font-size: 14px; font-weight: 500; color: var(--muted);">(Totale)</span>`;
-  $('expenseToday').textContent = `Spese di Oggi: ${fmtEur(sumEuro(all.filter(x => x.day === currentDay)))}`;
-  const days = new Set(all.map(x => x.day)).size;
-  $('expenseAvg').textContent = days ? `Media: ${fmtEur(total / days)} al giorno (su ${days} ${days === 1 ? 'giorno' : 'giorni'} con spese)` : '';
+  const all = state.expenses, total = sumEuro(all), today = sumEuro(all.filter(x => x.day === currentDay));
+  const days = new Set(all.map(x => x.day)).size, cats = new Set(all.map(x => x.cat)).size;
+  const bud = Number(state.budget) > 0 ? Number(state.budget) : 0, left = bud - total;
+  const tile = (cls, label, val, sub, extra) => `<div class="bt ${cls}"><div class="bl">${label}</div><div class="bv">${val}</div>${sub ? `<div class="bs">${sub}</div>` : ''}${extra || ''}</div>`;
+  const budgetBlock = bud
+    ? `<div class="bd-prog"><i style="width:${Math.min(100, Math.round(total / bud * 100))}%;${left < 0 ? 'background:var(--warn)' : ''}"></i></div><div class="bd-line"><span class="bd-pill ${left < 0 ? 'bad' : 'ok'}">${left < 0 ? fmtEur(-left) + ' oltre il budget' : fmtEur(left) + ' disponibili'}</span><button class="bd-link" type="button" data-bd="budget">Modifica budget</button></div>`
+    : `<div class="bd-line"><button class="btn small" type="button" data-bd="budget">Imposta budget</button></div>`;
+  $('bdTiles').innerHTML =
+    tile('wide big', 'Speso finora', fmtEur(total), (bud ? `su ${fmtEur(bud)} di budget · ` : '') + `oggi ${fmtEur(today)}`, budgetBlock) +
+    tile('', 'Media giornaliera', days ? fmtEur(total / days) : '€0,00', days ? `su ${days} ${days === 1 ? 'giorno' : 'giorni'} con spese` : 'nessuna spesa') +
+    tile('', 'Spese registrate', String(all.length), cats ? `in ${cats} ${cats === 1 ? 'categoria' : 'categorie'}` : 'nessuna categoria') +
+    `<button type="button" class="bt wide bd-fx" data-bd="fx"><div class="bl">Cambio</div><div class="bv s">1 € = ${rate().toFixed(2).replace('.', ',')} ${esc(meta.currency.symbol)}</div><div class="bs">Tocca per convertire</div></button>`;
 
-  $('breakdown').innerHTML =
-    `<div class="sub-title">Per categoria</div>${barsHTML(groupEuro(all, x => { const c = catOf(x.cat); return `${c[1]} ${c[2]}`; }))}
-     <div class="sub-title">Per città</div>${barsHTML(groupEuro(all, x => x.city || cityOfDay(x.day)))}`;
+  const entries = bdView === 'cat' ? groupEuro(all, x => catName(x.cat)) : groupEuro(all, x => x.city || cityOfDay(x.day));
+  $('breakdown').innerHTML = entries.length
+    ? entries.map(([label, v]) => `<div class="bd-bar"><div class="bd-bl"><span>${esc(label)}</span><b>${fmtEur(v)} <em>${Math.round(v / total * 100)}%</em></b></div><div class="bd-track"><i style="width:${Math.max(3, Math.round(v / entries[0][1] * 100))}%"></i></div></div>`).join('')
+    : '<p class="note-line">Ancora nessuna spesa.</p>';
+  document.querySelectorAll('#bdSeg button').forEach(b => b.classList.toggle('on', b.dataset.v === bdView));
 
   if (!all.length) wrap.innerHTML = '<p class="note-line">Nessuna spesa registrata.</p>';
   all.slice().reverse().forEach(x => {
-    const c = catOf(x.cat);
-    const row = document.createElement('div'); row.className = 'expense-row';
-    row.innerHTML = `<span class="desc">${c[1]} ${esc(x.desc)} <span style="color:var(--muted); font-size:12px;">(Giorno ${esc(x.day)} · ${esc(x.city || cityOfDay(x.day))})</span></span>
-      <span class="right"><strong>${Number(x.amount).toFixed(2)} ${esc(x.currency)}</strong><button class="del-btn" aria-label="Elimina spesa">✕</button></span>`;
-    row.querySelector('.del-btn').addEventListener('click', () => {
+    const row = document.createElement('div'); row.className = 'bd-item';
+    const foreign = x.currency !== '€';
+    row.innerHTML = `<div class="bd-it-main"><b>${esc(x.desc)}</b><span>${esc(catName(x.cat))} · Giorno ${esc(x.day)} · ${esc(x.city || cityOfDay(x.day))}</span></div>
+      <div class="bd-it-amt"><b>${fmtEur(toEuro(x))}</b>${foreign ? `<span>${Number(x.amount).toFixed(2).replace('.', ',')} ${esc(x.currency)}</span>` : ''}</div>
+      <button class="bd-del" type="button">Elimina</button>`;
+    row.querySelector('.bd-del').addEventListener('click', () => {
       if (!confirm(`Eliminare "${x.desc}"?`)) return;
       state.expenses = state.expenses.filter(e => e.id !== x.id);
-      saveState(); renderExpenses();
+      saveState(); renderExpenses(); renderUtilHome();
     });
     wrap.appendChild(row);
   });
 }
 
-function setupExpenseForm() {
-  $('expenseCat').innerHTML = CATS.map(c => `<option value="${c[0]}">${c[1]} ${c[2]}</option>`).join('');
+function expenseSheet() {
+  const box = document.createElement('div'); box.className = 'bd-form';
+  let cur = foreignCur ? meta.currency.symbol : '€', cat = CATS[0][0];
   const cities = ['In viaggio', ...trip.cities.map(c => c.name)];
-  $('expenseCity').innerHTML = cities.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
-  $('expenseCity').value = cityOfDay(trip.days[tripDayIndex()].day);
-
-  $('addExpense').addEventListener('click', () => {
-    const descEl = $('expenseDesc'), amtEl = $('expenseAmount');
-    const desc = descEl.value.trim(), amount = parseNum(amtEl.value);
-    if (!desc || !Number.isFinite(amount) || amount <= 0) return;
-    state.expenses.push({ id: Date.now(), desc, amount, currency: $('expenseCurrency').value,
-      day: trip.days[tripDayIndex()].day, cat: $('expenseCat').value, city: $('expenseCity').value });
-    descEl.value = ''; amtEl.value = '';
-    saveState(); renderExpenses();
+  box.innerHTML = `<input id="bdDesc" class="field" placeholder="Cos'hai comprato?" autocomplete="off">
+    <div class="bd-amt"><input id="bdAmt" class="field" type="text" inputmode="decimal" placeholder="Importo" autocomplete="off">${foreignCur ? `<div class="seg two" id="bdCur"><button type="button" data-c="${esc(meta.currency.symbol)}" class="on">${esc(meta.currency.symbol)}</button><button type="button" data-c="€">€</button></div>` : ''}</div>
+    <div class="bd-conv" id="bdConv"></div>
+    <div class="bd-chips" id="bdCats">${CATS.map(c => `<button type="button" data-k="${esc(c[0])}" class="${c[0] === cat ? 'on' : ''}">${esc(c[2])}</button>`).join('')}</div>
+    <select id="bdCity" class="field">${cities.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('')}</select>
+    <button class="btn primary" id="bdSave" type="button">Aggiungi spesa</button>`;
+  const upd = () => { const v = parseNum($('bdAmt').value); $('bdConv').textContent = Number.isFinite(v) && v > 0 ? '≈ ' + fmtEur(cur === '€' ? v : v / rate()) : ''; };
+  setTimeout(() => {
+    $('bdCity').value = cityOfDay(trip.days[tripDayIndex()].day);
+    $('bdAmt').addEventListener('input', upd);
+    if ($('bdCur')) $('bdCur').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; cur = b.dataset.c; $('bdCur').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); upd(); });
+    $('bdCats').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; cat = b.dataset.k; $('bdCats').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); });
+    $('bdSave').addEventListener('click', () => {
+      const desc = $('bdDesc').value.trim(), amount = parseNum($('bdAmt').value);
+      if (!desc || !Number.isFinite(amount) || amount <= 0) { toast('Inserisci descrizione e importo'); return; }
+      state.expenses.push({ id: Date.now(), desc, amount, currency: cur, day: trip.days[tripDayIndex()].day, cat, city: $('bdCity').value });
+      saveState(); closeModal(); renderExpenses(); renderUtilHome(); toast('Spesa aggiunta');
+    });
+  }, 0);
+  return box;
+}
+function budgetSheet() {
+  const box = document.createElement('div'); box.className = 'bd-form';
+  box.innerHTML = `<p class="note-line">Quanto vuoi spendere in tutto il viaggio, in euro.</p>
+    <input id="bdBud" class="field" type="text" inputmode="decimal" placeholder="Es. 2500" value="${Number(state.budget) > 0 ? Number(state.budget) : ''}">
+    <button class="btn primary" id="bdBudSave" type="button">Salva budget</button>
+    ${Number(state.budget) > 0 ? '<button class="btn" id="bdBudDel" type="button">Rimuovi budget</button>' : ''}`;
+  setTimeout(() => {
+    const done = () => { saveState(); closeModal(); renderExpenses(); renderUtilHome(); };
+    $('bdBudSave').addEventListener('click', () => { const v = parseNum($('bdBud').value); if (!Number.isFinite(v) || v <= 0) { toast('Inserisci un importo'); return; } state.budget = v; done(); });
+    if ($('bdBudDel')) $('bdBudDel').addEventListener('click', () => { state.budget = 0; done(); });
+  }, 0);
+  return box;
+}
+function exportCsv() {
+  if (!state.expenses.length) { toast('Nessuna spesa da esportare'); return; }
+  const q = v => '"' + String(v).replace(/"/g, '""') + '"';
+  const rows = [['Giorno', 'Città', 'Categoria', 'Descrizione', 'Importo', 'Valuta', 'Importo EUR'].map(q).join(';')]
+    .concat(state.expenses.map(x => [x.day, x.city || cityOfDay(x.day), catName(x.cat), x.desc, Number(x.amount).toFixed(2).replace('.', ','), x.currency, toEuro(x).toFixed(2).replace('.', ',')].map(q).join(';')));
+  const blob = new Blob(['﻿' + rows.join('\n')], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'spese-' + meta.id + '.csv';
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  toast('CSV esportato');
+}
+function setupExpenseForm() {
+  $('addExpenseBtn').addEventListener('click', () => openSheetNode('Nuova spesa', expenseSheet));
+  $('expCsv').addEventListener('click', exportCsv);
+  $('bdSeg').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; bdView = b.dataset.v; renderExpenses(); });
+  $('bdTiles').addEventListener('click', e => {
+    const b = e.target.closest('[data-bd]'); if (!b) return;
+    if (b.dataset.bd === 'budget') openSheetNode('Budget del viaggio', budgetSheet); else goTool('cambio');
   });
 }
 
@@ -2877,7 +2954,7 @@ function renderUtilHome() {
   const cs = meta.currency && meta.currency.symbol || '';
   const tiles = [
     ['cash', 'Cambio', true, 'conv', () => '1 € = ' + rate().toFixed(2).replace('.', ',') + ' ' + cs],
-    ['wallet', 'Budget', true, 'budget', () => fmtEur(sumEuro(state.expenses)) + ' spesi'],
+    ['wallet', 'Budget', true, 'budget', () => fmtEur(sumEuro(state.expenses)) + (Number(state.budget) > 0 ? ' di ' + fmtEur(Number(state.budget)) : ' spesi')],
     ['cloud', 'Meteo', true, 'weather', () => 'Previsioni per città'],
     ['tr', 'Traduttore', true, 'trans', () => 'Traduci al volo'],
     ['chat', 'Frasi utili', hasPhr, 'phrases', () => phrases.length + ' frasi'],
@@ -2912,7 +2989,6 @@ const hasInfo = INFO.length > 0, hasPhr = phrases.length > 0;
 $('tabPhrases').hidden = !hasPhr;
 if (hasInfo) $('infoBox').innerHTML = INFO.map(g => `<details class="more" style="margin-top:8px"><summary><b>${esc(g.title)}</b></summary><ul class="sec" style="margin-top:8px">${g.items.map(i => `<li>${esc(i)}</li>`).join('')}</ul></details>`).join('');
 const foreignCur = !!(meta.currency && meta.currency.symbol && meta.currency.symbol !== '€');
-if (!foreignCur) { const ec = $('expenseCurrency'); ec.value = '€'; ec.hidden = true; }
 if (meta.apps && meta.apps.length) {
   const qa = $('quickApps'); qa.hidden = false;
   qa.innerHTML = meta.apps.map(a => { const [label, url] = String(a).split(' | '); return `<a href="${esc((url || '').trim())}">${esc((label || '').trim())}</a>`; }).join('');
@@ -2941,7 +3017,7 @@ $('brandTitle').textContent = meta.countryIt || meta.title;
 $('sosNote').textContent = meta.emergencyNote;
 $('sosGrid').innerHTML = meta.emergency.map(e => `<div style="padding:10px; background:var(--fill); border-radius:12px;"><strong>${esc(e[0])}</strong><br><small>${esc(e[1])}</small></div>`).join('');
 $('sosAssist').href = 'tel:' + meta.assistance.tel; $('sosAssist').textContent = '' + meta.assistance.label;
-$('convLabel').textContent = `${meta.currency.name} (${meta.currency.symbol})`; $('curOpt').textContent = meta.currency.symbol;
+$('convLabel').textContent = `${meta.currency.name} (${meta.currency.symbol})`;
 setupConverter(); setupExpenseForm(); setupBackup(); refreshRate();
 renderCities(); renderUtilHome(); renderItinerary(); renderGuideControls(); renderCompanion(); renderTodayGuides(); loadNews(); renderTransfers(); renderWallet(); renderCodes();
 initExtras();
