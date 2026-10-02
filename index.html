@@ -416,7 +416,9 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
 .sec div, .sec li { font-size: 14px; line-height: 1.5; }
 
 html, body { touch-action: pan-x pan-y; overscroll-behavior-y: none; -webkit-text-size-adjust: 100%; }
-* { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+/* Il testo si può selezionare e copiare (indirizzi, numeri di prenotazione); restano non selezionabili solo i controlli che si toccano */
+body { -webkit-touch-callout: default; -webkit-user-select: text; user-select: text; }
+button, nav, .bottom-nav, .seg, .dchips, .btn, .chip, [role="button"], .stopc, .wrow, .dlink, .dtog, .sc-t, .leaflet-container { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
 input, textarea, select, [contenteditable] { -webkit-user-select: auto; user-select: auto; font-size: 16px; }
 .leaflet-container { touch-action: none; }
 /* ===== TEMA CARD iOS (design fornito dall'utente) ===== */
@@ -733,6 +735,29 @@ button.wp { cursor: pointer; }
 .cc-head .companion-meta{flex:0 0 auto;margin:0!important;white-space:nowrap;font-size:11px!important;padding:5px 10px!important}
 .cc-head .fav{flex:0 0 auto;margin-right:-6px}
 .view > .seg.two{margin:0 0 12px}
+/* ===== Leggibilità e tocchi (analisi di usabilità, 02/10/2026) ===== */
+:root { --muted: light-dark(#66666b, #aeaeb2); --accent-ink: light-dark(#d4163f, #ff6482); --ok-ink: light-dark(#1d7a35, #30d158); --warn-ink: light-dark(#a85a00, #ff9f0a); }
+/* colore dei testi accesi: più scuro sul chiaro, per leggerli anche al sole */
+.brand-state, .btn.ghost, .today-row.next .tr-time, .wx-more, .news-item a, .sc-t, .ss-t, .time, .now-card .nc-time, details.more summary, .ubar, .grow.more b, .wx-tile .rn { color: var(--accent-ink); }
+.wrow .wp, .wp.ok, .vbadge.ok { color: var(--ok-ink); }
+.wrow .wp.warn, .vbadge.warn, .wchips button.warn { color: var(--warn-ink); }
+.wrow .wp.mute, .wp.mute { color: var(--muted); }
+/* testi minimi */
+.bottom-nav button { font-size: 11px; }
+.wx-tile .wdt, .wx-tile .rn, .wrow .wp, .dchips button small, .wtile .wp, #todayWeather .companion-meta { font-size: 12px; }
+#todayWeather .wx-h span, #todayWeather .wx-h em { font-size: 12px; }
+.wrow .ws, .note-line, .ss-py { font-size: 13px; }
+.clocks { font-size: 13px; }
+/* bersagli di tocco da 44 px */
+.btn.small, a.btn.small, button.btn.small { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+.seg button { min-height: 40px; }
+.wchips button { min-height: 40px; }
+.dchips button { min-height: 56px; }
+.todo-list .btn.small { min-height: 44px; width: 100%; }
+/* nomi lunghi: vanno a capo invece di essere tagliati */
+.wrow .wt, .wrow .ws { white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; }
+/* Come arrivare a punti */
+.how-list { margin: 0; padding-left: 18px; } .how-list li { margin: 0 0 6px; line-height: 1.45; }
 </style>
 </head>
 <body>
@@ -768,13 +793,13 @@ button.wp { cursor: pointer; }
 
     <div id="todayNews"></div>
 
-
-
     <section class="card" id="bookingAlertsTitle" style="display:none;">
       <h3>Da fare</h3>
       <p>Promemoria e prenotazioni in scadenza.</p>
       <div class="todo-list" id="bookingAlertsGrid"></div>
     </section>
+
+
 
 
   </section>
@@ -1082,10 +1107,12 @@ function btnGrid(items) {
 }
 function bAct(label, fn, cls) { const b = document.createElement('button'); b.type = 'button'; b.className = 'btn small ' + (cls || ''); b.textContent = label; if (fn) b.addEventListener('click', fn); return b; }
 function bLink(label, href, cls, ext) { const a = document.createElement('a'); a.className = 'btn small ' + (cls || ''); a.href = href; a.textContent = label; if (ext) { a.target = '_blank'; a.rel = 'noopener'; } return a; }
-function routeRow(q, taxiFn) {
+/* Metro solo dove ha senso: per gli hotel se la scheda parla di metro/linee, per le tappe se il testo le cita */
+const mentionsMetro = t => /\b(metro|metropolitana|subway)\b|\blinee? \d/i.test(String(t || ''));
+function routeRow(q, taxiFn, noMetro) {
   const it = [];
   if (taxiFn) it.push(bAct(meta.taxi || 'Taxi', taxiFn));
-  if (q) { it.push(bLink('Mappa', appleMaps(q))); it.push(bLink('Metro', transitApple(q))); }
+  if (q) { it.push(bLink('Mappa', appleMaps(q))); if (!noMetro) it.push(bLink('Metro', transitApple(q))); }
   return it.length ? btnGrid(it) : null;
 }
 const hotelQ = h => h.zh || h.addr || [h.name && h.name.replace(/ \(.*$/, ''), h.city, meta.country].filter(Boolean).join(', ');
@@ -1253,7 +1280,7 @@ function hotelMoreHTML(k) {
 }
 function hotelActs(k, host) {
   const h = hotelInfo(k);
-  const g = routeRow(hotelQ(h), () => showPlaceCard(hotelCardData(k))); if (g) host.appendChild(g);
+  const g = routeRow(hotelQ(h), () => showPlaceCard(hotelCardData(k)), !mentionsMetro(h.metro)); if (g) host.appendChild(g);
   if (h.tel) host.appendChild(btnGrid([bLink('Chiama', 'tel:' + h.tel)]));
 }
 function renderTodayHotel() {
@@ -1342,7 +1369,7 @@ function renderBookingAlerts() {
   title.style.display = 'block';
   due.forEach(r => {
     const card = document.createElement('div'); card.className = 'utility-card';
-    card.innerHTML = `<div class="companion-meta">Promemoria</div><h4 style="margin:0; font-size:18px;">${esc(r.title)}</h4><p style="margin:8px 0 0; font-size:14px; font-weight:500;">${esc(r.sub)}</p><p style="margin:4px 0 0; font-size:14px; font-weight:600; color:var(--accent-2);">${esc(fmtDT(r.at))}</p><button class="btn small" style="width:100%; margin-top:12px;">Fatto</button>`;
+    card.innerHTML = `<div class="companion-meta">Promemoria</div><h4 style="margin:0; font-size:18px;">${esc(r.title)}</h4><p style="margin:8px 0 0; font-size:14px; font-weight:500;">${esc(r.sub)}</p><p style="margin:4px 0 0; font-size:14px; font-weight:600; color:var(--accent-2);">${esc(fmtDT(r.at, r.tz))}</p><button class="btn small" style="width:100%; margin-top:12px;">Fatto</button>`;
     card.querySelector('button').onclick = () => { state.remDone[r.id] = true; saveState(); renderBookingAlerts(); renderReminders(); };
     wrap.appendChild(card);
   });
@@ -1562,7 +1589,7 @@ function resCard(r) {
       ${isBooked ? '' : '<span class="badge warn">Da prenotare</span>'}
     </div><p style="margin:0; font-size: 15px;"><strong>Date:</strong> ${esc(r.date)}</p><p style="margin:4px 0 0; color:var(--muted); font-size: 13px;">Rif: ${esc(r.ref)}</p>`;
   const add = (el) => { card.appendChild(el); return el; };
-  if (r.hk) { const g = routeRow(hotelQ(hotelInfo(r.hk)), () => showPlaceCard(hotelCardData(r.hk))); if (g) { g.style.marginTop = '14px'; card.appendChild(g); } }
+  if (r.hk) { const g = routeRow(hotelQ(hotelInfo(r.hk)), () => showPlaceCard(hotelCardData(r.hk)), !mentionsMetro(hotelInfo(r.hk).metro)); if (g) { g.style.marginTop = '14px'; card.appendChild(g); } }
   const mk = (html, css) => { const d = document.createElement('div'); d.style.cssText = css || 'margin-top:12px;'; d.innerHTML = html; return d; };
   const toggle = val => { if (val) state.booked[r.id] = true; else delete state.booked[r.id]; saveState(); renderBookingAlerts(); renderWallet(); renderToday(); };
   state.resCodes = state.resCodes || {};
@@ -1706,7 +1733,7 @@ function renderCities() {
       <div class="city-dates" style="margin-top:10px">Hotel: <strong>${esc(h.name)}</strong></div>
       <div class="city-dates">${esc(h.en || '')}</div>
       `;
-    const g1 = routeRow(hotelQ(h), () => showPlaceCard(hotelCardData(city.key))); if (g1) card.appendChild(g1);
+    const g1 = routeRow(hotelQ(h), () => showPlaceCard(hotelCardData(city.key)), !mentionsMetro(h.metro)); if (g1) card.appendChild(g1);
     card.appendChild(btnGrid([bAct('Itinerario', () => {
       setView('itinerary');
       goDay(city.days[0]);
@@ -1745,12 +1772,19 @@ const ICON = {
   note: SVG('<path d="M5 4h14v16H5zM9 9h6M9 13h6"/>')
 };
 const dsec = (ic, label, html) => html ? `<div class="dsec"><div class="di">${ICON[ic] || ic}</div><div><b>${label}</b>${html}</div></div>` : '';
+/* "Come arrivare": una frase per riga quando il testo è lungo */
+function howHTML(t) {
+  if (!t) return '';
+  const raw = L(t), parts = raw.split(/(?<=[.!?])\s+(?=[A-ZÀ-Ý¥0-9"'(])/).map(x => x.trim()).filter(Boolean);
+  if (parts.length < 3) return `<div>${esc(raw)}</div>`;
+  return `<ul class="how-list">${parts.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`;
+}
 function detHTML(day, i) {
   const st = day.det[i], p = placeInfo(day, i);
   const txt = t => t ? `<div>${esc(L(t))}</div>` : '';
   let h = '';
   if (p.zh || p.addr) h += dsec('pin', 'Dove', `<div class="dn">${esc(L(p.py || st.title))}</div>${p.pya ? `<div>${esc(p.pya)}</div>` : ''}<div class="py">I caratteri locali sono nel pulsante Taxi</div>`);
-  h += dsec('route', 'Come arrivare', txt(st.how)) + dsec('clock', 'Orari', txt(st.hours)) + dsec('coin', 'Costi', txt(st.cost)) + dsec('ticket', 'Prenotazione', txt(st.book));
+  h += dsec('route', 'Come arrivare', howHTML(st.how)) + dsec('clock', 'Orari', txt(st.hours)) + dsec('coin', 'Costi', txt(st.cost)) + dsec('ticket', 'Prenotazione', txt(st.book));
   if (st.warn) h += `<div class="warnbox"><b>Attenzione</b> ${esc(L(st.warn))}</div>`;
   if (st.tips && st.tips.length) h += dsec('bulb', 'Consigli', `<ul>${st.tips.map(t => `<li>${esc(L(t))}</li>`).join('')}</ul>`);
   if (st.v !== 'ok' || p.custom) h += `<div class="vb">${st.v !== 'ok' ? '<span class="vbadge warn">Da verificare prima di partire</span>' : ''}${p.custom ? '<span class="vbadge">Modificato da te</span>' : ''}</div>`;
@@ -2033,7 +2067,7 @@ function stopSheet(day, i) {
   box.innerHTML = `${p.zh ? `<div class="ss-zh">${esc(p.zh)}</div>${p.py ? `<div class="ss-py">${esc(p.py)}</div>` : ''}` : ''}<div class="ss-t">${esc(s[0])}</div>${s[2] ? `<div class="ss-s">${esc(L(s[2]))}</div>` : ''}<div class="stop-acts"></div>${st ? '<div class="stop-det"></div>' : ''}`;
   if (st) {
     const acts = box.querySelector('.stop-acts');
-    const g1 = routeRow(stopMapQ(day, st, p), hasPlace ? () => showPlaceCard(stopCardData(day, i)) : null); if (g1) acts.appendChild(g1);
+    const g1 = routeRow(stopMapQ(day, st, p), hasPlace ? () => showPlaceCard(stopCardData(day, i)) : null, !mentionsMetro([st.how, s[2], st.hours].join(' '))); if (g1) acts.appendChild(g1);
     const r2 = [];
     if (st.guide) r2.push(bAct('Guida', () => openGuideByTitle(st.guide)));
     if (st.tel) r2.push(bLink('Chiama', 'tel:' + st.tel));
@@ -2049,10 +2083,10 @@ function renderDay(day, target) {
   const section = document.createElement('article'); section.className = 'day-card'; section.id = `day-${day.day}`;
   section.innerHTML = `<div class="day-head"><div class="day-title"><h4>Giorno ${day.day} · ${esc(day.city)}</h4><p>${esc(day.date)} · ${esc(day.title)}</p></div><div class="wx-line" data-wxday="${day.day}"></div></div>
     ${day.alert ? `<div class="alert"><b>Attenzione</b> ${esc(day.alert)}</div>` : ''}
+    <div class="timeline"></div>
     ${hk && isCheckinDay(day, hk) ? `<div class="hotel-box" data-hotel>${hotelBoxHTML(hk, false)}</div>` : ''}
     <div class="day-map" data-daymap><div class="dm-mini"></div><div class="dm-chip"></div></div>
     ${RACCONTO[day.day] ? `<div class="racc"><button class="dlink dtog" type="button" aria-expanded="false"><span>Racconto del giorno</span><i>▾</i></button><div class="racc-body" hidden></div></div>` : ''}
-    <div class="timeline"></div>
     <div class="diary"><button class="dlink dtog" type="button" aria-expanded="false"><span>Diario della giornata</span><i>▾</i></button>
       <div class="note-area" hidden><textarea id="note-${day.day}" aria-label="Diario della giornata" placeholder="Ricordi, appunti, sensazioni..."></textarea></div></div>`;
   if (hk && section.querySelector('[data-hotel]')) hotelActs(hk, section.querySelector('[data-hotel]'));
@@ -2081,9 +2115,16 @@ function renderDay(day, target) {
   ta.addEventListener('blur', flush);
   target.appendChild(section);
 }
+/* La riga dei giorni si apre col giorno in corso al posto del primo chip: i giorni precedenti scorrono a sinistra */
+function alignDayChips() {
+  const c = $('dayChips'); if (!c) return;
+  const on = c.querySelector('.on'), first = c.firstElementChild; if (!on || !first) return;
+  const d = on.getBoundingClientRect().left - first.getBoundingClientRect().left;
+  if (d || c.scrollLeft) c.scrollLeft += d;
+}
 function goDay(n, scroll = true) {
   selDay = n; renderItinerary();
-  const c = document.querySelector('#dayChips .on'); if (c) c.scrollIntoView({ inline: 'center', block: 'nearest' });
+  alignDayChips();
   if (scroll) window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 function renderItinerary() {
@@ -2094,6 +2135,7 @@ function renderItinerary() {
   wrap.appendChild(chips);
   renderDay(trip.days.find(d => d.day === selDay), wrap);
   if (typeof renderDayWeather === 'function') renderDayWeather();
+  alignDayChips();
 }
 
 /* ====================== AUDIOGUIDA ====================== */
@@ -2409,7 +2451,7 @@ function renderHomeWeather() {
   const isToday = true;
   const city = wxCityOf(day), iso = today, f = wxFor(city, iso);
   const head = `<div class="companion-meta">Meteo · ${esc(city)}${onTrip ? '' : ' · oggi'}</div>`;
-  if (!f) { box.innerHTML = head + '<p style="margin:0;">Nessun dato salvato: si aggiorna da solo quando c\'è connessione.</p>'; return; }
+  if (!f) { box.innerHTML = `<p class="note-line" style="margin:0;">Meteo · ${esc(city)}: nessun dato salvato, si aggiorna con la connessione.</p>`; return; }
   const cur = isToday && f.kind === 'fc' && f.w.current;
   const big = cur ? cur.temperature_2m : f.max, code = cur ? cur.weather_code : f.code;
   const nowStr = new Date().toLocaleString('sv-SE', { timeZone: meta.tz }).replace(' ', 'T');
@@ -2539,21 +2581,32 @@ function setupOffline() {
 }
 
 /* ====================== EXTRA: PROMEMORIA, DOCUMENTI, IMPORT EMAIL, TRADUTTORE ====================== */
-const fmtDT = ms => new Date(ms).toLocaleString('it-IT', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Rome' });
+/* Orari dei promemoria: nel fuso del luogo a cui si riferiscono (ricavato dall'offset dell'orario ISO); se è diverso da quello del telefono, si indica di quale paese è l'ora */
+const TZ_BY_OFFSET = { '+08:00': 'Asia/Shanghai', '+02:00': 'Europe/Rome', '+01:00': 'Europe/Rome', '+04:00': 'Asia/Dubai' };
+const TZ_LABEL = { 'Asia/Shanghai': 'Cina', 'Europe/Rome': 'Italia', 'Asia/Dubai': 'Abu Dhabi' };
+const tzOfIso = iso => { const m = /([+-]\d\d:\d\d)$/.exec(String(iso || '')); return m ? TZ_BY_OFFSET[m[1]] : undefined; };
+const deviceTz = () => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone; } catch { return undefined; } };
+const fmtDT = (ms, tz) => {
+  const o = { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' };
+  if (tz) o.timeZone = tz;
+  let out = new Date(ms).toLocaleString('it-IT', o);
+  if (tz && tz !== deviceTz() && TZ_LABEL[tz]) out += ' (ora ' + TZ_LABEL[tz] + ')';
+  return out;
+};
 const cardBase = (inner, extra) => { const d = document.createElement('div'); d.className = 'utility-card'; d.style.cssText = 'margin-bottom:12px;' + (extra || ''); d.innerHTML = inner; return d; };
 
 /* ---- Promemoria ---- */
 function buildReminders() {
   const out = [];
   state.imported = state.imported || [];
-  if (transfers[0]) out.push({ id: 'esim', title: "Attiva l'eSIM", sub: 'Con il Wi-Fi, prima di partire', at: new Date(transfers[0].dep).getTime() - 86400000 });
+  if (transfers[0]) out.push({ id: 'esim', title: "Attiva l'eSIM", sub: 'Con il Wi-Fi, prima di partire', at: new Date(transfers[0].dep).getTime() - 86400000, tz: tzOfIso(transfers[0].dep) });
   transfers.forEach(t => {
     const dep = new Date(t.dep).getTime(), fl = /Volo/.test(t.type);
-    if (fl) out.push({ id: 'ci-' + t.id, title: 'Check-in online', sub: t.title, at: dep - 86400000 });
-    out.push({ id: 'go-' + t.id, title: fl ? "Parti per l'aeroporto" : 'Parti per la stazione', sub: t.title + ' · ' + fmtLocal(t.dep), at: dep - (fl ? 4 : 1.5) * 3600000 });
+    if (fl) out.push({ id: 'ci-' + t.id, title: 'Check-in online', sub: t.title, at: dep - 86400000, tz: tzOfIso(t.dep) });
+    out.push({ id: 'go-' + t.id, title: fl ? "Parti per l'aeroporto" : 'Parti per la stazione', sub: t.title + ' · ' + fmtLocal(t.dep), at: dep - (fl ? 4 : 1.5) * 3600000, tz: tzOfIso(t.dep) });
   });
-  reservations.forEach(r => { if (r.opens && !state.booked[r.id]) out.push({ id: 'op-' + r.id, title: 'Apre la prenotazione', sub: r.title, at: +parseOpens(r.opens) }); });
-  state.imported.forEach(x => { if (x.dep) out.push({ id: 'imp-' + x.id, title: x.title, sub: 'Prenotazione importata', at: new Date(x.dep).getTime() - 3 * 3600000 }); });
+  reservations.forEach(r => { if (r.opens && !state.booked[r.id]) out.push({ id: 'op-' + r.id, title: 'Apre la prenotazione', sub: r.title, at: +parseOpens(r.opens), tz: 'Europe/Rome' }); });
+  state.imported.forEach(x => { if (x.dep) out.push({ id: 'imp-' + x.id, title: x.title, sub: 'Prenotazione importata', at: new Date(x.dep).getTime() - 3 * 3600000, tz: tzOfIso(x.dep) }); });
   (state.remCustom = state.remCustom || []).forEach(c => out.push({ id: 'c-' + c.id, title: c.title, sub: 'Tuo promemoria', at: c.at, custom: c.id }));
   return out.filter(r => !isNaN(r.at)).sort((a, b) => a.at - b.at);
 }
@@ -2587,7 +2640,7 @@ function renderReminders() {
   const row = (r, isDone) => {
     const d = document.createElement('div'); d.className = 'grow nr';
     const late = r.at < now && !isDone;
-    d.innerHTML = `<div style="min-width:0;flex:1;"><div style="font-weight:600;">${esc(r.title)}</div><div class="note-line" style="margin:2px 0 0;">${esc(r.sub)} · ${late ? 'scaduto' : esc(fmtDT(r.at))}</div></div>`;
+    d.innerHTML = `<div style="min-width:0;flex:1;"><div style="font-weight:600;">${esc(r.title)}</div><div class="note-line" style="margin:2px 0 0;">${esc(r.sub)} · ${late ? 'scaduto' : esc(fmtDT(r.at, r.tz))}</div></div>`;
     const b = bAct(isDone ? 'Ripristina' : 'Fatto', () => { if (isDone) delete state.remDone[r.id]; else state.remDone[r.id] = true; saveState(); renderReminders(); renderBookingAlerts(); });
     d.appendChild(b);
     if (r.custom) d.appendChild(bAct('Elimina', () => { state.remCustom = state.remCustom.filter(c => c.id !== r.custom); saveState(); renderReminders(); renderBookingAlerts(); }));
@@ -2775,6 +2828,7 @@ function setView(view) {
   document.querySelectorAll(`.bottom-nav [data-view="${nav}"]`).forEach(b => b.classList.add('active'));
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   $(view).classList.add('active');
+  if (view === 'itinerary') requestAnimationFrame(alignDayChips);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 /* sotto-schede: Tappe = Itinerario | Guida, Doc = Prenotazioni | Documenti */
