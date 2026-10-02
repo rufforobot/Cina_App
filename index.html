@@ -1783,7 +1783,7 @@ function bookedCosts() {
 const catOfExp = x => x.catLabel || catName(x.cat);
 function renderExpenses() {
   const wrap = $('expenseList'); wrap.innerHTML = '';
-  wrap.hidden = !bdListOpen; $('expToggle').textContent = bdListOpen ? 'Nascondi' : 'Mostra';
+  wrap.hidden = !bdListOpen; $('expToggle').setAttribute('aria-label', bdListOpen ? 'Nascondi elenco spese' : 'Mostra elenco spese'); $('expToggle').textContent = bdListOpen ? '▴' : '▾';
   const currentDay = trip.days[tripDayIndex()].day;
   const all = state.expenses, fixed = bookedCosts(), every = fixed.concat(all);
   const total = sumEuro(every), spent = sumEuro(all), booked = sumEuro(fixed), today = sumEuro(all.filter(x => x.day === currentDay));
