@@ -415,7 +415,8 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; }
 .sec { margin-top: 10px; }
 .sec div, .sec li { font-size: 14px; line-height: 1.5; }
 
-html, body { touch-action: pan-x pan-y; overscroll-behavior-y: none; -webkit-text-size-adjust: 100%; }
+html { overscroll-behavior-y: none; }
+html, body { touch-action: pan-x pan-y; -webkit-text-size-adjust: 100%; }
 /* Il testo si può selezionare e copiare (indirizzi, numeri di prenotazione); restano non selezionabili solo i controlli che si toccano */
 body { -webkit-touch-callout: default; -webkit-user-select: text; user-select: text; }
 button, nav, .bottom-nav, .seg, .dchips, .btn, .chip, [role="button"], .stopc, .wrow, .dlink, .dtog, .sc-t, .leaflet-container { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
@@ -764,6 +765,7 @@ button.wp { cursor: pointer; }
 .cc-head .companion-meta{flex:0 1 auto!important;min-width:0;max-width:46%;overflow:hidden;text-overflow:ellipsis}
 .companion-card .btn-grid{min-width:0}
 .companion-card .btn-grid .btn{min-width:0}
+@supports (overflow-x: clip) { html, body, #app { overflow-x: clip; } }
 </style>
 </head>
 <body>
