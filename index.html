@@ -711,6 +711,23 @@ button.wp { cursor: pointer; }
 .bottom-nav button.active { background: var(--text); color: var(--bg); }
 .modal-card { border-radius: 32px; }
 .modal.sheet .modal-card { border-radius: 32px 32px 0 0; }
+
+/* Guida in stile Bento */
+#companion #guideSearch{border-radius:99px;padding-left:20px;height:48px}
+#companion .guide-bar{grid-template-columns:1fr auto;gap:8px}
+#companion .guide-bar .field,#companion .guide-bar .btn{border-radius:99px;height:44px}
+#companion .guide-bar .btn.primary{background:var(--text);color:var(--bg)}
+#companion .seg{display:flex;gap:8px;overflow-x:auto;background:none;padding:2px 0 4px;scrollbar-width:none;margin-top:10px}
+#companion .seg::-webkit-scrollbar{display:none}
+#companion .seg button{flex:0 0 auto;border-radius:99px;padding:9px 16px;font-weight:700;background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+#companion .seg button.on{background:var(--text);color:var(--bg)}
+#guideCount{font-weight:700;letter-spacing:.2px}
+.companion-card{border-radius:30px!important;padding:20px 20px 18px!important}
+.companion-card .city-name{font-size:21px;font-weight:800;letter-spacing:-.4px;line-height:1.15}
+.companion-card .companion-meta{display:inline-block;background:var(--fill);border-radius:99px;padding:4px 11px;font-size:12px;font-weight:600}
+.companion-card .btn-grid .btn{border-radius:99px;height:42px;font-weight:700}
+.companion-card .btn-grid .btn.read-btn{background:var(--text);color:var(--bg)}
+.companion-card .btn-grid .btn.listen-btn{background:var(--fill);color:var(--text)}
 </style>
 </head>
 <body>
