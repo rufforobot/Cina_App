@@ -129,7 +129,7 @@ weather:
 
 # Guide
 
-> Una sezione per città, una guida per tappa. tag: local, influencer oppure "-"
+> Una sezione per città, una guida per tappa. tag: local, mainstream oppure "-"
 ## Tokyo
 
 ### Senso-ji

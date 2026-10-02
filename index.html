@@ -862,6 +862,15 @@ button.wp { cursor: pointer; }
 .sg-listen::before{content:"";width:16px;height:16px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M4 14v-2a8 8 0 0 1 16 0v2'/%3E%3Crect x='3' y='14' width='4' height='6' rx='2'/%3E%3Crect x='17' y='14' width='4' height='6' rx='2'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M4 14v-2a8 8 0 0 1 16 0v2'/%3E%3Crect x='3' y='14' width='4' height='6' rx='2'/%3E%3Crect x='17' y='14' width='4' height='6' rx='2'/%3E%3C/svg%3E") center/contain no-repeat}
 .sg-b{display:flex;justify-content:center}
 .sg-read{min-width:60%;min-height:44px;border:0;border-radius:99px;background:var(--text);color:var(--bg);font:inherit;font-weight:700;cursor:pointer}
+
+/* Doppia opzione Mainstream / Local: colore solo sul badge */
+.obadge { display: inline-block; padding: 2px 9px; border-radius: 99px; color: #fff; font-size: 11px; font-weight: 700; letter-spacing: .2px; line-height: 1.5; }
+.obadge.mainstream { background: #b7791f; }
+.obadge.local { background: #2f855a; }
+.sc-o { display: flex; gap: 6px; margin-top: 6px; }
+.dopts .orow { display: flex; gap: 10px; align-items: flex-start; padding: 6px 0; }
+.dopts .orow .obadge { flex: 0 0 92px; margin-top: 3px; text-align: center; }
+.dopts .orow span:last-child { font-size: 15px; line-height: 1.5; }
 </style>
 </head>
 <body>
@@ -1943,11 +1952,18 @@ function howHTML(t) {
   if (parts.length < 3) return `<div>${esc(raw)}</div>`;
   return `<ul class="how-list">${parts.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`;
 }
+/* Doppia opzione: ogni voce è "mainstream: testo" o "local: testo" */
+const OPT_LABEL = { mainstream: 'Mainstream', local: 'Local' };
+function optsOf(st) {
+  return ((st && st.opts) || []).map(o => { const m = String(L(o)).match(/^(mainstream|local)\s*:\s*(.+)$/i); return m ? { k: m[1].toLowerCase(), t: m[2].trim() } : null; }).filter(Boolean);
+}
+function optsBadges(st) { return optsOf(st).map(o => `<span class="obadge ${o.k}">${OPT_LABEL[o.k]}</span>`).join(''); }
 function detHTML(day, i) {
   const st = day.det[i], p = placeInfo(day, i);
   const txt = t => t ? `<div>${esc(L(t))}</div>` : '';
   let h = '';
   if (p.zh || p.addr) h += dsec('pin', 'Dove', `<div class="dn">${esc(L(p.py || st.title))}</div>${p.pya ? `<div>${esc(p.pya)}</div>` : ''}<div class="py">I caratteri locali sono nel pulsante Taxi</div>`);
+  { const os = optsOf(st); if (os.length) h += `<div class="dsec dopts"><div class="di">${ICON.route}</div><div><b>Scegli una delle due</b>${os.map(o => `<div class="orow"><span class="obadge ${o.k}">${OPT_LABEL[o.k]}</span><span>${esc(o.t)}</span></div>`).join('')}</div></div>`; }
   h += dsec('route', 'Come arrivare', howHTML(st.how)) + dsec('clock', 'Orari', txt(st.hours)) + dsec('coin', 'Costi', txt(st.cost)) + dsec('ticket', 'Prenotazione', txt(st.book));
   if (st.warn) h += `<div class="warnbox"><b>Attenzione</b> ${esc(L(st.warn))}</div>`;
   if (st.tips && st.tips.length) h += dsec('bulb', 'Consigli', `<ul>${st.tips.map(t => `<li>${esc(L(t))}</li>`).join('')}</ul>`);
@@ -2270,7 +2286,7 @@ function renderDay(day, target) {
   const timeline = section.querySelector('.timeline');
   day.stops.forEach((s, i) => {
     const row = document.createElement('button'); row.type = 'button'; row.className = 'stopc';
-    row.innerHTML = `<div class="sc-t">${esc(s[0])}</div><div class="sc-bar"></div><div class="sc-i"><div class="sc-h">${esc(L(s[1]))}${guidesForStop(day, i).length ? '<em class="sc-g">Guida</em>' : ''}</div>${s[2] ? `<div class="sc-s">${esc(L(s[2]))}</div>` : ''}</div><i class="sc-c">›</i>`;
+    row.innerHTML = `<div class="sc-t">${esc(s[0])}</div><div class="sc-bar"></div><div class="sc-i"><div class="sc-h">${esc(L(s[1]))}${guidesForStop(day, i).length ? '<em class="sc-g">Guida</em>' : ''}</div>${s[2] ? `<div class="sc-s">${esc(L(s[2]))}</div>` : ''}${optsOf(day.det[i]).length ? `<div class="sc-o">${optsBadges(day.det[i])}</div>` : ''}</div><i class="sc-c">›</i>`;
     row.onclick = () => openSheetNode(L(s[1]), () => stopSheet(day, i));
     timeline.appendChild(row);
   });
@@ -2317,7 +2333,7 @@ function renderItinerary() {
 /* ====================== AUDIOGUIDA ====================== */
 const guide = { city: 'all', tag: 'all', q: '', favOnly: false };
 guide.city = todayGuideCity() || 'all';
-const TAGS = { influencer: 'Influencer', local: 'Local' };
+const TAGS = { mainstream: 'Mainstream', local: 'Local' };
 const tagLabel = t => (t && TAGS[t]) || 'Classica';
 const stopKey = (city, stop) => `${city}|${stop.title}`;
 const hanziOf = native => (String(native).match(new RegExp('[' + SCRIPT_CLS + ']+', 'g')) || []).join(' ');
@@ -2390,7 +2406,7 @@ function renderGuideControls() {
   const fav = $('guideFav'); fav.classList.toggle('primary', !!guide.favOnly);
   fav.onclick = () => { guide.favOnly = !guide.favOnly; refreshGuide(); };
   const seg = $('guideTags'); seg.innerHTML = '';
-  [['all', 'Tutti'], ['classic', 'Classiche'], ['influencer', 'Influencer'], ['local', 'Local']].forEach(([k, l]) => {
+  [['all', 'Tutti'], ['classic', 'Classiche'], ['mainstream', 'Mainstream'], ['local', 'Local']].forEach(([k, l]) => {
     const b = document.createElement('button'); b.type = 'button'; b.textContent = l; b.className = guide.tag === k ? 'on' : '';
     b.onclick = () => { guide.tag = k; refreshGuide(); }; seg.appendChild(b);
   });
