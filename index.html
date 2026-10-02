@@ -323,7 +323,7 @@ main { max-width: 1180px; margin: 0 auto; padding: 20px 18px 120px; }
 .modal-body { padding: 20px; background: transparent; }
 .modal-body p { line-height: 1.6; color: var(--text); font-size: 15px; }
 
-.day-map { position: relative; margin: 14px 0 0; height: 170px; border-top: 0.5px solid var(--glass-border); border-bottom: 0.5px solid var(--glass-border); background: var(--glass); overflow: hidden; cursor: pointer; }
+.day-map { position: relative; margin: 14px 0 0; height: 140px; border-top: 0.5px solid var(--glass-border); border-bottom: 0.5px solid var(--glass-border); background: var(--glass); overflow: hidden; cursor: pointer; }
 .dm-mini { position: absolute; inset: 0; }
 .dm-chip { position: absolute; left: 12px; bottom: 12px; z-index: 500; padding: 6px 12px; border-radius: 999px; font-size: 13px; font-weight: 600; background: var(--glass-strong); border: 0.5px solid var(--glass-border); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: var(--shadow); }
 .day-map:not(.ready) { display: flex; align-items: center; justify-content: center; }
@@ -613,6 +613,31 @@ button.wp { cursor: pointer; }
 .wj-st.on:before { border-color: var(--accent); }
 .wj-t { font-size: 17px; font-weight: 700; } .wj-t span { color: var(--muted); font-weight: 500; font-size: 13px; margin-left: 6px; }
 .wj-d { font-size: 14px; } .wj-n { font-size: 13px; color: var(--muted); margin-top: 1px; }
+/* Tappe: riga dei giorni, tappe compatte, dettaglio dal basso */
+.dchips { display: flex; gap: 8px; overflow-x: auto; margin: 0 -16px 12px; padding: 2px 16px 6px; scrollbar-width: none; }
+.dchips::-webkit-scrollbar { display: none; }
+.dchips button { flex: none; width: 46px; border: 0.5px solid var(--glass-border); background: var(--glass); box-shadow: var(--shadow); border-radius: 14px; padding: 6px 0; color: var(--muted); font: inherit; text-align: center; }
+.dchips button small { display: block; font-size: 11px; font-weight: 600; }
+.dchips button b { display: block; font-size: 17px; color: var(--text); }
+.dchips button.on { background: var(--text); color: color-mix(in srgb, var(--bg) 70%, transparent); }
+.dchips button.on b { color: var(--bg); }
+.dlink { display: flex; width: calc(100% - 32px); margin: 14px 16px 0; justify-content: space-between; align-items: center; border: 0; background: var(--fill); color: var(--text); font: inherit; font-weight: 600; border-radius: 16px; padding: 13px 16px; text-align: left; }
+.dlink i { font-style: normal; color: var(--muted); font-size: 18px; }
+.timeline { padding: 12px 16px 4px; }
+.stopc { display: flex; width: 100%; gap: 12px; align-items: center; border: 0.5px solid var(--glass-border); background: var(--glass); box-shadow: var(--shadow); border-radius: 20px; padding: 14px 14px 14px 10px; margin-bottom: 10px; color: var(--text); font: inherit; text-align: left; transition: transform .15s; }
+.stopc:active { transform: scale(.97); }
+.sc-t { min-width: 46px; text-align: right; font-weight: 700; font-size: 15px; color: var(--accent); }
+.sc-bar { width: 4px; height: 40px; border-radius: 2px; background: var(--fill); flex: none; }
+.sc-i { flex: 1; min-width: 0; }
+.sc-h { font-weight: 600; font-size: 16px; line-height: 1.25; letter-spacing: -.2px; }
+.sc-s { color: var(--muted); font-size: 13px; margin-top: 2px; line-height: 1.3; }
+.sc-c { font-style: normal; color: var(--muted); font-size: 20px; }
+.diary { padding: 0 0 16px; }
+.diary .dlink { margin-top: 6px; }
+.diary .note-area { padding: 10px 16px 0; }
+.diary .note-area[hidden] { display: none; }
+.ss-zh { font-size: 26px; font-weight: 600; } .ss-py { color: var(--muted); font-size: 14px; margin-bottom: 8px; }
+.ss-t { font-size: 22px; font-weight: 700; letter-spacing: -.3px; color: var(--accent); } .ss-s { color: var(--muted); font-size: 14px; margin: 2px 0 12px; }
 /* widget (stile iOS 26): griglia di riquadri che aprono un popup o una schermata */
 .wgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .wsec-t { font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 22px 4px 10px; }
@@ -1202,7 +1227,7 @@ function renderToday() {
   d.stops.forEach((st, i) => {
     const r = document.createElement('button'); r.type = 'button'; r.className = 'today-row' + (i === nextIdx ? ' next' : '');
     r.innerHTML = `<span class="tr-time">${esc(st[0])}</span><span class="tr-main"><b>${esc(L(st[1]))}</b><small>${esc(L(st[2]))}</small></span>`;
-    r.onclick = () => { setView('itinerary'); setTimeout(() => { const e = $('day-' + d.day); if (e) e.scrollIntoView({ block: 'start' }); }, 60); };
+    r.onclick = () => { setView('itinerary'); goDay(d.day); };
     list.appendChild(r);
   });
   box.appendChild(list);
@@ -1586,7 +1611,7 @@ function renderCities() {
     const g1 = routeRow(hotelQ(h), () => showPlaceCard(hotelCardData(city.key))); if (g1) card.appendChild(g1);
     card.appendChild(btnGrid([bAct('Itinerario', () => {
       setView('itinerary');
-      setTimeout(() => $(`day-${city.days[0]}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+      goDay(city.days[0]);
     }, 'primary')].concat(h.tel ? [bLink('Chiama', 'tel:' + h.tel)] : [])));
     wrap.appendChild(card);
   });
@@ -1902,6 +1927,25 @@ function openRacconto(n) {
 }
 document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-racconto]'); if (b) openRacconto(Number(b.dataset.racconto)); });
 
+let selDay = null;
+const diaryOpen = new Set();
+function stopSheet(day, i) {
+  const s = day.stops[i], st = day.det ? day.det[i] : null, p = st ? placeInfo(day, i) : { zh: '', addr: '' };
+  const hasPlace = !!(p.zh || p.addr), box = document.createElement('div');
+  box.innerHTML = `${p.zh ? `<div class="ss-zh">${esc(p.zh)}</div>${p.py ? `<div class="ss-py">${esc(p.py)}</div>` : ''}` : ''}<div class="ss-t">${esc(s[0])}</div>${s[2] ? `<div class="ss-s">${esc(L(s[2]))}</div>` : ''}<div class="stop-acts"></div>${st ? '<div class="stop-det"></div>' : ''}`;
+  if (st) {
+    const acts = box.querySelector('.stop-acts');
+    const g1 = routeRow(stopMapQ(day, st, p), hasPlace ? () => showPlaceCard(stopCardData(day, i)) : null); if (g1) acts.appendChild(g1);
+    const r2 = [];
+    if (st.guide) r2.push(bAct('Guida', () => openGuideByTitle(st.guide)));
+    if (st.tel) r2.push(bLink('Chiama', 'tel:' + st.tel));
+    if (r2.length) acts.appendChild(btnGrid(r2));
+    const det = box.querySelector('.stop-det'); det.innerHTML = detHTML(day, i);
+    const tx = det.querySelector('[data-a="taxi"]'); if (tx) tx.onclick = () => showPlaceCard(stopCardData(day, i));
+    if (!det.textContent.trim()) det.remove();
+  }
+  return box;
+}
 function renderDay(day, target) {
   const hk = hotelKeyForDay(day);
   const section = document.createElement('article'); section.className = 'day-card'; section.id = `day-${day.day}`;
@@ -1909,57 +1953,45 @@ function renderDay(day, target) {
     ${day.alert ? `<div class="alert"><b>Attenzione</b> ${esc(day.alert)}</div>` : ''}
     ${hk && isCheckinDay(day, hk) ? `<div class="hotel-box" data-hotel>${hotelBoxHTML(hk, false)}</div>` : ''}
     <div class="day-map" data-daymap><div class="dm-mini"></div><div class="dm-chip"></div></div>
-    ${RACCONTO[day.day] ? `<button class="btn block racconto-link" type="button" data-racconto="${day.day}" style="margin:0 0 14px;">Leggi il racconto del giorno</button>` : ''}
+    ${RACCONTO[day.day] ? `<button class="dlink" type="button" data-racconto="${day.day}"><span>Leggi il racconto del giorno</span><i>›</i></button>` : ''}
     <div class="timeline"></div>
-    <div class="note-area">
-      <label class="lbl" for="note-${day.day}">Diario della giornata</label>
-      <textarea id="note-${day.day}" placeholder="Ricordi, appunti, sensazioni..."></textarea>
-    </div>`;
+    <div class="diary"><button class="dlink dtog" type="button" aria-expanded="false"><span>Diario della giornata</span><i>▾</i></button>
+      <div class="note-area" hidden><textarea id="note-${day.day}" aria-label="Diario della giornata" placeholder="Ricordi, appunti, sensazioni..."></textarea></div></div>`;
   if (hk && section.querySelector('[data-hotel]')) hotelActs(hk, section.querySelector('[data-hotel]'));
-
   { const dm = section.querySelector('[data-daymap]'); if (dayPoints(day).length > 0) initMini(day, dm); else dm.remove(); }
   const timeline = section.querySelector('.timeline');
   day.stops.forEach((s, i) => {
-    const row = document.createElement('div'); row.className = 'stop';
-    const key = `${day.day}-${i}`;
-    const st = day.det ? day.det[i] : null;
-    const p = st ? placeInfo(day, i) : { zh: '', addr: '' };
-    const hasPlace = !!(p.zh || p.addr);
-    row.innerHTML = `<div class="time">${esc(s[0])}</div>
-      <div><h5>${esc(L(s[1]))}</h5><p>${esc(L(s[2]))}</p>
-</div>
-      ${st ? `<div class="stop-acts"></div><div class="stop-det" hidden></div>` : ''}`;
-    if (st) {
-      const acts = row.querySelector('.stop-acts');
-      const mq = stopMapQ(day, st, p);
-      const g1 = routeRow(mq, hasPlace ? () => showPlaceCard(stopCardData(day, i)) : null); if (g1) acts.appendChild(g1);
-      const r2 = [];
-      if (st.guide) r2.push(bAct('Guida', () => openGuideByTitle(st.guide)));
-      if (st.tel) r2.push(bLink('Chiama', 'tel:' + st.tel));
-      const tg = bAct('Dettagli ▾'); tg.dataset.a = 'tg'; tg.setAttribute('aria-expanded', 'false'); r2.push(tg);
-      acts.appendChild(btnGrid(r2));
-      const det = row.querySelector('.stop-det');
-      const fill = () => {
-        det.innerHTML = detHTML(day, i);
-        const on = (a, fn) => { const b = det.querySelector(`[data-a="${a}"]`); if (b) b.onclick = fn; };
-        on('taxi', () => showPlaceCard(stopCardData(day, i)));
-      };
-      const setOpen = open => { det.hidden = !open; tg.setAttribute('aria-expanded', open); tg.textContent = open ? 'Chiudi ▴' : 'Dettagli ▾'; if (open) { fill(); detOpen.add(key); } else detOpen.delete(key); };
-      tg.addEventListener('click', () => setOpen(det.hidden));
-      if (detOpen.has(key)) setOpen(true);
-    }
+    const row = document.createElement('button'); row.type = 'button'; row.className = 'stopc';
+    row.innerHTML = `<div class="sc-t">${esc(s[0])}</div><div class="sc-bar"></div><div class="sc-i"><div class="sc-h">${esc(L(s[1]))}</div>${s[2] ? `<div class="sc-s">${esc(L(s[2]))}</div>` : ''}</div><i class="sc-c">›</i>`;
+    row.onclick = () => openSheetNode(L(s[1]), () => stopSheet(day, i));
     timeline.appendChild(row);
   });
-
-  const ta = section.querySelector('textarea');
+  const ta = section.querySelector('textarea'), area = section.querySelector('.note-area'), tog = section.querySelector('.dtog');
   ta.value = state.notes[day.day] || '';
+  const setDiary = open => { area.hidden = !open; tog.setAttribute('aria-expanded', open); tog.querySelector('i').textContent = open ? '▴' : '▾'; if (open) diaryOpen.add(day.day); else diaryOpen.delete(day.day); };
+  tog.querySelector('span').textContent = 'Diario della giornata' + (ta.value.trim() ? ' · scritto' : '');
+  tog.onclick = () => setDiary(area.hidden);
+  if (diaryOpen.has(day.day)) setDiary(true);
   let timer;
-  const flush = () => { clearTimeout(timer); state.notes[day.day] = ta.value; saveState(); };
+  const flush = () => { clearTimeout(timer); state.notes[day.day] = ta.value; saveState(); tog.querySelector('span').textContent = 'Diario della giornata' + (ta.value.trim() ? ' · scritto' : ''); };
   ta.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(flush, 400); });
   ta.addEventListener('blur', flush);
   target.appendChild(section);
 }
-function renderItinerary() { const wrap = $('fullItinerary'); wrap.innerHTML = ''; trip.days.forEach(d => renderDay(d, wrap)); }
+function goDay(n, scroll = true) {
+  selDay = n; renderItinerary();
+  const c = document.querySelector('#dayChips .on'); if (c) c.scrollIntoView({ inline: 'center', block: 'nearest' });
+  if (scroll) window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function renderItinerary() {
+  const wrap = $('fullItinerary'); wrap.innerHTML = '';
+  if (selDay == null || !trip.days.some(d => d.day === selDay)) selDay = trip.days[tripDayIndex()].day;
+  const chips = document.createElement('div'); chips.className = 'dchips'; chips.id = 'dayChips';
+  trip.days.forEach(d => { const b = document.createElement('button'); b.type = 'button'; b.className = d.day === selDay ? 'on' : ''; b.innerHTML = `<small>G${d.day}</small><b>${esc(d.date.slice(0, 2))}</b>`; b.onclick = () => goDay(d.day, false); chips.appendChild(b); });
+  wrap.appendChild(chips);
+  renderDay(trip.days.find(d => d.day === selDay), wrap);
+  if (typeof renderDayWeather === 'function') renderDayWeather();
+}
 
 /* ====================== AUDIOGUIDA ====================== */
 const guide = { city: 'all', tag: 'all', q: '', favOnly: false };
