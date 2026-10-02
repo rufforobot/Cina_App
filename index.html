@@ -856,7 +856,7 @@ button.wp { cursor: pointer; }
 .sg{background:var(--fill);border-radius:24px;padding:16px;margin:0 0 14px}
 .sg-l{font-size:12px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:var(--accent-ink)}
 .sg-p{font-size:14px;line-height:1.5;margin:6px 0 12px}
-.sg-full{margin-top:12px;font-size:14px;line-height:1.55}.sg-full p{margin:0 0 10px}
+.sg-full{margin:10px 0 14px;font-size:14px;line-height:1.55}.sg-full p{margin:0 0 10px}
 .sg-h{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .sg-listen{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 14px 0 11px;border:0;border-radius:99px;background:var(--accent);color:#fff;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
 .sg-listen::before{content:"";width:16px;height:16px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M4 14v-2a8 8 0 0 1 16 0v2'/%3E%3Crect x='3' y='14' width='4' height='6' rx='2'/%3E%3Crect x='17' y='14' width='4' height='6' rx='2'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M4 14v-2a8 8 0 0 1 16 0v2'/%3E%3Crect x='3' y='14' width='4' height='6' rx='2'/%3E%3Crect x='17' y='14' width='4' height='6' rx='2'/%3E%3C/svg%3E") center/contain no-repeat}
@@ -2251,12 +2251,12 @@ function stopSheet(day, i) {
     gl.forEach(x => {
       const g = document.createElement('div'); g.className = 'sg';
       let intro = x.stop.text.split('. ')[0] + '.'; if (intro.length > 150) intro = intro.slice(0, 147).replace(/\s+\S*$/, '') + '...';
-      g.innerHTML = `<div class="sg-h"><div class="sg-l">Guida · ${esc(tagLabel(x.stop.tag))}</div></div><div class="sg-p">${esc(intro)}</div><div class="sg-b"></div><div class="sg-full" hidden>${esc(x.stop.text).split(/\n+/).map(p => '<p>' + p + '</p>').join('')}</div>`;
+      g.innerHTML = `<div class="sg-h"><div class="sg-l">Guida · ${esc(tagLabel(x.stop.tag))}</div></div><div class="sg-p">${esc(intro)}</div><div class="sg-full" hidden>${esc(x.stop.text).split(/\n+/).map(p => '<p>' + p + '</p>').join('')}</div><div class="sg-b"></div>`;
       const listen = document.createElement('button'); listen.type = 'button'; listen.className = 'sg-listen'; listen.textContent = 'Ascolta'; listen.dataset.label = 'Ascolta';
       listen.addEventListener('click', e => speak(x.stop.text, meta.guideLang || 'it-IT', e.currentTarget, 0.95));
       g.querySelector('.sg-h').appendChild(listen);
       const rd = document.createElement('button'); rd.type = 'button'; rd.className = 'sg-read'; rd.textContent = 'Leggi'; const full = g.querySelector('.sg-full');
-      rd.addEventListener('click', () => { full.hidden = !full.hidden; rd.textContent = full.hidden ? 'Leggi' : 'Nascondi'; });
+      rd.addEventListener('click', () => { full.hidden = !full.hidden; g.querySelector('.sg-p').hidden = !full.hidden; rd.textContent = full.hidden ? 'Leggi' : 'Nascondi'; });
       g.querySelector('.sg-b').appendChild(rd);
       anchor.parentNode.insertBefore(g, anchor);
     }); }
