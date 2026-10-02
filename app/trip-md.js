@@ -19,7 +19,7 @@
   const esc = s => String(s).replace(/\\/g, '\\\\').replace(/\n/g, '\\n');
   const num = v => { const n = Number(String(v).replace(',', '.')); return Number.isFinite(n) ? n : v; };
   const yes = v => /^(si|sì|true|yes|1)$/i.test(String(v).trim());
-  const vOut = v => (/^(ok|verificato)$/i.test(String(v).trim()) ? 'ok' : 'chk');
+  const vOut = v => (v == null || String(v).trim() === '' || /^(ok|verificato)$/i.test(String(v).trim()) ? 'ok' : 'chk');
 
   /* ---- intestazione YAML semplificata ---- */
   function parseFront(text) {

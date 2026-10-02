@@ -1185,7 +1185,7 @@ function hotelMoreHTML(k) {
   return dsec('pin', 'Posizione', `<div>${esc(L(h.metro))}</div>`) + dsec('clock', 'Check-in / check-out', `<div>${esc(h.cin)} · ${esc(h.cout)}</div>`) +
     (h.telShow ? dsec('phone', 'Telefono', `<div>${esc(h.telShow)}</div>`) : '') + (h.booking ? dsec('ticket', 'Prenotazione', `<div>${esc(h.booking)}</div>`) : '') +
     (h.warn ? `<div class="warnbox"><b>Attenzione</b> ${esc(L(h.warn))}</div>` : '') +
-    `<div class="vb">${h.custom ? '<span class="vbadge">Modificato da te</span>' : (h.v === 'ok' ? '<span class="vbadge ok">Verificato su fonti online</span>' : '<span class="vbadge warn">Da verificare con la tua conferma</span>')}</div>`;
+    ((h.custom || h.v !== 'ok') ? `<div class="vb">${h.custom ? '<span class="vbadge">Modificato da te</span>' : '<span class="vbadge warn">Da verificare con la tua conferma</span>'}</div>` : '');
 }
 function hotelActs(k, host) {
   const h = hotelInfo(k);
@@ -1658,7 +1658,7 @@ function detHTML(day, i) {
   h += dsec('route', 'Come arrivare', txt(st.how)) + dsec('clock', 'Orari', txt(st.hours)) + dsec('coin', 'Costi', txt(st.cost)) + dsec('ticket', 'Prenotazione', txt(st.book));
   if (st.warn) h += `<div class="warnbox"><b>Attenzione</b> ${esc(L(st.warn))}</div>`;
   if (st.tips && st.tips.length) h += dsec('bulb', 'Consigli', `<ul>${st.tips.map(t => `<li>${esc(L(t))}</li>`).join('')}</ul>`);
-  h += `<div class="vb">${st.v === 'ok' ? '<span class="vbadge ok">Verificato su fonti online</span>' : '<span class="vbadge warn">Da verificare prima di partire</span>'}${p.custom ? '<span class="vbadge">Modificato da te</span>' : ''}</div>`;
+  if (st.v !== 'ok' || p.custom) h += `<div class="vb">${st.v !== 'ok' ? '<span class="vbadge warn">Da verificare prima di partire</span>' : ''}${p.custom ? '<span class="vbadge">Modificato da te</span>' : ''}</div>`;
   return h;
 }
 function isCheckinDay(day, hk) {
