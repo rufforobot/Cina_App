@@ -872,6 +872,15 @@ button.wp { cursor: pointer; }
 .dopts .orow { display: flex; gap: 10px; align-items: flex-start; padding: 6px 0; }
 .dopts .orow .obadge { flex: 0 0 92px; margin-top: 3px; text-align: center; }
 .dopts .orow span:last-child { font-size: 15px; line-height: 1.5; }
+
+/* taxi: frasi che si scambiano con quella grande */
+.taxi-ph .tx-ph{display:block;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--glass-border);padding:12px 0;color:var(--text);font:inherit;cursor:pointer}
+.taxi-ph .tx-ph strong{display:block;font-size:20px}
+.taxi-ph .tx-ph:active{opacity:.6}
+.tx-say{display:inline-flex;align-items:center;justify-content:center;gap:8px;margin:14px auto 0;min-height:44px;padding:0 20px 0 16px;border:0;border-radius:99px;background:var(--fill);color:var(--text);font:inherit;font-weight:700;cursor:pointer}
+.tx-say::before{content:"";width:20px;height:20px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 10v4h4l7 5V5l-7 5z'/%3E%3Cpath d='M17.5 9a4 4 0 0 1 0 6M20 6.5a8 8 0 0 1 0 11'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 10v4h4l7 5V5l-7 5z'/%3E%3Cpath d='M17.5 9a4 4 0 0 1 0 6M20 6.5a8 8 0 0 1 0 11'/%3E%3C/svg%3E") center/contain no-repeat}
+.taxi-big{display:flex;flex-direction:column;align-items:center}
+.taxi-big>*{max-width:100%}.taxi-big .req,.taxi-big .zh1,.taxi-big .ad1,.taxi-big .py1{align-self:stretch}.taxi-big .req{font-size:30px;line-height:1.3}
 </style>
 </head>
 <body>
@@ -1322,14 +1331,32 @@ function showPlaceCard(p) {
     <div class="taxi-big">
       ${zh ? `<div class="zh1">${esc(zh)}</div>` : ''}
       ${addr ? `<div class="ad1">${esc(addr)}</div>` : ''}
-      <div class="req">${esc(DRIVER_PHRASES[0][0])}</div>
-      <div class="py1">${esc(DRIVER_PHRASES[0][1])} · ${esc(DRIVER_PHRASES[0][2])}</div>
+      <div class="req" id="txReq"></div>
+      <div class="py1" id="txPy"></div>
+      <button type="button" class="tx-say" id="txSay" data-label="Ascolta">Ascolta</button>
     </div>
     ${btns ? `<div class="btn-grid" style="--n:1">${btns}</div>` : ''}
     ${p.en ? `<p class="py" style="text-align:center">${esc(p.en)}</p>` : ''}
     ${p.more ? `<h4 class="msec">Info</h4>${p.more}` : ''}
     <h4 class="msec">Altre frasi per il tassista</h4>
-    <div class="taxi-ph">${DRIVER_PHRASES.slice(1).map(f => `<div><strong style="font-size:20px">${esc(f[0])}</strong><br><span class="py">${esc(f[1])} · ${esc(f[2])}</span></div>`).join('')}</div>`);
+    <div class="taxi-ph" id="txList"></div>`);
+  /* la frase toccata prende il posto di quella grande, che scende nell'elenco */
+  let cur = 0;
+  const draw = () => {
+    stopSpeech();
+    const f = DRIVER_PHRASES[cur];
+    $('txReq').textContent = f[0]; $('txPy').textContent = f[1] + ' · ' + f[2];
+    const list = $('txList'); list.innerHTML = '';
+    DRIVER_PHRASES.forEach((g, i) => {
+      if (i === cur) return;
+      const d = document.createElement('button'); d.type = 'button'; d.className = 'tx-ph';
+      d.innerHTML = `<strong>${esc(g[0])}</strong><span class="py">${esc(g[1])} · ${esc(g[2])}</span>`;
+      d.onclick = () => { cur = i; draw(); };
+      list.appendChild(d);
+    });
+  };
+  $('txSay').onclick = e => speak(DRIVER_PHRASES[cur][0], meta.tts || 'zh-CN', e.currentTarget, 0.8);
+  draw();
 }
 /* Retro-compatibilità: Taxi Card da un testo cinese libero (trasferimenti) */
 function showTaxiCard(zh) {
