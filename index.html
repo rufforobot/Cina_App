@@ -1322,7 +1322,6 @@ function showPlaceCard(p) {
   const zh = (p.zh || '').trim(), addr = (p.addr || '').trim();
   if (!zh && !addr) { toast('Inserisci prima nome o indirizzo nella lingua locale ()'); if (p.onEdit) p.onEdit(); return; }
   const q = zh || addr;
-  const btns = p.tel ? `<a class="btn small primary" href="tel:${esc(p.tel)}">Chiama</a>` : '';
   openModal(p.title || "Mostra all'autista", `
     <div class="taxi-lat">
       ${p.latName ? `<div class="lat-n">${esc(p.latName)}</div>` : ''}
@@ -1335,7 +1334,6 @@ function showPlaceCard(p) {
       <div class="py1" id="txPy"></div>
       <button type="button" class="tx-say" id="txSay" data-label="Ascolta">Ascolta</button>
     </div>
-    ${btns ? `<div class="btn-grid" style="--n:1">${btns}</div>` : ''}
     ${p.en ? `<p class="py" style="text-align:center">${esc(p.en)}</p>` : ''}
     ${p.more ? `<h4 class="msec">Info</h4>${p.more}` : ''}
     <h4 class="msec">Altre frasi per il tassista</h4>
